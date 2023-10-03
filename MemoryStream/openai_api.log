@@ -1,0 +1,57 @@
+ERROR:root:Error calling OpenAI API in function observation_memory_AI: HTTP code 502 from API (<html>
+<head><title>502 Bad Gateway</title></head>
+<body>
+<center><h1>502 Bad Gateway</h1></center>
+<hr><center>cloudflare</center>
+</body>
+</html>
+)
+ERROR:root:get_embedding: an error occurred - '$.input' is invalid. Please check the API reference: https://platform.openai.com/docs/api-reference.
+ERROR:root:get_embedding: an error occurred - HTTP code 502 from API (<html>
+<head><title>502 Bad Gateway</title></head>
+<body>
+<center><h1>502 Bad Gateway</h1></center>
+<hr><center>cloudflare</center>
+</body>
+</html>
+)
+ERROR:root:Error calling OpenAI API in function get_embedding: HTTP code 502 from API (<html>
+<head><title>502 Bad Gateway</title></head>
+<body>
+<center><h1>502 Bad Gateway</h1></center>
+<hr><center>cloudflare</center>
+</body>
+</html>
+)
+ERROR:root:Error calling OpenAI API in function summary_AI: Internal error {
+    "error": {
+        "message": "Internal error",
+        "type": "internal_error",
+        "param": null,
+        "code": "internal_error"
+    }
+}
+ 500 {'error': {'message': 'Internal error', 'type': 'internal_error', 'param': None, 'code': 'internal_error'}} {'Date': 'Thu, 07 Sep 2023 21:57:32 GMT', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '152', 'Connection': 'keep-alive', 'vary': 'Origin', 'x-ratelimit-limit-requests': '3000', 'x-ratelimit-limit-tokens': '250000', 'x-ratelimit-limit-tokens_usage_based': '250000', 'x-ratelimit-remaining-requests': '2999', 'x-ratelimit-remaining-tokens': '249500', 'x-ratelimit-remaining-tokens_usage_based': '207730', 'x-ratelimit-reset-requests': '20ms', 'x-ratelimit-reset-tokens': '120ms', 'x-ratelimit-reset-tokens_usage_based': '10.144s', 'x-request-id': '8be5fc062cde26d5ab81298b54fba9ed', 'strict-transport-security': 'max-age=15724800; includeSubDomains', 'CF-Cache-Status': 'DYNAMIC', 'Server': 'cloudflare', 'CF-RAY': '803234ebeb71a246-YYZ', 'alt-svc': 'h3=":443"; ma=86400'}
+ERROR:root:Error calling OpenAI API in function summary_AI: Internal error {
+    "error": {
+        "message": "Internal error",
+        "type": "internal_error",
+        "param": null,
+        "code": "internal_error"
+    }
+}
+ 500 {'error': {'message': 'Internal error', 'type': 'internal_error', 'param': None, 'code': 'internal_error'}} {'Date': 'Thu, 07 Sep 2023 22:02:34 GMT', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '152', 'Connection': 'keep-alive', 'vary': 'Origin', 'x-ratelimit-limit-requests': '3000', 'x-ratelimit-limit-tokens': '250000', 'x-ratelimit-limit-tokens_usage_based': '250000', 'x-ratelimit-remaining-requests': '2999', 'x-ratelimit-remaining-tokens': '249500', 'x-ratelimit-remaining-tokens_usage_based': '249500', 'x-ratelimit-reset-requests': '20ms', 'x-ratelimit-reset-tokens': '120ms', 'x-ratelimit-reset-tokens_usage_based': '120ms', 'x-request-id': '51c270fa985a6b8cbb569d2e66b064d2', 'strict-transport-security': 'max-age=15724800; includeSubDomains', 'CF-Cache-Status': 'DYNAMIC', 'Server': 'cloudflare', 'CF-RAY': '80323c3bae0936b2-YYZ', 'alt-svc': 'h3=":443"; ma=86400'}
+ERROR:root:Error calling OpenAI API in function notetaking_AI: HTTP code 502 from API (<html>
+<head><title>502 Bad Gateway</title></head>
+<body>
+<center><h1>502 Bad Gateway</h1></center>
+<hr><center>cloudflare</center>
+</body>
+</html>
+)
+ERROR:root:Error calling OpenAI API in function notetaking_AI: This model's maximum context length is 16385 tokens. However, your messages resulted in 33144 tokens. Please reduce the length of the messages.
+ERROR:root:Error calling OpenAI API in function notetaking_AI: This model's maximum context length is 16385 tokens. However, your messages resulted in 18376 tokens. Please reduce the length of the messages.
+ERROR:root:get_embedding: an error occurred - '$.input' is invalid. Please check the API reference: https://platform.openai.com/docs/api-reference.
+ERROR:root:get_embedding: an error occurred - '$.input' is invalid. Please check the API reference: https://platform.openai.com/docs/api-reference.
+ERROR:root:get_embedding: an error occurred - '$.input' is invalid. Please check the API reference: https://platform.openai.com/docs/api-reference.
+ERROR:root:get_embedding: an error occurred - '$.input' is invalid. Please check the API reference: https://platform.openai.com/docs/api-reference.
