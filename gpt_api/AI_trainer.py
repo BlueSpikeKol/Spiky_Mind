@@ -1,8 +1,9 @@
 import mysql.connector
 import openai
 import uuid
+from GeneralUse import config_retrieval
+openai.api_key = config_retrieval.get_openai_key()
 
-openai.api_key = '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'
 
 def training_dataset_creation(prompt, answer, AI_name):
     mydb = mysql.connector.connect(

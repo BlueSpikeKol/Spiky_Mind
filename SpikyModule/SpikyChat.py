@@ -1,13 +1,9 @@
 import re
 import uuid
-import openai
 from MemoryStream import MemoryStreamAccess
 from gpt_api import AI_entities as AI
 
-openai.api_key = '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'
-mydb = {"host": "localhost", "user": "root", "password": "Q144bughL0?Y@JFYxPA0", "database": "externalmemorydb"}
-index_name = "spiky-testing"
-memory_stream = MemoryStreamAccess.MemoryStreamAccess(mydb, index_name)
+memory_stream = MemoryStreamAccess.MemoryStreamAccess()
 
 def get_relevent_memories(user_input):
     pass

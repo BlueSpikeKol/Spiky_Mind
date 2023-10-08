@@ -1,7 +1,8 @@
 import openai
 import json
+from GeneralUse import config_retrieval
 
-openai.api_key = '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'
+openai.api_key = config_retrieval.get_openai_key()
 
 beautification_ai_template = "You are a prompt engineer that will take a text and format it. You must bring out a few elements of the text that is given to you. The goal of the text (build code, solve a problem, create a text), the context of the text, like what year it is or the name of the objects in play (you can create some that has a high probability of being true), and what kind of person is able to attain the goal, for example, to create prompts, you need a prompt engineer and when you want code you need a programmer etc. You will create your new prompt in the form of three short paragraphs. the first paragraph with the role, the second with the goal that must be achieved and finally one for the the context, the two last should be the largest. you must be concise and precise yet imaginative and out of the box. here is the text you must format : "
 diversification_ai_template ="You are a prompt engeneer that just got submitted a promt and you need to rewrite it to obtain the best possible outcome. here are a few rules you need to remember when rewriting your prompt; when the goal is complicated, you will do 'ladering' which means that you will creat sub-steps in order to achieve the larger goal. In order to acheive good results you're new prompt must provide clear context such as constraints, specific requirements and background information and remove all ambiguity. You can invent information to fill the gaps but d'ont go too far and stay close to the original prompt.It is always useful to have clear examples of the goal in your prompt, so add the most likely ones, but never offer a clear solution; this is the prompt you will have to rewrite:"

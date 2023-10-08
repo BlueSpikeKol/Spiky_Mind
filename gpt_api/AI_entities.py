@@ -14,9 +14,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 import json
 
-mydb = {"host": "localhost", "user": "root", "password": "Q144bughL0?Y@JFYxPA0", "database": "externalmemorydb"}
-index_name = "spiky-testing"
-memory_stream = MemoryStreamAccess.MemoryStreamAccess(mydb, index_name)
+memory_stream = MemoryStreamAccess.MemoryStreamAccess()
 encoder = tiktoken.encoding_for_model("gpt-3.5-turbo-16k")
 
 tokenizer = AutoTokenizer.from_pretrained('nlptown/bert-base-multilingual-uncased-sentiment')

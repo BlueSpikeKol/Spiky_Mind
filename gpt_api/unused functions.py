@@ -12,9 +12,7 @@ import logging
 import openai
 import AI_entities as AI
 
-mydb = {"host": "localhost", "user": "root", "password": "Q144bughL0?Y@JFYxPA0", "database": "externalmemorydb"}
-index_name = "spiky-testing"
-memory_stream = MemoryStreamAccess.MemoryStreamAccess(mydb, index_name)
+memory_stream = MemoryStreamAccess.MemoryStreamAccess()
 encoder = tiktoken.encoding_for_model("gpt-3.5-turbo-16k")
 def retry_on_openai_error(max_retries=7):
     """

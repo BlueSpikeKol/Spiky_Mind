@@ -4,9 +4,7 @@ from gpt_api import AI_entities as AI
 
 
 def retrieve_recent_memories(num_memories): #not useful for reflection anymore
-    mydb = {"host": "localhost", "user": "root", "password": "Q144bughL0?Y@JFYxPA0", "database": "externalmemorydb"}
-    index_name = "spiky-testing"
-    memory_stream = MemoryStreamAccess.MemoryStreamAccess(mydb, index_name)
+    memory_stream = MemoryStreamAccess.MemoryStreamAccess()
     recent_memories = memory_stream.select_memories("spiky_memory", num_memories, "most recent creation")
     return recent_memories, memory_stream
 

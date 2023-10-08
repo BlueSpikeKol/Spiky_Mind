@@ -1,0 +1,82 @@
+{
+    "fetch_user_names_from_db_to_dict": {
+        "description": "Simulates fetching all names from the 'user' table in the database and returns them as a dictionary. The dictionary will have user IDs as keys and names as values.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "start_id": {
+                    "type": "integer",
+                    "description": "The starting ID for the dictionary."
+                },
+                "end_id": {
+                    "type": "integer",
+                    "description": "The ending ID for the dictionary."
+                }
+            },
+            "required": [
+                "start_id",
+                "end_id"
+            ]
+        }
+    },
+    "add": {
+        "description": "Add two numbers and return the result.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "a": {
+                    "type": "number",
+                    "description": "First number"
+                },
+                "b": {
+                    "type": "number",
+                    "description": "Second number"
+                }
+            },
+            "required": [
+                "a",
+                "b"
+            ]
+        }
+    },
+    "subtract": {
+        "description": "Subtract the second number from the first and return the result.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "a": {
+                    "type": "number",
+                    "description": "First number"
+                },
+                "b": {
+                    "type": "number",
+                    "description": "Second number"
+                }
+            },
+            "required": [
+                "a",
+                "b"
+            ]
+        }
+    },
+    "multiply": {
+        "description": "Multiply two numbers and return the result.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "a": {
+                    "type": "number",
+                    "description": "First number"
+                },
+                "b": {
+                    "type": "number",
+                    "description": "Second number"
+                }
+            },
+            "required": [
+                "a",
+                "b"
+            ]
+        }
+    }
+}

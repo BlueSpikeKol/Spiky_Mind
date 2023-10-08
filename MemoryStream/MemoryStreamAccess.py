@@ -2,14 +2,14 @@ import mysql.connector
 import pinecone
 import openai
 from MemoryStream import MemoryObject
+from GeneralUse import config_retrieval
 
-openai.api_key = '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'
-#mysql_config = {"host": "localhost", "user": "root", "password": "Q144bughL0?Y@JFYxPA0", "database": "externalmemorydb"}
-#pinecone_index = "spiky-testing"
+openai.api_key = config_retrieval.get_openai_key()
+
 class MemoryStreamAccess:
-    def __init__(self, mysql_config, pinecone_index):
-        self.mysql_config = mysql_config
-        self.pinecone_index = pinecone_index
+    def __init__(self):
+        self.mysql_config = config_retrieval.get_mysql_config()
+        self.pinecone_index = config_retrieval.get_pinecone_config()['index_name']
         try:
             self.mydb = mysql.connector.connect(**self.mysql_config)
             self.mycursor = self.mydb.cursor()
