@@ -4,12 +4,13 @@ import openai
 from MemoryStream import MemoryObject
 from GeneralUse import config_retrieval
 
-openai.api_key = config_retrieval.get_openai_key()
+config_manager = config_retrieval.ConfigManager()
+
 
 class MemoryStreamAccess:
     def __init__(self):
-        self.mysql_config = config_retrieval.get_mysql_config()
-        self.pinecone_index = config_retrieval.get_pinecone_config()['index_name']
+        self.mysql_config = config_manager.mysql.as_dict()
+        self.pinecone_index = config_manager.pinecone.index_name
         try:
             self.mydb = mysql.connector.connect(**self.mysql_config)
             self.mycursor = self.mydb.cursor()
@@ -18,7 +19,7 @@ class MemoryStreamAccess:
             self.mydb = None
             self.mycursor = None
 
-        pinecone.init(api_key="acd0a88d-9cfe-4361-8854-24cc8fb9f0b3", environment="us-west4-gcp")
+        pinecone.init(api_key=config_manager.pinecone.api_key, environment=config_manager.pinecone.environment)
         try:
             if self.pinecone_index not in pinecone.list_indexes():
                 pinecone.create_index(name=self.pinecone_index, dimension=1536, metric="cosine")
@@ -57,7 +58,8 @@ class MemoryStreamAccess:
             error_msg = f"Error occurred while adding memory to {memory_table}. Details: {str(e)}"
             raise Exception(error_msg)
 
-    def select_memories(self, table_name, num_select=1, type_select="most recent creation",corresponding_IDs=None,level_of_abstraction=None):
+    def select_memories(self, table_name, num_select=1, type_select="most recent creation", corresponding_IDs=None,
+                        level_of_abstraction=None):
         if corresponding_IDs is None:
             corresponding_IDs = []
         mydb = {"host": "localhost", "user": "root", "password": "Q144bughL0?Y@JFYxPA0",

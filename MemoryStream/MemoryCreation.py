@@ -10,13 +10,11 @@ import uuid
 from scipy.cluster.hierarchy import linkage, fcluster, dendrogram
 import matplotlib.pyplot as plt
 import numpy as np
+from GeneralUse import config_retrieval
 
 MAXIMUM_TOKENS_16K = 14000
 
-openai.api_key = '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'
-mydb = {"host": "localhost", "user": "root", "password": "Q144bughL0?Y@JFYxPA0", "database": "externalmemorydb"}
-index_name = "spiky-testing"
-memory_stream = MemoryStreamAccess.MemoryStreamAccess(mydb, index_name)
+memory_stream = MemoryStreamAccess.MemoryStreamAccess()
 
 notes_dir_path = r'C:\Users\philippe\Documents\pdf to txt files\notes'
 

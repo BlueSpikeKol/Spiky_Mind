@@ -1,8 +1,6 @@
 import uuid
 from datetime import datetime
-import openai
 
-openai.api_key = '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'
 
 class MemoryObject:
     def __init__(self, memory_id=None ,content="", child_list_ID=None, parent_ID=None, access_level=0, level_of_abstraction=0, retrieved_memory=False):

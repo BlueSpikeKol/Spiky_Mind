@@ -8,7 +8,7 @@ import function_repositery
 
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 model = BertModel.from_pretrained('bert-base-uncased')
-JSON_FILEPATH = r"C:\Users\philippe\Documents\pdf to txt files\test\JSON_function_calling.txt"
+JSON_FILEPATH = r".\JSON_function_calling.txt"
 JSON_INPUT_EXAMPLE = """{
   "id": "TaskID_91011",
   "links": ["TaskID_1234", "TaskID_5678"],

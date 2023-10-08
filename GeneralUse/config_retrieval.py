@@ -1,24 +1,67 @@
 import configparser
-
-config = configparser.ConfigParser()
-config.read('config.ini')
-
-
-def get_openai_key():
-    return config['openai']['api_key']
+from dataclasses import dataclass, asdict
+import os
 
 
-def get_mysql_config():
-    mysql_config = {}
-    mysql_section = config['mysql']
-    for key in mysql_section:
-        mysql_config[key] = mysql_section[key]
-    return mysql_config
+# Define the individual data classes for each section of the configuration.
+# Each field in the data classes serves as a hint for both types and the structure of the config.
+# The `frozen=True` attribute ensures the instances are immutable after creation.
+
+@dataclass(frozen=True)
+class OpenAIConfig:
+    api_key: str
 
 
-def get_pinecone_config():
-    pinecone_config = {}
-    pinecone_section = config['pinecone']
-    for key in pinecone_section:
-        pinecone_config[key] = pinecone_section[key]
-    return pinecone_config
+@dataclass(frozen=True)
+class MySQLConfig:
+    host: str
+    user: str
+    password: str
+    database: str
+
+    def as_dict(self):
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class PineconeConfig:
+    index_name: str
+    api_key: str
+    environment: str
+
+
+class ConfigManager:
+    def __init__(self, config_path='config.ini'):
+        config = configparser.ConfigParser()
+        config.read(config_path)
+
+        if 'openai' in config:
+            self.openai = os.environ.get("OPENAI_API_KEY")
+
+        if 'mysql' in config:
+            mysql_config = config['mysql']
+            self.mysql = MySQLConfig(
+                host=mysql_config['host'],
+                user=mysql_config['user'],
+                password=mysql_config['password'],
+                database=mysql_config['database']
+            )
+
+        if 'pinecone' in config:
+            self.pinecone = PineconeConfig(
+                index_name=config['pinecone']['index_name'],
+                api_key=config['pinecone']['api_key'],
+                environment=config['pinecone']['environment']
+            )
+
+    # To add a new config section:
+    # 1. Define a new dataclass above, annotating all fields with their expected types.
+    # 2. Make sure the dataclass has the attribute `frozen=True` to ensure immutability.
+    # 3. In this ConfigManager's `__init__` method, add a condition to check for the section's presence:
+    #    if 'your_new_section_name' in config:
+    #        self.your_new_section_variable = YourNewDataClass(
+    #            attribute1=config['your_new_section_name']['attribute1'],
+    #            attribute2=config['your_new_section_name']['attribute2'],
+    #            ...
+    #        )
+    # 4. The instance variable `self.your_new_section_variable` will now hold the config for that section.
