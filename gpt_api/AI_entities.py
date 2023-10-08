@@ -488,10 +488,6 @@ Please ensure that your analysis is comprehensive, integrating your current insi
     AI_trainer.training_dataset_creation(text, response, "conversation_comments_ai_2")
     return response + "\n\n\n"
 
-
-import openai
-
-
 def function_calling(messages, function_manager, model="gpt-4-0613"):
     if not isinstance(messages, list):
         messages = []

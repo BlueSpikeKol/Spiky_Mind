@@ -36,7 +36,7 @@ def run_conversation():
         model="gpt-3.5-turbo-0613",
         messages=messages,
         functions=functions,
-        function_call="auto",  # auto is default, but we'll be explicit
+        function_call="auto",  # auto is default usage
     )
     response_message = response["choices"][0]["message"]
 
