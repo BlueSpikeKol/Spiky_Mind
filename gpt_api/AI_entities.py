@@ -496,9 +496,11 @@ def function_calling(messages, function_manager, model="gpt-4-0613"):
     if not isinstance(messages, list):
         messages = []
 
-    function_json_schema = [{'name': name, **info['metadata']} for name, info in function_manager.functions_dict.items()]
+    function_items = function_manager.functions_dict.items()
 
-    function_dict = {name: info['function'] for name, info in function_manager.functions_dict.items()}
+    function_json_schema = [{'name': name, **info['metadata']} for name, info in function_items]
+
+    function_dict = {name: info['function'] for name, info in function_items}
 
     response = openai.ChatCompletion.create(
         model=model,
@@ -508,9 +510,10 @@ def function_calling(messages, function_manager, model="gpt-4-0613"):
     )
 
     response_message = response["choices"][0]["message"]
-    function_name = response["choices"][0]["message"]["function_call"]["name"]
-    function_args = json.loads(response["choices"][0]["message"]["function_call"]["arguments"])
-    function_json = response["choices"][0]["message"]["function_call"]
+
+    function_json = response_message["function_call"]
+    function_name = function_json["name"]
+    function_args = json.loads(function_json["arguments"])
 
     function_to_call = function_dict[function_name]
     function_response = function_to_call(**function_args)
@@ -530,7 +533,7 @@ def function_calling(messages, function_manager, model="gpt-4-0613"):
         messages=messages,
     )
     print(second_response)
-    return function_to_call,function_json,function_name,function_args
+    return function_to_call, function_json, function_name, function_args
 
 
 logging.basicConfig(filename=r'C:\Users\philippe\Documents\pdf to txt files\logs\application.log', level=logging.ERROR,

@@ -1,4 +1,3 @@
-
 def fetch_user_names_from_db_to_dict(start_id, end_id):
     """
     Simulates fetching all names from the 'user' table in the database and returns them as a dictionary.
@@ -17,12 +16,14 @@ def fetch_user_names_from_db_to_dict(start_id, end_id):
 
     return user_dict
 
+
 def add(a, b):
     return a + b
+
 
 def subtract(a, b):
     return a - b
 
+
 def multiply(a, b):
     return a * b
-

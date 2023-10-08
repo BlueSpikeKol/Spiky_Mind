@@ -9,7 +9,7 @@ import function_repositery
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 model = BertModel.from_pretrained('bert-base-uncased')
 JSON_FILEPATH = r"C:\Users\philippe\Documents\pdf to txt files\test\JSON_function_calling.txt"
-JSON_INPUT_EXAMPLE="""{
+JSON_INPUT_EXAMPLE = """{
   "id": "TaskID_91011",
   "links": ["TaskID_1234", "TaskID_5678"],
   "estimated_time": "2 hours",
@@ -18,21 +18,23 @@ JSON_INPUT_EXAMPLE="""{
   "task_description": "The task is to create a Python dictionary that holds all the names from the 'user' table in the database. This task requires that a database connection be established and that the program has read access to the user table. The dictionary should have user IDs as keys and names as values."
 }
 """
+
+
 class AtomicStepExecutor:
     def __init__(self, json_input):
-        self.data_input = self.parse_json(json_input) # this is what the atomic step content will look like. it does not come from the user, but from the schedule generator
+        self.data_input = self.parse_json(
+            json_input)  # this is what the atomic step content will look like. it does not come from the user, but from the schedule generator
 
-        self.function_obj = None # this does not come from a speculation made by the schedule generator, but from the function calling manager. not speculative, it is confirmed
+        self.function_obj = None  # this does not come from a speculation made by the schedule generator, but from the function calling manager. not speculative, it is confirmed
         self.function_json = None
         self.function_name = None
         self.function_args = None
-
 
     def parse_json(self, json_input):
         # Parse JSON and return the data
         return json.loads(json_input)
 
-    def get_bert_embedding(self,text):
+    def get_bert_embedding(self, text):
         inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True, max_length=512)
         outputs = model(**inputs)
         return outputs.last_hidden_state.mean(dim=1)
@@ -66,22 +68,23 @@ class AtomicStepExecutor:
 
     def search_and_execute_existing_function(self):
         messages = \
-        [
-            {
-                "role": "user",
-                "content": self.data_input["task_description"]
-            }
-        ]
-        function_manager = function_call_manager.FunctionCallManager(function_repositery,JSON_FILEPATH)
-        self.function_obj,self.function_json,self.function_name,self.function_args= AI.function_calling(messages,function_manager)
+            [
+                {
+                    "role": "user",
+                    "content": self.data_input["task_description"]
+                }
+            ]
+        function_manager = function_call_manager.FunctionCallManager(function_repositery, JSON_FILEPATH)
+        self.function_obj, self.function_json, self.function_name, self.function_args = AI.function_calling(messages,
+                                                                                                            function_manager)
 
     def create_new_function(self):
         # Create a new function based on self.description, self.parameters, and self.data
         pass  # Placeholder
+
     def announce_atomic_step_to_user(self):
         print(self.data_input)
         pass
-
 
     def execute_atomic_step(self):
         is_computer_task = self.physical_or_computer_task()
@@ -94,7 +97,7 @@ class AtomicStepExecutor:
             print(self.announce_atomic_step_to_user())  # Placeholder function
 
 
-atomic_executor=AtomicStepExecutor("""{
+atomic_executor = AtomicStepExecutor("""{
   "id": "TaskID_91011",
   "links": ["TaskID_1234", "TaskID_5678"],
   "estimated_time": "2 hours",
