@@ -13,7 +13,7 @@ import openai
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 import json
-
+openai.api_key = config_retrieval.OpenAIConfig.api_key
 memory_stream = MemoryStreamAccess.MemoryStreamAccess()
 encoder = tiktoken.encoding_for_model("gpt-3.5-turbo-16k")
 

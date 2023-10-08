@@ -11,7 +11,9 @@ import time
 import logging
 import openai
 import AI_entities as AI
+from GeneralUse import config_retrieval
 
+openai.api_key = config_retrieval.OpenAIConfig.api_key
 memory_stream = MemoryStreamAccess.MemoryStreamAccess()
 encoder = tiktoken.encoding_for_model("gpt-3.5-turbo-16k")
 def retry_on_openai_error(max_retries=7):
