@@ -529,6 +529,64 @@ def function_calling(messages, function_manager, model="gpt-4-0613"):
     print(second_response)
     return function_to_call, function_json, function_name, function_args
 
+def create_code(task: Dict, outside_dependencies: Dict, advice: str, lessons: str) -> String:
+    system_prompt = f"""Your task is to create a Python function based on the following requirements:
+- Description: {task['description']}
+- Input Type: {task['input_type']}
+- Output Type: {task['output_type']}
+- Constraints: {task['constraints']}
+You are allowed to use the following libraries: {', '.join(outside_dependencies['allowed_libraries'])}
+You should avoid using these functions: {', '.join(outside_dependencies['disallowed_functions'])}
+Do you have any advice or lessons to consider before starting? {advice if advice else 'None'}"""
+
+    response = openai.ChatCompletion.create(
+        model="gpt-4.0-turbo",  # Replace with the actual GPT-4 model ID
+        messages=[
+                {"role": "system", "content": "You are a programmer tasked with writing Python code. Always add a small analysis paragraph before the code to explain how you will approach the problem"},
+                {"role": "user", "content": system_prompt}
+            ],
+        temperature=0.2
+        )["choices"][0]["message"]
+    trainer_prompt=f"""- Description: {task['description']}
+- Input Type: {task['input_type']}
+- Output Type: {task['output_type']}
+- Constraints: {task['constraints']}"""
+    AI_trainer.training_dataset_creation(trainer_prompt,response,"Programmer_AI")
+    return response
+
+def evaluate_and_advise(programmer_output: Dict, task: Dict, outside_dependencies: Dict) -> String:
+    # Prepare the enriched system prompt for GPT-4
+    system_prompt = f"""Please evaluate the following code snippet based on these criteria:
+- Code Correctness: Does the code perform the task as described?
+- Library Use: Are the libraries used appropriate and within the allowed list?
+- Code Complexity: Is the code's complexity metric reasonable for the task?
+- Coding Standards: Does the code adhere to common coding standards like PEP 8?
+- Resource Efficiency: Are the resource metrics within acceptable limits?
+
+Code Snippet: {programmer_output['code']}
+Used Libraries: {', '.join(programmer_output['used_libraries'])}
+Complexity Metric: {programmer_output['complexity_metric']}
+Coding Standards: {programmer_output['coding_standards']}
+Resource Metrics: Memory - {programmer_output['resource_metrics']['memory']}, CPU - {programmer_output['resource_metrics']['CPU']}
+
+Is the code satisfactory based on these criteria? If not, please provide specific advice and lessons for improvement."""
+
+    # GPT-4 API call
+    response = openai.ChatCompletion.create(
+        model="gpt-4.0-turbo",  # Replace with the actual GPT-4 model ID
+        messages=[
+                {"role": "system", "content": "You are a code assessor tasked with evaluating Python code. When problems are encoutnered they are highlighted and simple ameliorations are also mentioned in you answers."},
+                {"role": "user", "content": system_prompt}
+                ],
+        temperature=0.2
+        )["choices"][0]["message"]
+    trainer_prompt = f"""Code Snippet: {programmer_output['code']}
+Used Libraries: {', '.join(programmer_output['used_libraries'])}
+Complexity Metric: {programmer_output['complexity_metric']}
+Coding Standards: {programmer_output['coding_standards']}
+Resource Metrics: Memory - {programmer_output['resource_metrics']['memory']}, CPU - {programmer_output['resource_metrics']['CPU']}"""
+    AI_trainer.training_dataset_creation(trainer_prompt,response,"Code_Assessor_AI")
+    return response
 
 logging.basicConfig(filename=r'C:\Users\philippe\Documents\pdf to txt files\logs\application.log', level=logging.ERROR,
                     format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
