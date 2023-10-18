@@ -1,11 +1,10 @@
 # Import required libraries
 import ast
-import openai  # You would install this package to interact with the OpenAI API
-from gpt_api import AI_entities as AI
+from gpt_api_old import AI_entities as AI
 
 # Function_Creator Class
 class Function_Creator:
-    def __init__(self, task: Dict, outside_dependencies: Dict):
+    def __init__(self, task: dict, outside_dependencies: dict):
         self.task = task
         self.outside_dependencies = outside_dependencies
         self.advice = ""
@@ -53,7 +52,7 @@ class Function_Creator:
 
 # Programmer Class
 class Programmer:
-    def create_code(self, task: Dict, outside_dependencies: Dict, advice: str, lessons: str) -> Dict:
+    def create_code(self, task: dict, outside_dependencies: dict, advice: str, lessons: str) -> dict:
         # Simulate GPT-4 API call (you would replace this with an actual API call)
         gpt_response = AI.create_code(
             task=task,
@@ -71,7 +70,7 @@ class Programmer:
 
 # CodeAssessor Class
 class CodeAssessor:
-    def evaluate_and_advise(self, programmer_output: Dict, task: Dict, outside_dependencies: Dict) -> Tuple[
+    def evaluate_and_advise(self, programmer_output: dict, task: dict, outside_dependencies: dict) -> list[
         bool, str, str]:
         # Simulate GPT-4 API call (you would replace this with an actual API call)
         gpt_response = AI.evaluate_and_advise(
@@ -94,8 +93,7 @@ class CodeAssessor:
 task = {
     'description': 'Create a Python function to sum all even numbers in a list.',
     'input_type': 'list of integers',
-    'output_type': 'integer',
-    'constraints': 'Use only standard Python libraries'
+    'output_type': 'integer'
 }
 
 outside_dependencies = {

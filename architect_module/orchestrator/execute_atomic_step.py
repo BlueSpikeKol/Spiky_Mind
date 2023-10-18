@@ -1,5 +1,5 @@
 from architect_module.orchestrator import schedule_formation
-from gpt_api import AI_entities as AI
+from gpt_api_old import AI_entities as AI
 import json
 from transformers import BertTokenizer, BertModel
 import torch
@@ -8,7 +8,7 @@ import function_repositery
 
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 model = BertModel.from_pretrained('bert-base-uncased')
-JSON_FILEPATH = r"../function_calling/JSON_function_calling.txt"
+JSON_FILEPATH = r"../../utils/function_calling/JSON_function_calling.txt"
 JSON_INPUT_EXAMPLE = """{
   "id": "TaskID_91011",
   "links": ["TaskID_1234", "TaskID_5678"],

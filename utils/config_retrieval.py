@@ -29,14 +29,19 @@ class PineconeConfig:
     api_key: str
     environment: str
 
-
 class ConfigManager:
-    def __init__(self, config_path='config.ini'):
+    def __init__(self, config_path=r'C:\Users\philippe\PycharmProjects\Spiky_Mind\config.ini'):
         config = configparser.ConfigParser()
-        config.read(config_path)
+
+        # Check if the file was read successfully
+        if not config.read(config_path):
+            print(f"Error: Could not read {config_path}")
+            return
 
         if 'openai' in config:
-            self.openai = os.environ.get("OPENAI_API_KEY")
+            self.openai = OpenAIConfig(
+                api_key=os.environ.get("OPENAI_API_KEY")
+            )
 
         if 'mysql' in config:
             mysql_config = config['mysql']
@@ -54,7 +59,7 @@ class ConfigManager:
                 environment=config['pinecone']['environment']
             )
 
-    # To add a new config section:
+# To add a new config section:
     # 1. Define a new dataclass above, annotating all fields with their expected types.
     # 2. Make sure the dataclass has the attribute `frozen=True` to ensure immutability.
     # 3. In this ConfigManager's `__init__` method, add a condition to check for the section's presence:
