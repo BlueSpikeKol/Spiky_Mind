@@ -25,7 +25,24 @@ class ChatTypeMessages:
                 bool: True if messages are valid, False otherwise.
             """
             try:
-                # Your validation code here
+                if not isinstance(messages, list):
+                    raise TypeError("messages must be a list.")
+
+                for message in messages:
+                    if not isinstance(message, dict):
+                        raise TypeError("Each message must be a dictionary.")
+
+                    required_keys = ["role", "content"]
+                    for key in required_keys:
+                        if key not in message:
+                            raise KeyError(f"Message is missing required key: {key}")
+
+                    if message["role"] not in ["system", "user", "assistant"]:
+                        raise ValueError("Invalid role in message.")
+
+                    if not isinstance(message["content"], str):
+                        raise TypeError("Content must be a string.")
+
                 return True
             except (TypeError, KeyError, ValueError) as e:
                 print(f"Error: {e}")
@@ -59,14 +76,16 @@ class PromptTypeMessages:
                 bool: True if the prompt is valid, False otherwise.
             """
             try:
-                # Your validation code here
+                if not isinstance(prompt, (str, list)):
+                    raise TypeError("Prompt must be a string or a list.")
+
                 return True
             except TypeError as e:
                 print(f"Error: {e}")
                 return False
 
         if validate_prompt(prompt):
-            self.prompt = prompt
+            self.prompt_str = prompt
 
 
 class AdaTypeEmbedding:
@@ -93,7 +112,9 @@ class AdaTypeEmbedding:
                 bool: True if the text is valid, False otherwise.
             """
             try:
-                # Your validation code here
+                if not isinstance(input_text, (str, list)):
+                    raise TypeError("Input text must be a string or a list.")
+
                 return True
             except (TypeError, ValueError) as e:
                 print(f"Error: {e}")
