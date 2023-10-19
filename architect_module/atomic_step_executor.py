@@ -3,8 +3,6 @@ from gpt_api_old import AI_entities as AI
 import json
 from transformers import BertTokenizer, BertModel
 import torch
-import function_call_manager
-import function_repositery
 
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 model = BertModel.from_pretrained('bert-base-uncased')

@@ -14,7 +14,6 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 import json
 from utils import config_retrieval
-from utils import config_retrieval
 
 TEXT_DAVINCI_COMMON_3 = "text-davinci-003"
 CHAT_GPT4 = "gpt-4"
