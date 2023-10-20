@@ -13,6 +13,29 @@ class ModelType:
     FUNCTION_CALLING_GPT4 = "gpt-4-0613"
     TEXT_EMBEDDING_ADA = "text-embedding-ada-002"
 
+    # Prices per token for each model
+    MODEL_PRICES = {
+        TEXT_DAVINCI_COMMON_3: {'input': 0.02, 'output': 0.02},
+        GPT_3_5_TURBO: {'input': 0.003, 'output': 0.004},
+        CHAT_GPT4: {'input': 0.03, 'output': 0.06},
+        GPT_4_32k: {'input': 0.06, 'output': 0.12},
+        FUNCTION_CALLING_GPT4: {'input': 0.03, 'output': 0.06},
+        TEXT_EMBEDDING_ADA: {'input': 0.0001, 'output': 0.00009}
+    }
+
+    @classmethod
+    def get_price(cls, model: str) -> float:
+        """
+        Retrieves the price per token for a given model.
+
+        Parameters:
+            model (str): The model name.
+
+        Returns:
+            float: The price per token for the model.
+        """
+        return cls.MODEL_PRICES.get(model, 0.0)
+
 
 class ModelsTokenLimits:
     """
