@@ -1,1 +1,1 @@
-{"TotalCountPool": {"total_pool_tokens": 0, "total_pool_cost": 0.0, "models": {}}}
+{"TotalCountPool": {"total_pool_tokens": 131, "total_pool_cost": 0.00266, "models": {"gpt-3.5-turbo-16k-0613": {"tokens": 62, "cost": 0.0002, "prompt_tokens": 48, "output_tokens": 14}, "gpt-4-0613": {"tokens": 65, "cost": 0.0024599999999999995, "prompt_tokens": 48, "output_tokens": 17}, "text-embedding-ada-002-v2": {"tokens": 4, "cost": 0.0, "prompt_tokens": 4, "output_tokens": 0}}}}

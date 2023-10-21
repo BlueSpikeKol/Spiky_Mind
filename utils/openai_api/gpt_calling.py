@@ -1,10 +1,12 @@
 import openai
-from typing import Optional, Union, List
 from utils import config_retrieval
 import templates
 import models
+from models import ModelType
 import inspect
 import token_pools
+from dataclasses import dataclass
+from typing import Optional, Union, List
 
 EXAMPLE_CHAT_COMPLETION= """
 {
@@ -49,21 +51,52 @@ EXAMPLE_TEXT_COMPLETION = """
 }
 """
 
+@dataclass
+class AgentConfig:
+    """
+    Configuration options for creating a GPTAgent.
+
+    Attributes:
+        echo (bool): Whether to echo the prompt in the response.
+        frequency_penalty (float): Controls the frequency of token occurrence in the output.
+        logit_bias (dict): Bias logits before sampling. Pass {"50256": -100} to prevent a specific token from being generated.
+        logprobs (int): Number of logprobs to return. Max value is 5.
+        max_tokens (int): Maximum number of tokens for the output. Default is 50.
+        n (int): Number of completions to generate. Default is 1.
+        presence_penalty (float): Controls the presence of tokens in the output.
+        stop (Union[str, List[str]]): Token(s) that indicate the end of the generated content.
+        stream (bool): Whether to stream the output.
+        suffix (str): Suffix to attach after the prompt.
+        temperature (float): Controls randomness. Lower value makes output more focused.
+        top_p (float): Controls diversity via nucleus sampling. Default is 1.0.
+        user (str): Identifier for the user. Default is "developer1".
+    """
+    echo: Optional[bool] = False
+    frequency_penalty: Optional[float] = 0.0
+    logit_bias: Optional[dict] = None
+    logprobs: Optional[int] = None
+    max_tokens: Optional[int] = 50
+    n: Optional[int] = 1
+    presence_penalty: Optional[float] = 0.0
+    stop: Optional[Union[str, List[str]]] = None
+    stream: Optional[bool] = False
+    suffix: Optional[str] = None
+    temperature: Optional[float] = 1.0
+    top_p: Optional[float] = 1.0
+    user: Optional[str] = "developer1"
+
 class GPTAgent:
     """
     Class to handle GPT-based agents for both chat and completion tasks.
     """
     def __init__(self,
-                 is_chat_agent: bool,
                  model,
-                 prompt: str = None,
-                 messages: list = None,
+                 messages: Union[list,str] = None,
                  echo: Optional[bool] = False,
                  frequency_penalty: Optional[float] = 0.0,
                  function_call: Optional[Union[str, dict]] = "none",
                  functions: Optional[list] = None,
-                 logit_bias: Optional[dict] = None,
-                 # As an example, you can pass {"50256": -100} to prevent the <|endoftext|> token from being generated.
+                 logit_bias: Optional[dict] = None, # As an example, you can pass {"50256": -100} to prevent the <|endoftext|> token from being generated.
                  logprobs: Optional[int] = None,  # max value is 5. returns x most likely tokens with prompt.
                  max_tokens: Optional[int] = 50,
                  n: Optional[int] = 1,
@@ -74,10 +107,7 @@ class GPTAgent:
                  temperature: Optional[float] = 1.0,
                  top_p: Optional[float] = 1.0,
                  user: Optional[str] = "developper1"):
-
-        self.chat_agent = is_chat_agent
         self.model = model
-        self.prompt = prompt
         self.messages = messages
         self.echo = echo
         self.frequency_penalty = frequency_penalty
@@ -95,6 +125,30 @@ class GPTAgent:
         self.top_p = top_p
         self.user = user
         self.completion = None
+
+    def run_agent(self, token_pools_list=None):
+        """
+        Executes the GPT agent based on the provided configurations.
+
+        Parameters:
+            token_pools_list (list, optional): List of token pool names to which the token usage will be added.
+
+        Returns:
+            dict: The response from the GPT model.
+        """
+        common_params = self.set_common_params()
+
+        if self.model in ModelType.CHAT_MODELS:
+            self.completion = self.run_chat_agent(common_params)
+        elif self.model in ModelType.TEXT_MODELS:
+            self.completion = self.run_text_agent(common_params)
+        elif self.model in ModelType.EMBEDDING_MODELS:
+            self.completion = self.run_embedding_agent()
+
+        if self.completion:
+            self.add_token_pools(self.completion, token_pools_list or [])
+
+        return self.completion
 
     def update_agent(self, **kwargs):
         """
@@ -115,69 +169,109 @@ class GPTAgent:
                 setattr(self, key, value)
 
     def set_common_params(self):
+        """
+        Sets the common parameters for both chat and completion agents.
+
+        Returns:
+            dict: A dictionary containing the common parameters.
+        """
         return {
             'model': self.model,
             'frequency_penalty': self.frequency_penalty,
             'logit_bias': self.logit_bias,
-            'logprobs': self.logprobs,
             'max_tokens': self.max_tokens,
             'n': self.n,
             'presence_penalty': self.presence_penalty,
             'stop': self.stop,
             'stream': self.stream,
-            'suffix': self.suffix,
             'temperature': self.temperature,
             'top_p': self.top_p,
             'user': self.user
         }
 
+    def filter_optional_params(self, params: dict) -> dict:
+        """
+        Filters out optional parameters that are set to their default values.
+
+        Parameters:
+            params (dict): Dictionary of parameters to filter.
+
+        Returns:
+            dict: Filtered dictionary of parameters.
+        """
+        default_values = {
+            "frequency_penalty": 0.0,
+            "function_call": "none",
+            "functions": None,
+            "logit_bias": None,
+            "max_tokens": 50,
+            "n": 1,
+            "presence_penalty": 0.0,
+            "stop": None,
+            "stream": False,
+            "temperature": 1.0,
+            "top_p": 1.0,
+        }
+
+        return {k: v for k, v in params.items() if v != default_values.get(k, None)}
+
     def run_chat_agent(self, common_params):
+        """
+        Executes the chat agent with the provided common parameters.
+
+        Parameters:
+            common_params (dict): Dictionary of common parameters.
+
+        Returns:
+            dict: The response from the GPT model.
+        """
         chat_params = {
             'messages': self.messages,
             'function_call': self.function_call,
             'functions': self.functions
         }
-        return openai.ChatCompletion.create(**{**common_params, **chat_params})
+        filtered_params = self.filter_optional_params({**common_params, **chat_params})
+        return openai.ChatCompletion.create(**filtered_params)
 
-    def run_completion_agent(self, common_params):
-        completion_params = {
-            'prompt': self.prompt,
-            'echo': self.echo # also returns prompt True or False
-        }
-        return openai.Completion.create(**{**common_params, **completion_params})
-
-    def update_token_pools(self, usage, token_pools_list):
-        token_pool_manager = token_pools.TokenPool()
-        if "TotalCountPool" not in token_pools_list:
-            token_pools_list.append("TotalCountPool")
-        for pool in token_pools_list:
-            token_pool_manager.add_tokens(pool, usage)
-
-    def run_agent(self, token_pools_list=None):
+    def run_text_agent(self, common_params):
         """
-        Executes the GPT agent based on the provided configurations.
+        Executes the completion agent with the provided common parameters.
 
         Parameters:
-            token_pools_list (list, optional): List of token pool names to which the token usage will be added.
+            common_params (dict): Dictionary of common parameters.
 
         Returns:
-            completion openai object: The response from the GPT model.
+            dict: The response from the GPT model.
         """
-        common_params = self.set_common_params()
+        completion_params = {
+            'prompt': self.messages[-1] if self.messages else None,  # Use the last message as the prompt
+            'echo': self.echo,
+            'logprobs': self.logprobs,
+            'suffix': self.suffix
+        }
+        filtered_params = self.filter_optional_params({**common_params, **completion_params})
+        return openai.Completion.create(**filtered_params)
 
-        if self.chat_agent:
-            self.completion = self.run_chat_agent(common_params)
-        else:
-            self.completion = self.run_completion_agent(common_params)
+    def run_embedding_agent(self):
+        """
+        Executes the embedding agent with the provided string.
 
-        if self.completion:
-            usage = self.completion["usage"]["total_tokens"]
-            if token_pools_list is None:
-                token_pools_list = []
-            self.update_token_pools(usage, token_pools_list)
+        Returns:
+            dict: The response from the GPT model.
+        """
+        embedding_data = openai.Embedding.create(input=[self.messages], model=self.model)
+        return embedding_data
 
-        if inspect.currentframe().f_back.f_lineno in inspect.getouterframes(inspect.currentframe())[1].frame.f_lineno:
-            return self.completion
+    def add_token_pools(self, completion, token_pools_list):
+        """
+        Updates the token pools with the usage data from the completion.
+
+        Parameters:
+            completion (dict): The completion object returned by the GPT model.
+            token_pools_list (list): List of token pool names to update.
+        """
+        token_pool_manager = token_pools.TokenPool()
+        token_pool_manager.add_completion_to_pool(completion, token_pools_list)
 
     def get_finish_reason(self, index: Union[List[int], int] = 0):
         """
@@ -256,142 +350,62 @@ class GPTAgent:
             For text: "\n\nThis is indeed a test"
         """
         if self.completion:
-            if self.chat_agent:
+            if "message" in self.completion["choices"][0]:
+                # This is a chat completion
                 if isinstance(index, list):
                     return [self.completion["choices"][i]["message"]["content"] for i in index]
                 return self.completion["choices"][index]["message"]["content"]
             else:
+                # This is a text completion
                 if isinstance(index, list):
                     return [self.completion["choices"][i]["text"] for i in index]
                 return self.completion["choices"][index]["text"]
         return "No completion data available."
 
+    def get_vector(self):
+        """
+        Retrieves the vector object from the completion data.
+
+        Returns:
+            list: The vector object if available, otherwise a message indicating it's not available.
+
+        Example Output:
+            [0.0023064255, -0.009327292, ...., -0.0028842222]
+        """
+        if self.completion and 'embedding' in self.completion:
+            return self.completion['embedding']
+        return "No vector data available."
+
+    def get_model_used(self):
+        """
+        Retrieves the model used for the completion.
+
+        Returns:
+            str: The model used if available, otherwise a message indicating it's not available.
+
+        Example Output:
+            "text-embedding-ada-002"
+        """
+        if self.completion and 'model' in self.completion:
+            return self.completion['model']
+        return "No model data available."
+
 
 class GPTManager:
     """
-        Manages the creation of GPT agents into all the types of agent (prompt, message, embedding, function).
+    Manages the creation of GPT agents for various tasks (prompt, chat, embedding, etc.).
     """
+
     def __init__(self):
         """
-                Initializes the GPTManager with necessary configurations.
+        Initializes the GPTManager with necessary configurations.
         """
         config = config_retrieval.ConfigManager()
         openai.api_key = config.openai.api_key
         self.template_manager = templates.TemplateManager()
-        self.models_manager = models.ModelManager()
-    def get_agent(self,
-                  model,
-                  prompt,
-                  echo: Optional[bool] = False,
-                  frequency_penalty: Optional[float] = 0.0,
-                  logit_bias: Optional[dict] = None,
-                  # As an example, you can pass {"50256": -100} to prevent the <|endoftext|> token from being generated.
-                  logprobs: Optional[int] = None,  # max value is 5. returns x most likely tokens with prompt.
-                  max_tokens: Optional[int] = 50,
-                  n: Optional[int] = 1,
-                  presence_penalty: Optional[float] = 0.0,
-                  stop: Optional[Union[str, list]] = None,
-                  stream: Optional[bool] = False,
-                  suffix: Optional[str] = None,
-                  temperature: Optional[float] = 1.0,
-                  top_p: Optional[float] = 1.0,
-                  user: Optional[str] = "developper1"
-                  ) -> GPTAgent:
-        """
-                Creates and returns a GPTAgent for completion tasks.
+        self.model_manager = models.ModelManager()
 
-                args: all the variables possibly involved in the communication with the api
-
-                Returns:
-                    GPTAgent: The GPTAgent object.
-                """
-        prompt_message = self.template_manager.transform_into_prompt(prompt)
-        prompt = prompt_message.prompt_str
-        #TODO check if there is a better way to hand le the tranformation of messagaes to MessageTypes and back to messages
-        if self.models_manager.check_agent_model(model):
-            pass
-        if self.models_manager.check_agent_token_limit(model, prompt, max_tokens):
-            pass
-            raise ValueError("Either the prompt or the max_tokens parameter is problematic.")
-        gpt_agent = GPTAgent(is_chat_agent=False,
-                             model=model,
-                             prompt=prompt,
-                             echo=echo,
-                             frequency_penalty=frequency_penalty,
-                             logit_bias=logit_bias,
-                             logprobs=logprobs,
-                             max_tokens=max_tokens,
-                             n=n,
-                             presence_penalty=presence_penalty,
-                             stop=stop,
-                             stream=stream,
-                             suffix=suffix,
-                             temperature=temperature,
-                             top_p=top_p,
-                             user=user)
-        return gpt_agent
-
-    def get_chat_agent(self,
-                       model,
-                       messages: list,
-                       frequency_penalty: Optional[float] = 0.0,
-                       function_call: Optional[Union[str, dict]] = "none",
-                       functions: Optional[list] = None,
-                       logit_bias: Optional[dict] = None,
-                       # As an example, you can pass {"50256": -100} to prevent the <|endoftext|> token from being generated.
-                       logprobs: Optional[int] = None,  # max value is 5. returns x most likely tokens with prompt.
-                       max_tokens: Optional[int] = 50,
-                       n: Optional[int] = 1,
-                       presence_penalty: Optional[float] = 0.0,
-                       stop: Optional[Union[str, list]] = None,
-                       stream: Optional[bool] = False,
-                       suffix: Optional[str] = None,
-                       temperature: Optional[float] = 1.0,
-                       top_p: Optional[float] = 1.0,
-                       user: Optional[str] = "developper1"
-                       ) -> GPTAgent:
-        """
-                Creates and returns a GPTAgent for chat tasks.
-
-                Returns:
-                    GPTAgent: The GPTAgent object.
-        """
-        #TODO same as above
-        messages = self.template_manager.transform_into_messages(messages)
-        gpt_agent = GPTAgent(
-            is_chat_agent=True,
-            model=model,
-            messages=messages.messages,
-            frequency_penalty=frequency_penalty,
-            function_call=function_call,
-            functions=functions,
-            logit_bias=logit_bias,
-            logprobs=logprobs,
-            max_tokens=max_tokens,
-            n=n,
-            presence_penalty=presence_penalty,
-            stop=stop,
-            stream=stream,
-            suffix=suffix,
-            temperature=temperature,
-            top_p=top_p,
-            user=user)
-        return gpt_agent
-
-    def create_embedding(self,embedding_str:str=None):
-        """
-               Creates an embedding using the provided string.
-
-               Returns:
-                   dict: The embedding data.
-        """
-        ada_embedding = self.template_manager.transform_into_embedding(embedding_str)
-        return openai.Embedding.create(input=[ada_embedding.embedding_str], model=ada_embedding.model)['data'][0]['embedding']
-    def set_agent(self, agent):
-        """
-                Sets the GPTAgent object. (This method is currently empty and can be implemented as needed)
-
-                Parameters:
-                    agent (GPTAgent): The GPTAgent object to set.
-        """
-        pass
+    def create_agent(self, model: str, **kwargs) -> 'GPTAgent':
+        if not self.model_manager.check_agent_model(model):
+            raise ValueError("Invalid model.")
+        return GPTAgent(model=model, **kwargs)
