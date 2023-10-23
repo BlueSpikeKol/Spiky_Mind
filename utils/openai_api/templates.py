@@ -1,4 +1,4 @@
-import models
+import utils.openai_api.models as models
 
 
 class ChatTypeMessages:

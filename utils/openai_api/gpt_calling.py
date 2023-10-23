@@ -1,14 +1,16 @@
-import openai
-from utils import config_retrieval
-import templates
-import models
-from models import ModelType
 import inspect
-import token_pools
-from dataclasses import dataclass
 from typing import Optional, Union, List
+from dataclasses import dataclass
 
-EXAMPLE_CHAT_COMPLETION= """
+import openai
+
+import utils.openai_api.templates as templates
+import utils.openai_api.models as models
+import utils.openai_api.token_pools as token_pools
+from utils.openai_api.models import ModelType
+from utils import config_retrieval
+
+EXAMPLE_CHAT_COMPLETION = """
 {
   "id": "chatcmpl-123",
   "object": "chat.completion",
@@ -51,6 +53,7 @@ EXAMPLE_TEXT_COMPLETION = """
 }
 """
 
+
 @dataclass
 class AgentConfig:
     """
@@ -85,18 +88,21 @@ class AgentConfig:
     top_p: Optional[float] = 1.0
     user: Optional[str] = "developer1"
 
+
 class GPTAgent:
     """
     Class to handle GPT-based agents for both chat and completion tasks.
     """
+
     def __init__(self,
                  model,
-                 messages: Union[list,str] = None,
+                 messages: Union[list, str] = None,
                  echo: Optional[bool] = False,
                  frequency_penalty: Optional[float] = 0.0,
                  function_call: Optional[Union[str, dict]] = "none",
                  functions: Optional[list] = None,
-                 logit_bias: Optional[dict] = None, # As an example, you can pass {"50256": -100} to prevent the <|endoftext|> token from being generated.
+                 logit_bias: Optional[dict] = None,
+                 # As an example, you can pass {"50256": -100} to prevent the <|endoftext|> token from being generated.
                  logprobs: Optional[int] = None,  # max value is 5. returns x most likely tokens with prompt.
                  max_tokens: Optional[int] = 50,
                  n: Optional[int] = 1,
