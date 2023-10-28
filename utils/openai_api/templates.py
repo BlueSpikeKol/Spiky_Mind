@@ -129,8 +129,8 @@ class TemplateManager:
     """
     Manages the transformation of various types of inputs into their respective validated forms.
     """
-
-    def transform_into_messages(self, messages=None):
+    @staticmethod
+    def transform_into_messages(messages=None):
         """
         Transforms and validates chat messages.
 
@@ -142,7 +142,8 @@ class TemplateManager:
         """
         return ChatTypeMessages(messages)
 
-    def transform_into_prompt(self, prompt):
+    @staticmethod
+    def transform_into_prompt(prompt):
         """
         Transforms and validates a prompt.
 
@@ -154,7 +155,8 @@ class TemplateManager:
         """
         return PromptTypeMessages(prompt)
 
-    def transform_into_embedding(self, text_to_embed):
+    @staticmethod
+    def transform_into_embedding(text_to_embed):
         """
         Transforms and validates text to be embedded.
 
