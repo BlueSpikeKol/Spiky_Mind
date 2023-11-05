@@ -47,12 +47,14 @@ def get_roles(file_path: Path) -> (List[str], Dict[str, str]):
 def select_roles(agent_roles: List[str], convo_prompt: str) -> List[str]:
     agent_manager = gpt_calling.GPTManager()
     agent_roles_str = '\n'.join(map(str, agent_roles))
-    system_prompt = f"""Roles:{agent_roles_str}.given the project description below and the available roles displayed here, choose 2 roles that could bring important points of view and contribute to the project. You are not allowed to invent roles that are not in the list above. Display your answer like this:
+    system_prompt = f"""Roles:{agent_roles_str}. Given the project or task description below and the available roles displayed here, choose 2 roles that could bring important points of view and contribute to the project.
+     You are not allowed to invent roles that are not in the list above. Bear in mind that in any coding task, there should be a Software Developer and a Project Manager, if possible.
+     Display your answer like this:
 1.[<role1>]
 2.[<role2>]
 <reason to choose each>"""
-    recruitment_agent = agent_manager.create_agent(model=ModelType.CHAT_GPT4, messages=convo_prompt,
-                                                   system_prompt=system_prompt, max_tokens=500)
+    recruitment_agent = agent_manager.create_agent(model=ModelType.GPT_3_5_TURBO, messages=convo_prompt,
+                                                   system_prompt=system_prompt, max_tokens=150)
     recruitment_agent.run_agent()
     chosen_roles = recruitment_agent.get_text()
 
