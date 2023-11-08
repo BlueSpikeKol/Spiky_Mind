@@ -13,10 +13,11 @@ from architect_module.function_creation import create_new_function
 
 
 class RoundManager:
-    def __init__(self, agent_manager: GPTManager, session_president: GPTAgent, agents: list[GPTAgent], session_type,
+    def __init__(self, convo_manager, agent_manager: GPTManager, session_president: GPTAgent, agents: list[GPTAgent], session_type,
                  convo_name,
                  main_convo_name=None):
         self.agent_manager = agent_manager
+        self.convo_manager = convo_manager
         self.session_president = session_president
         self.agents = agents
         self.rounds = []
@@ -24,6 +25,8 @@ class RoundManager:
         self.convo_name = convo_name
         self.session_type = session_type
         self.main_convo_name = main_convo_name
+        self.convo_item_count = 0
+        self.conversation_ended = False
 
     def play_introduction_round(self):
         """
@@ -38,7 +41,7 @@ class RoundManager:
                 temperature=0.2)
             # Run the agent to get the introduction
             agent.run_agent()
-            agent_introduction = agent.get_text()
+            agent_introduction = "Debater introduction: " + agent.get_text()
 
             # Add the introduction to the list
             introductions.append({agent.agent_name: agent_introduction})
@@ -50,17 +53,38 @@ class RoundManager:
         """
         Play a regular round where the Debate President asks a question and agents may interject.
         """
-        # Step 1: President issues a question based on prior rounds
-        prior_conversations = self.format_prior_conversations()
+        if self.conversation_ended:
+            print("The conversation has already ended. No further action taken.")
+            return
+        guidance = self.format_prior_conversations()
+        president_output = ""
+        exchange_type = ""
+        # Check if the round should be skipped
+        if guidance in ["wrap-up", "atomic_step"]:
+            if guidance == "wrap-up":
+                self.wrap_up_round()
+            elif guidance == "atomic_step":
+                self.atomic_step_gathering()
+            # Skip the round and note completion
+            self.convo_item_count = 1  # Reset the conversation item count
+            skip_message = 'Completion Noted No Need For Further Summarizing Or Exploration: [Solution Found]'
+            this_round_output = [{agent.agent_name: skip_message} for agent in self.agents]
+        else:
+            print(guidance)
+            self.convo_item_count += 1
+            president_message = self.summaries[-1]['content'] + guidance
+            self.session_president.update_agent(messages=president_message, max_tokens=400, temperature=0.3)
+            self.session_president.run_agent()
+            president_output = self.session_president.get_text()
+            if "[CONVO_END]" in president_output:
+                self.conversation_ended = True
+                print("The Debate President has ended the conversation.")
+                return
 
-        self.session_president.update_agent(messages=prior_conversations, max_tokens=400)
-        self.session_president.run_agent()
-        president_output = self.session_president.get_text()
-
-        # Initialize a list to hold the output of this round
-        this_round_output = [{self.session_president.agent_name: president_output}]
-        exchange_type = self.classify_exchange(president_output)
-        # Step 2: Each agent decides whether to interject
+            # Initialize a list to hold the output of this round
+            this_round_output = [{self.session_president.agent_name: president_output}]
+            exchange_type = self.classify_exchange(president_output)
+            # Step 2: Each agent decides whether to interject
         for agent in self.agents:
             query = 'Would you like to interject on this issue given by the debate president? Only interject if you think you can bring useful information and explore the subject according to your profession (a farmer should only talk about the implementation of a certain feature in the context that he is a farmer). Answer with YES or NO and no other choice in between.'
             agent.update_agent(messages=president_output + query, max_tokens=3, temperature=0.1,
@@ -71,14 +95,16 @@ class RoundManager:
                 interject_response = agent.get_text().strip().lower()
                 # Step 3: If agent chooses to interject
                 if re.search(r'\byes\b', interject_response):
+                    fused_conversation = self.extract_conversation_context(self.convo_item_count)
+                    fused_conversation = fused_conversation.strip() + "\n\n" + president_output
 
                     if exchange_type == 'main':
                         personnality = agent.system_prompt
-                        agent.update_agent(messages=president_output, max_tokens=500, temperature=0.7,
+                        agent.update_agent(messages=fused_conversation, max_tokens=600, temperature=1.1,
                                            system_prompt=personnality + main_vs_side.MAIN_CONVO_SYSTEM_PROMPT)
                     elif exchange_type == 'side':
                         personnality = agent.system_prompt
-                        agent.update_agent(messages=president_output, max_tokens=300, temperature=0.7,
+                        agent.update_agent(messages=fused_conversation, max_tokens=600, temperature=0.4,
                                            system_prompt=personnality + main_vs_side.SIDE_CONVO_SYSTEM_PROMPT)
                     else:
                         raise ValueError(f"Unexpected exchange type: {exchange_type}")
@@ -100,16 +126,42 @@ class RoundManager:
 
         self.rounds.append(this_round_output)
 
+    def wrap_up_round(self):
+        context = self.extract_conversation_context(self.convo_item_count)
+        summary_of_debate_item = self.summarize_round_debaters("", context=context, wrap_up=True)
+        self.process_split_conversations(summary_of_debate_item, 'side')
+
+    def atomic_step_gathering(self):
+        context = self.extract_conversation_context(self.convo_item_count)
+        atomic_steps_summary = self.summarize_round_debaters("", context=context, atomic_steps=True)
+        self.process_split_conversations(atomic_steps_summary, 'function_creator')
+
+    def process_split_conversations(self, summary, session_type):
+        convo_splitter = conversation_splitter.ConversationSplitter(self.convo_name, self.agent_manager)
+        convo_splitter.split_conversation(summary)
+
+        for split_convo in convo_splitter.get_split_conversations():
+            try:
+                new_session = self.convo_manager.create_session(
+                    session_type=session_type,
+                    main_convo_name=self.main_convo_name,
+                    side_convo_prompt=split_convo['side_topic_context'] if session_type == 'side' else None,
+                    task=split_convo['side_topic_context'] if session_type == 'function_creator' else None
+                )
+                new_session.start_role_playing_session()
+            except Exception as e:
+                print(f"Failed to create or initialize session for {session_type}: {e}")
+
     def classify_exchange(self, president_message):
-        differentiate_system_prompt = """Using the provided text by a debate president, determine whether it reflects a 'main' or 'side' 
-        conversation in the context of a structured debate. For 'main' conversations, identify elements that suggest a broad, 
-        strategic dialogue, such as overarching issues, project-wide implications, or high-level problem identification. Look 
-        for indicators of conceptual discussion over technical specifics. For 'side' conversations, identify signs of a more 
-        detailed, tactical discourse, such as specific task-oriented details, granular steps towards problem-solving, 
-        or actionable solutions. Classify the text accordingly and provide justification for your classification based on the 
-        content and focus of the discussion. Provide your answer with this format:
-        [<Conversation Classification 'main' or 'side'>]
-        <Justification of classification>"""
+        differentiate_system_prompt = """Using the provided text by a debate president, determine whether it reflects 
+        a 'main' or 'side' conversation in the context of a structured debate. For 'main' conversations, 
+        identify elements that suggest a broad, strategic dialogue, such as overarching issues, project-wide 
+        implications, or high-level problem identification. Look for indicators of conceptual discussion over 
+        technical specifics. For 'side' conversations, identify signs of a more detailed, specific discourse, 
+        such as specific task-oriented details, granular steps towards problem-solving, or actionable solutions. 
+        Classify the text accordingly and provide justification for your classification based on the content and 
+        focus of the discussion. Provide your answer with this format: [<Conversation Classification 'main' or 
+        'side'>] <Justification of classification>"""
         differentiate_agent = self.agent_manager.create_agent(model=ModelType.GPT_3_5_TURBO, messages=president_message,
                                                               system_prompt=differentiate_system_prompt, max_tokens=75)
         differentiate_agent.run_agent()
@@ -190,7 +242,7 @@ class RoundManager:
 
         return single_round
 
-    def summarize_round_debaters(self, user_content, context):
+    def summarize_round_debaters(self, user_content, context="", wrap_up=False, atomic_steps=False):
         """
         Summarize the content provided by agents during a round.
 
@@ -201,32 +253,57 @@ class RoundManager:
         Returns:
             A string containing the summarized content.
         """
+        summarizing_agent=None
+        if wrap_up:
+            summarizing_system_prompt = context + (
+                "Above are the previous rounds."
+                "\nFrom the new round's inputs, create your own summary highlighting:\n\n"
+                "1. **Distinct Solutions:** List specific solutions from each participant "
+                "(e.g., 'Use library X for parsing').\n"
+                "2. **Key Challenges:** Note any difficulties or concerns raised "
+                "(e.g., 'Scalability issues with solution Y').\n"
+                "3. **Consensus/Differences:** Indicate any agreements or debates "
+                "(e.g., 'Agreed on framework Z, debated on in-house vs. open-source tools').\n"
+                "4. **Categorized Actions:**\n"
+                "   - **Immediate Steps:** Actions to implement now "
+                "(e.g., 'Refactor code for readability').\n"
+                "   - **Strategic Recommendations:** Long-term plans "
+                "(e.g., 'Overhaul module architecture').\n"
+                "5. **Further Exploration/Resolutions:** Mention topics needing more discussion "
+                "or those resolved (e.g., 'AI integration needs exploring, Agile methodology adopted').\n"
+                "6. **Complex Ideas:** Provide a brief text for complex proposals "
+                "(e.g., 'Hybrid cloud merits detailed analysis').\n"
+                "Note: Focus on the new information only. Focus on the high quality structure of your summary."
+                " Your summary cannot exceed 1000 words."
+            )
+            summarizing_agent = self.agent_manager.create_agent(model=ModelType.FUNCTION_CALLING_GPT_3_5,
+                                                                messages="now create the summary:",
+                                                                system_prompt=summarizing_system_prompt, max_tokens=1100,
+                                                                temperature=0.5)
+        elif atomic_steps:
+            summarizing_system_prompt = (
+                "When delineating atomic steps for any task, it's critical to elucidate the micro-objective of each "
+                "step, capped at 150 words to ensure brevity and clarity. For each step, the input should be "
+                "specified in detail—it could encompass resources like time allocation, budgetary limits, "
+                "or information prerequisites such as data formats, expected knowledge, or preparatory work. The "
+                "output is equally vital, marking the completion of the step with a deliverable, which might be a "
+                "tangible artifact like a document, a code module, or an intangible result such as enhanced knowledge "
+                "or a decision point."
+                "Moreover, any existing tools, processes, or functions that are to be leveraged must be identified to "
+                "facilitate the step. This may involve predefined frameworks, established methodologies, or specific "
+                "pieces of code. Articulating these elements ensures each "
+                "atomic step is not just a task, but a cog in a larger mechanism. This precise breakdown into atomic "
+                "steps equips even a novice with a clear, actionable path forward"
+                )
+            summarizing_agent = self.agent_manager.create_agent(model=ModelType.FUNCTION_CALLING_GPT_3_5,
+                                                                messages="now create the atomic steps:",
+                                                                system_prompt=summarizing_system_prompt + context, max_tokens=1100,
+                                                                temperature=0.2)
+        else:
+            summarizing_system_prompt = "cut in half the content given by creating an unstructured summary of it."
 
-        # Include context in the system prompt
-        summarizing_system_prompt = "\n".join(context) + (
-            "Above are the old rounds summaries."
-            "\nFrom the new round's inputs, create your own summary highlighting:\n\n"
-            "1. **Distinct Solutions:** List specific solutions from each participant "
-            "(e.g., 'Use library X for parsing').\n"
-            "2. **Key Challenges:** Note any difficulties or concerns raised "
-            "(e.g., 'Scalability issues with solution Y').\n"
-            "3. **Consensus/Differences:** Indicate any agreements or debates "
-            "(e.g., 'Agreed on framework Z, debated on in-house vs. open-source tools').\n"
-            "4. **Categorized Actions:**\n"
-            "   - **Immediate Steps:** Actions to implement now "
-            "(e.g., 'Refactor code for readability').\n"
-            "   - **Strategic Recommendations:** Long-term plans "
-            "(e.g., 'Overhaul module architecture').\n"
-            "5. **Further Exploration/Resolutions:** Mention topics needing more discussion "
-            "or those resolved (e.g., 'AI integration needs exploring, Agile methodology adopted').\n"
-            "6. **Complex Ideas:** Provide a brief text for complex proposals "
-            "(e.g., 'Hybrid cloud merits detailed analysis').\n"
-            "Note: Focus on the new information only. Do not re-summarize previous rounds' content."
-            " Your summary cannot exceed 400 words. Your summary should aim to halve the original content."
-        )
-
-        summarizing_agent = self.agent_manager.create_agent(model=ModelType.CHAT_GPT4, messages=user_content,
-                                                            system_prompt=summarizing_system_prompt, max_tokens=500)
+            summarizing_agent = self.agent_manager.create_agent(model=ModelType.GPT_3_5_TURBO, messages=user_content,
+                                                                system_prompt=summarizing_system_prompt, max_tokens=500)
         summarizing_agent.run_agent()
         summary = summarizing_agent.get_text()
         return summary
@@ -267,8 +344,118 @@ class RoundManager:
         if not hasattr(self, 'summaries'):
             self.summaries = []
         self.summaries.extend(self.flatten_rounds(summary_rounds))
+        guidance = self.guide_next_round()
+        return guidance
 
-        return self.summaries
+    def guide_next_round(self):
+        if len(self.rounds) < 2:
+            return ""  # Return an empty string if not enough context
+
+        fused_conversation = self.extract_conversation_context(3)
+        guide_system_prompt = "You are the advisor of a debate president. You are listening to the debate as it is happening" \
+                              "and your goal is to propose to the president what his next action should be. The point " \
+                              "of view of the debate president is that he has a objects on his list he MUST go " \
+                              "through, but he doesnt need to lead them to completion. So when enough " \
+                              "information on the item has been said, you must tell him to either wrap up and talk " \
+                              "about the next item on the list or create atomic steps." \
+                              "When an item is wrapped up, it will be given to another" \
+                              "debate president in order to reduce the load on himself. Each item on the list should " \
+                              "have roughly the same amount of rounds attributed to them (1 min, 3 rounds max). Sometimes the " \
+                              "president will ask debaters to create the specific actions that will lead to the " \
+                              "resolution of the item on his list. This is the 'atomic step creation' and should only " \
+                              "happen when the granularity is high. when granularity is high that means that you " \
+                              "cannot think of any way for the tasks to be broken down further. An atomic task should " \
+                              "be able to be handled by a novice. Never forget that atomic task creation is rather " \
+                              "rare and can only happen when all high level solutions have been explored. before " \
+                              "suggesting the creation of atomic steps, always ask yourself if these requirements are " \
+                              "fulfilled." \
+                              "You have a few actions to choose from:" \
+                              "1. Suggest to talk more deeply about a subject on the list.(same as 2 but more general, to gather more information on the subject)" \
+                              "2. Suggest to ask the debaters for <specific information> that will help understand a subject on the list.(same as 1 but you have in mind what is the information missing)" \
+                              "3. Suggest to wrap up on this subject.(never suggest the next topic, simply state that this topic should be wrapped up)" \
+                              "4. Suggest to ask the debaters to create atomic steps.(remember the special requirements to suggest atomic steps!)" \
+                              "remember that your <suggestion> will be given out of context to the president, " \
+                              "so be thoughtful of your <suggestion>." \
+                              "Offer you answer in the order provided by this format(first the reason and then the suggestion between []):\n" \
+                              "<Reason why you chose this option and not the other options. Do not put between []>\n" \
+                              "[Suggestion: <suggestion, ALWAYS START WITH: 'I think you should...'>]"
+
+        conversation_guide_agent = self.agent_manager.create_agent(model=ModelType.GPT_3_5_TURBO,
+                                                                   messages=fused_conversation,
+                                                                   system_prompt=guide_system_prompt, temperature=0.1,
+                                                                   max_tokens=250)
+        conversation_guide_agent.run_agent()
+        agent_output = conversation_guide_agent.get_text()
+
+        # Regular expression pattern to match text inside the first pair of square brackets
+        pattern = r"\[(.*?)\]"
+
+        # Use the search method to find the first match
+        match = re.search(pattern, agent_output)
+
+        # If there's a match, extract the 'suggestion' group
+        if match:
+            suggestion = match.group(1).strip()
+            analysis_agent = self.agent_manager.create_agent(
+                model=ModelType.GPT_3_5_TURBO,
+                messages=suggestion,
+                system_prompt="Analyze the following text and determine which of the four options has been chosen by the agent."
+                              "1. Suggest to talk more deeply about a subject on the list.(same as 2 but more general, to gather more information on the subject)" \
+                              "2. Suggest to ask the debaters for <specific information> that will help understand a subject on the list.(same as 1 but you have in mind what is the information missing)" \
+                              "3. Suggest to wrap up on this subject.(never suggest the next topic, simply state that this topic should be wrapped up)"
+                              "4. Suggest to ask the debaters to create atomic steps.(remember the special requirements to suggest atomic steps!)"
+                              "give your answer like this: Option Chosen:[<Number1 or Number2 or Number3 or Number4>]",
+                temperature=0.1,
+                max_tokens=100
+            )
+            analysis_agent.run_agent()
+            agent_choice = analysis_agent.get_text()
+            option_match = re.search(r"(\b1\b|\b2\b|\b3\b|\b4\b)", agent_choice)
+            if option_match and option_match.group(1) == "3":
+                return "wrap-up"
+            elif option_match and option_match.group(1) == "4":
+                return "atomic_steps"
+            else:
+                return suggestion
+        else:
+            return ""
+
+    def extract_conversation_context(self, number_of_rounds_to_extract=1, target_extraction=None):
+        """
+        Extracts the context of the conversation from the specified number of recent rounds.
+
+        :param number_of_rounds_to_extract: The number of rounds to extract from the end of the rounds list.
+        :param target_extraction: The target list of rounds from which to extract the conversation context.
+                                  Defaults to self.rounds if not specified.
+        :return: A string that fuses the conversation context with markers.
+        """
+        if target_extraction is None:
+            target_extraction = self.rounds
+
+        # Determine the number of rounds to extract
+        rounds_to_extract = min(number_of_rounds_to_extract, len(target_extraction))
+        context_messages = target_extraction[-rounds_to_extract:]
+
+        round_start_marker = "\n--- START OF ROUND ---\n"
+        round_end_marker = "\n--- END OF ROUND ---\n"
+
+        # Pattern to match the role at the beginning of the text, accounting for any number of spaces
+        role_pattern = re.compile(r"^\w+\s*:")
+
+        fused_conversation = ""
+        for round_ in context_messages:
+            fused_conversation += round_start_marker
+            for speech in round_:
+                for role, text in speech.items():
+                    # Check if the text starts with the role name followed by a colon (and optional spaces)
+                    if role_pattern.match(text):
+                        # Remove the role prefix if it's already there
+                        text = role_pattern.sub("", text).strip()
+                    # Now prepend the role name to ensure consistent formatting
+                    fused_conversation += f"{role}:\n{text}\n\n"
+            fused_conversation += round_end_marker
+
+        return fused_conversation.strip()
 
     @staticmethod
     def flatten_rounds(formatted_rounds):
@@ -422,21 +609,18 @@ class SessionObject:
             project. Never forget that the main task is to lead the other debaters so they can solve problems in 
             the project. If the debaters cannot answer or find your directives unclear they will answer with [
             Cannot Process Directives: <Reason for incompletion>]. Avoid calling out to any specific participant, 
-            let them choose wether they have something to say by giving context that might help them share their 
+            let them choose weather they have something to say by giving context that might help them share their 
             specialized opinion on the subject.
 
             When presented with a numbered list of items to discuss, you are to address each item sequentially, 
-            focusing on one issue at a time without introducing multiple issues simultaneously. Upon concluding the 
-            discussion of an item, you are to declare its completion with 'Completion Noted: [Item Exported to New 
-            Session]'. This statement signifies that you have collected ample information for the feature's 
-            development, which will then be passed on to the following debate president. You will then create a 
-            summary, ensuring impartiality throughout the process. The debaters will not participate in this 
-            summarization round, as it is reserved for you to encapsulate all key points and nuances of the debate 
-            for that item to provide a solid foundation for the next phase. As the current debate president, 
-            your findings and discussions will be the sole context provided to the next session's president. Always 
-            add 'Debate President: ' when you start to talk, and maintain a vigilant watch for unbiased facilitation, 
-            steering clear of influencing the direction of solutions. The debaters have a very short memory, 
-            so reminders of prior conclusions are necessary for continuity. Now, here is the context of the project:"""
+            focusing on one issue at a time without introducing multiple items simultaneously. Listen to the debaters 
+            if they want to add more information to an item in the list. Upon completion of an item, 
+            this will clearly be stated :'Completion Noted: [Solution Found]'. When the discussion is finished write 
+            [CONVO_END] to end the debate. Always add 'Debate President: ' when you start to talk and never talk for 
+            more than 300 words. Maintain a vigilant watch for unbiased facilitation, steering clear of influencing 
+            the direction of solutions or asking specific participants for input. The debaters have a very short 
+            memory, so reminders of prior conclusions are necessary for continuity. Now, here is the context of the 
+            project:"""
 
 
             elif self.session_type == 'side':
@@ -450,8 +634,8 @@ class SessionObject:
             with [Cannot Process Directives: <Reason for incompletion>].
 
             When dealing with a numbered list of items, address each point in order, ensuring to tackle only one 
-            problem at a time, never bring up multiple problems at a time. The completion of an item in the list 
-            occurs when either a step-by-step solution is found, described in atomic steps that are detailed and 
+            problem at a time, never bring up multiple problems or items at a time. The completion of an item in the 
+            list occurs when either a step-by-step solution is found, described in atomic steps that are detailed and 
             explicit to the point where further division would be inefficient, or when the item is too complex to 
             articulate in atomic steps and requires a more in-depth exploration. In the latter case, it should be 
             exported for further discussion.
@@ -459,15 +643,11 @@ class SessionObject:
             When complexity escalates beyond the scope of debate it means that creating atomic steps is impossible 
             because of the complexity.
 
-            Upon completion of an item, clearly state 'Completion Noted: [Full Solution Found]' along with the atomic 
-            steps outlined, remember that wrapping up an item on the list means that debaters won't be involved while 
-            you format the solution/export. If the item is too complex, state 'Completion Noted: [Item Exported to 
-            New Session]'. This procedural closure signals the readiness for a transition to a new debate or a 
-            different stage of project development. Ensure that the atomic steps are sufficiently granular; for 
-            instance, rather than saying 'Implement the feature,' break it down into steps like '1. Define the 
-            function parameters, 2. Write the loop structure, 3. Validate input data, etc.' These steps should be 
-            formulated so that even a novice programmer could implement the solution without additional guidance. 
-            Always add 'Debate President: ' when you start to talk.
+            Upon completion of an item or if the item is deemed to complex to handle in this discussion, this will 
+            clearly be stated :'Completion Noted: [Solution Found]'. This procedural closure signals the readiness 
+            for a transition to a new debate or a different stage of project development. Always add 'Debate 
+            President: ' when you start to talk and never talk for more than 300 words. When the discussion is 
+            finished, write [CONVO_END] to end the debate.
 
             The debaters have a very short memory, so you must provide them with the conclusions from the previous 
             rounds to deepen the discussion.You must never create summaries of the discussion, unless an item is 
@@ -499,12 +679,12 @@ class SessionObject:
         elif self.session_type == 'function_creator':
             pass
 
-    def start_role_playing_session(self, num_rounds=4):
+    def start_role_playing_session(self, num_rounds=8):
         if self.session_president is None:
             self.appoint_session_president()
         self.appoint_session_agents()
         count = 0  # should be 0
-        self.round_manager = RoundManager(self.agent_manager, self.session_president, self.agents, self.session_type,
+        self.round_manager = RoundManager(self.convo_manager, self.agent_manager, self.session_president, self.agents, self.session_type,
                                           self.convo_name, main_convo_name=self.main_convo_name)
         try:
             while num_rounds > count:
@@ -521,30 +701,6 @@ class SessionObject:
             # if self.session_type == 'main':
             #    self.convo_name = "Backend_Python_Project_Processing"
             self.round_manager.save_rounds_and_summaries()
-            try:
-                convo_splitter = conversation_splitter.ConversationSplitter(self.convo_name, self.agent_manager)
-                convo_splitter.split_conversation(self.round_manager.get_summary(self.convo_name))
-
-                for split_convo in convo_splitter.get_split_conversations():
-                    try:
-                        if split_convo['side_topic_type'] == 'function_creator':
-                            self.convo_manager.create_session(
-                                session_type=split_convo['side_topic_type'],
-                                main_convo_name=self.main_convo_name,
-                                task=split_convo['side_topic_context']
-                            )
-                        new_session = self.convo_manager.create_session(
-                            session_type=split_convo['side_topic_type'],
-                            main_convo_name=self.main_convo_name,
-                            side_convo_prompt=split_convo['side_topic_context']
-                        )
-                        new_session.start_role_playing_session()
-                    except Exception as e:
-                        print(f"Failed to create or initialize session for {split_convo['side_topic_type']}: {e}")
-
-            except Exception as e:
-                print(f"Failed to split conversation: {e}")
-
     def get_convo_name(self):
         if self.session_president is None:
             self.appoint_session_president()
