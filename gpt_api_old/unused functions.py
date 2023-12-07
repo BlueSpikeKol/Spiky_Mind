@@ -1,5 +1,4 @@
 from gpt_api_old import AI_trainer
-from memory_stream_old import MemoryStreamAccess
 from memory_stream_old import MemoryObject
 import re
 import numpy as np
@@ -11,7 +10,7 @@ import time
 import logging
 import openai
 import AI_entities as AI
-from utils import config_retrieval
+from utils import config_retrieval, persistance_access
 
 openai.api_key = config_retrieval.OpenAIConfig.api_key
 memory_stream = MemoryStreamAccess.MemoryStreamAccess()

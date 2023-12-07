@@ -1,13 +1,14 @@
 import inspect
 from typing import Optional, Union, List
 from dataclasses import dataclass
+import time
 
 import openai
 
 import utils.openai_api.templates as templates
 import utils.openai_api.models as models
 import utils.openai_api.token_pools as token_pools
-from utils.openai_api.models import ModelType,ModelManager
+from utils.openai_api.models import ModelType, ModelManager
 from utils import config_retrieval
 
 EXAMPLE_CHAT_COMPLETION = """
@@ -64,7 +65,7 @@ class GPTAgentHandler:
         elif isinstance(self.agent.messages, dict):
             messages_copy = [self.agent.messages]
         elif isinstance(self.agent.messages, str):
-            messages_copy = [{'role':'user','content':self.agent.messages}]
+            messages_copy = [{'role': 'user', 'content': self.agent.messages}]
         else:
             messages_copy = []
 
@@ -80,16 +81,29 @@ class GPTAgentHandler:
 
         chat_message_object = templates.TemplateManager.transform_into_messages(messages_copy)
         prompt_string = " ".join([message_dict['content'] for message_dict in chat_message_object.messages])
-        ModelManager.check_agent_token_limit(model=self.agent.model, prompt=prompt_string, max_tokens=self.agent.max_tokens)
-        #TODO make sure that the inputed message is a collection of the system prompt and previous messages
-        return {'messages': chat_message_object.messages, 'function_call': self.agent.function_call, 'functions': self.agent.functions}
+        ModelManager.check_agent_token_limit(model=self.agent.model, prompt=prompt_string,
+                                             max_tokens=self.agent.max_tokens)
+        # TODO make sure that the inputed message is a collection of the system prompt and previous messages
+        return {'messages': chat_message_object.messages, 'function_call': self.agent.function_call,
+                'functions': self.agent.functions}
 
     def perform_api_call(self, api_function, params):
-        try:
-            return api_function(**params)
-        except Exception as e:
-            print(f"Error during API call: {e}")
-            return None
+        max_retries = 3
+        retry_delays = [10, 60, 300]  # Delays in seconds: 10s, 1min, 5min
+
+        for attempt in range(max_retries):
+            try:
+                response = api_function(**params)
+                time.sleep(0.15)  # Wait for 0.05 seconds before returning the response
+                return response
+            except Exception as e:
+                if attempt < max_retries - 1:
+                    print(f"Error during API call, retrying in {retry_delays[attempt]} seconds: {e}")
+                    time.sleep(retry_delays[attempt])
+                else:
+                    print(f"Error during API call after {max_retries} attempts: {e}")
+                    return None
+        return None
 
     def filter_optional_params(self, params):
         default_values = {
@@ -170,7 +184,6 @@ class GPTAgentHandler:
             return fake_completion
         else:
             return embedding_data
-
 
 
 class GPTAgent:
@@ -278,7 +291,6 @@ class GPTAgent:
             'top_p': self.top_p,
             'user': self.user
         }
-
 
     # def prepare_messages(self):
     #     if isinstance(self.messages, list):
@@ -494,8 +506,11 @@ class GPTAgent:
         Example Output:
             [0.0023064255, -0.009327292, ...., -0.0028842222]
         """
-        if self.completion and 'embedding' in self.completion:
-            return self.completion['embedding']
+        # Check if completion data is available and correctly structured
+        if self.completion and 'data' in self.completion:
+            for item in self.completion['data']:
+                if item['object'] == 'embedding':
+                    return item['embedding']
         return "No vector data available."
 
     def get_model_used(self):
@@ -594,9 +609,9 @@ class GPTManager:
             raise ValueError("Invalid model.")
 
         kwargs = {
-            'agent_name' : agent_name,
+            'agent_name': agent_name,
             'messages': messages,
-            'system_prompt' : system_prompt,
+            'system_prompt': system_prompt,
             'echo': echo,
             'frequency_penalty': frequency_penalty,
             'function_call': function_call,
@@ -615,4 +630,3 @@ class GPTManager:
         }
 
         return GPTAgent(model=model, **kwargs)
-

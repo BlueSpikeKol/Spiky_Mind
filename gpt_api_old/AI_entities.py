@@ -1,10 +1,4 @@
 from gpt_api_old import AI_trainer
-from memory_stream_old import MemoryStreamAccess
-from memory_stream_old import MemoryObject
-import re
-import numpy as np
-import random
-from sklearn.metrics.pairwise import cosine_similarity
 import openai.error
 import tiktoken
 import time
@@ -13,7 +7,7 @@ import openai
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 import json
-from utils import config_retrieval
+from utils import config_retrieval, persistance_access
 
 TEXT_DAVINCI_COMMON_3 = "text-davinci-003"
 CHAT_GPT4 = "gpt-4"

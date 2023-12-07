@@ -76,28 +76,27 @@ class ConversationSplitter:
                 classified_topics[convo_type].append(topic)
 
         # Now, prepare the string for 'c' type topics
-        c_type_topics_string = ',\n'.join(classified_topics['c'])
+        c_type_topics_string = ', '.join(classified_topics['c'])  # Join all 'c' type topics in a single string
 
         # Extract contexts for each type after all topics have been classified
         side_topics = []
-        for convo_type, topics_list in classified_topics.items():
-            if convo_type == 'c' and topics_list:
-                # Extract the conversation context for all 'c' type topics at once
-                side_topic_context = self.extract_conversation_context(conversation_summary, topic, c_type_topics_string)
-                for topic in topics_list:
-                    side_topics.append({
-                        'side_topic_name': topic,
-                        'side_topic_context': side_topic_context,
-                        'side_topic_type': 'side'
-                    })
-            elif convo_type == 'f':
-                for topic in topics_list:
-                    side_topic_context = self.extract_function_context(conversation_summary, topic)
-                    side_topics.append({
-                        'side_topic_name': topic,
-                        'side_topic_context': side_topic_context,
-                        'side_topic_type': 'function_creator'
-                    })
+        if classified_topics['c']:
+            # Extract the conversation context for all 'c' type topics at once
+            side_topic_context = self.extract_conversation_context(conversation_summary, c_type_topics_string)
+            side_topics.append({
+                'side_topic_name': None,
+                'side_topic_context': side_topic_context,
+                'side_topic_type': 'side'
+            })
+
+        for topic in classified_topics['f']:
+            # 'f' type topics are processed individually
+            side_topic_context = self.extract_function_context(conversation_summary, topic)
+            side_topics.append({
+                'side_topic_name': topic,
+                'side_topic_context': side_topic_context,
+                'side_topic_type': 'function_creator'
+            })
 
         return side_topics
 
@@ -126,7 +125,7 @@ class ConversationSplitter:
 
         return convo_type
 
-    def extract_conversation_context(self, conversation_summary, other_topics, topic):
+    def extract_conversation_context(self, conversation_summary, all_topics):
         """
         Extracts the conversation context for debate topics.
 
@@ -138,21 +137,29 @@ class ConversationSplitter:
         - str: Extracted conversation context.
         """
         content_extractor_system_prompt = (
-            f"List of other subjects [{other_topics}]."
-            f"You will be given a debate transcript and a corresponding topic. "
-            f"Your goal is to regroup all the information that has been said on the topic in a short and direct way, under 200 words."
-            f"you must avoid touching on parallel subjects. This means that, from the list of subjects provided, "
-            f"You must avoid picking information on those subjects to avoid confusion on what the main topic is. This "
-            f"means that you must avoid voicing concerns, suggestions and ideas that are related to other topics"
+            f"**Main Topics List :[{all_topics}].**"
+            "Engage in a thorough examination of a debate transcript, with the mission of extracting "
+            "and encapsulating pivotal arguments and data tied to a predetermined list of main topics, "
+            "adhering to a stringent 500-word total limit. The goal is to achieve great "
+            "identification and categorization of the main subjects at hand. Crystallize "
+            "these discussions into a lucid, comprehensive narrative, meticulously sifting out any "
+            "irrelevant to avoid retrieving information from irrelevant tics. Intertwine related thematic "
+            "elements to achieve a seamless and cogent storyline. You must identify the features that are related to "
+            "the main topic list and produce an answer in this format:\n"
+            "<75 word to describe general goal, what is the expected input and output>\n"
+            "1.<feature1>:<up to 100 words to explain this feature>\n"
+            "2.<feature2>:<up to 100 words to explain this feature>\n"
+            "etc, max 5 features\n"
+            "<How features interact with each other>"
         )
 
         # Assume self.agent_manager and other required methods are already defined.
         context_extractor = self.agent_manager.create_agent(
-            model=ModelType.GPT_3_5_TURBO,
-            max_tokens=500,
-            temperature=0.5,
+            model=ModelType.CHAT_GPT4,
+            max_tokens=700,
+            temperature=0.4,
             system_prompt=content_extractor_system_prompt,
-            messages=conversation_summary + " this is the main topic you must extract: " + topic
+            messages=conversation_summary
         )
         context_extractor.run_agent()
         return context_extractor.get_text()

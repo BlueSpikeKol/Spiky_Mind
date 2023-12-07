@@ -1,6 +1,6 @@
 import re
 import uuid
-from memory_stream_old import MemoryStreamAccess
+from utils import persistance_access
 from gpt_api_old import AI_entities as AI
 
 memory_stream = MemoryStreamAccess.MemoryStreamAccess()

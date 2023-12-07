@@ -100,6 +100,9 @@ class TokenPool:
             completion (dict): The completion data.
             token_pools_list (list): The list of token pools to update.
         """
+        if completion is None:
+            print("Completion data is None, skipping.")
+            return
         model = completion.get('model', 'unknown')
         usage = completion.get('usage', {})
         tokens_used = usage.get('total_tokens', 0)
@@ -111,10 +114,6 @@ class TokenPool:
             first_choice = choices[0]
             message = first_choice.get('message', {})
             content = message.get('content', 'N/A')
-
-            # Optionally, do something with content if needed
-        else:
-            print("No choices in the completion.")
 
         model_prices = models.ModelType.MODEL_PRICES.get(model, {'input': 0, 'output': 0})
         total_cost = (model_prices['input'] * prompt_tokens + model_prices['output'] * output_tokens) / 1000

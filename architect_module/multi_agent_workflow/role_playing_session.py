@@ -13,7 +13,8 @@ from architect_module.function_creation import create_new_function
 
 
 class RoundManager:
-    def __init__(self, convo_manager, agent_manager: GPTManager, session_president: GPTAgent, agents: list[GPTAgent], session_type,
+    def __init__(self, convo_manager, agent_manager: GPTManager, session_president: GPTAgent, agents: list[GPTAgent],
+                 session_type,
                  convo_name,
                  main_convo_name=None):
         self.agent_manager = agent_manager
@@ -95,7 +96,7 @@ class RoundManager:
                 interject_response = agent.get_text().strip().lower()
                 # Step 3: If agent chooses to interject
                 if re.search(r'\byes\b', interject_response):
-                    fused_conversation = self.extract_conversation_context(self.convo_item_count)
+                    fused_conversation = self.extract_conversation_context(self.convo_item_count, max_rounds=1)
                     fused_conversation = fused_conversation.strip() + "\n\n" + president_output
 
                     if exchange_type == 'main':
@@ -253,7 +254,7 @@ class RoundManager:
         Returns:
             A string containing the summarized content.
         """
-        summarizing_agent=None
+        summarizing_agent = None
         if wrap_up:
             summarizing_system_prompt = context + (
                 "Above are the previous rounds."
@@ -265,7 +266,8 @@ class RoundManager:
                 "3. **Consensus/Differences:** Indicate any agreements or debates "
                 "(e.g., 'Agreed on framework Z, debated on in-house vs. open-source tools').\n"
                 "4. **Categorized Actions:**\n"
-                "   - **Immediate Steps:** Actions to implement now "
+                "- **Immediate Steps:** Actions to implement now. only applicable if long-term plans are impossible "
+                "without them"
                 "(e.g., 'Refactor code for readability').\n"
                 "   - **Strategic Recommendations:** Long-term plans "
                 "(e.g., 'Overhaul module architecture').\n"
@@ -274,11 +276,12 @@ class RoundManager:
                 "6. **Complex Ideas:** Provide a brief text for complex proposals "
                 "(e.g., 'Hybrid cloud merits detailed analysis').\n"
                 "Note: Focus on the new information only. Focus on the high quality structure of your summary."
-                " Your summary cannot exceed 1000 words."
+                " Your summary cannot exceed 1000 words. write None when there is nothing to say"
             )
             summarizing_agent = self.agent_manager.create_agent(model=ModelType.FUNCTION_CALLING_GPT_3_5,
                                                                 messages="now create the summary:",
-                                                                system_prompt=summarizing_system_prompt, max_tokens=1100,
+                                                                system_prompt=summarizing_system_prompt,
+                                                                max_tokens=1100,
                                                                 temperature=0.5)
         elif atomic_steps:
             summarizing_system_prompt = (
@@ -294,10 +297,11 @@ class RoundManager:
                 "pieces of code. Articulating these elements ensures each "
                 "atomic step is not just a task, but a cog in a larger mechanism. This precise breakdown into atomic "
                 "steps equips even a novice with a clear, actionable path forward"
-                )
+            )
             summarizing_agent = self.agent_manager.create_agent(model=ModelType.FUNCTION_CALLING_GPT_3_5,
                                                                 messages="now create the atomic steps:",
-                                                                system_prompt=summarizing_system_prompt + context, max_tokens=1100,
+                                                                system_prompt=summarizing_system_prompt + context,
+                                                                max_tokens=1100,
                                                                 temperature=0.2)
         else:
             summarizing_system_prompt = "cut in half the content given by creating an unstructured summary of it."
@@ -376,12 +380,12 @@ class RoundManager:
                               "4. Suggest to ask the debaters to create atomic steps.(remember the special requirements to suggest atomic steps!)" \
                               "remember that your <suggestion> will be given out of context to the president, " \
                               "so be thoughtful of your <suggestion>." \
-                              "Offer you answer in the order provided by this format(first the reason and then the suggestion between []):\n" \
-                              "<Reason why you chose this option and not the other options. Do not put between []>\n" \
+                              "Offer you answer in the order provided by this format(first the reason and then the suggestion):\n" \
+                              "<Reason why you chose this option and not the other options>\n" \
                               "[Suggestion: <suggestion, ALWAYS START WITH: 'I think you should...'>]"
 
-        conversation_guide_agent = self.agent_manager.create_agent(model=ModelType.GPT_3_5_TURBO,
-                                                                   messages=fused_conversation,
+        conversation_guide_agent = self.agent_manager.create_agent(model=ModelType.FUNCTION_CALLING_GPT_3_5,
+                                                                   messages=fused_conversation + 'dont forget to put your suggestion between []',
                                                                    system_prompt=guide_system_prompt, temperature=0.1,
                                                                    max_tokens=250)
         conversation_guide_agent.run_agent()
@@ -420,17 +424,22 @@ class RoundManager:
         else:
             return ""
 
-    def extract_conversation_context(self, number_of_rounds_to_extract=1, target_extraction=None):
+    def extract_conversation_context(self, number_of_rounds_to_extract=1, target_extraction=None, max_rounds=None):
         """
         Extracts the context of the conversation from the specified number of recent rounds.
 
         :param number_of_rounds_to_extract: The number of rounds to extract from the end of the rounds list.
         :param target_extraction: The target list of rounds from which to extract the conversation context.
                                   Defaults to self.rounds if not specified.
+        :param max_rounds: The maximum number of rounds to consider for extraction.
         :return: A string that fuses the conversation context with markers.
         """
         if target_extraction is None:
             target_extraction = self.rounds
+
+        # If max_rounds is specified, limit the target_extraction to the last max_rounds entries
+        if max_rounds is not None:
+            target_extraction = target_extraction[-max_rounds:]
 
         # Determine the number of rounds to extract
         rounds_to_extract = min(number_of_rounds_to_extract, len(target_extraction))
@@ -655,7 +664,7 @@ class SessionObject:
 
             self.session_president = self.agent_manager.create_agent(model=ModelType.FUNCTION_CALLING_GPT_3_5,
                                                                      messages='empty',
-                                                                     system_prompt=president_system_prompt + self.convo_prompt,
+                                                                     system_prompt=president_system_prompt + self.convo_prompt + "never forget to address only one point at a time and let the debaters propose solutions! Your job is to lead not work!",
                                                                      agent_name="Debate President",
                                                                      max_tokens=400)
         elif self.session_type == 'function_creator':
@@ -684,7 +693,8 @@ class SessionObject:
             self.appoint_session_president()
         self.appoint_session_agents()
         count = 0  # should be 0
-        self.round_manager = RoundManager(self.convo_manager, self.agent_manager, self.session_president, self.agents, self.session_type,
+        self.round_manager = RoundManager(self.convo_manager, self.agent_manager, self.session_president, self.agents,
+                                          self.session_type,
                                           self.convo_name, main_convo_name=self.main_convo_name)
         try:
             while num_rounds > count:
@@ -701,6 +711,7 @@ class SessionObject:
             # if self.session_type == 'main':
             #    self.convo_name = "Backend_Python_Project_Processing"
             self.round_manager.save_rounds_and_summaries()
+
     def get_convo_name(self):
         if self.session_president is None:
             self.appoint_session_president()
