@@ -1,0 +1,76 @@
+{
+    "entities": [
+        {
+            "label": "Project",
+            "id": "highschoolcodingclub",
+            "name": "High School Coding Club",
+            "summary": "The High School Coding Club in Anytown, USA, aims to bridge the knowledge gap with a unique project targeted at elementary school children to create an interactive, web-based platform using HTML, CSS, JavaScript and React.js introducing coding concepts through gamified experiences. The target is to create a platform that is accessible and enjoyable for the youngest learners."
+        },
+        {
+            "label": "Goal",
+            "id": "createawebbasedplatform",
+            "name": "Create a web-based platform",
+            "summary": "The goal of the project is to create an interactive, web-based platform that introduces basic coding concepts through gamified experiences. The platform should be intuitive, user-friendly and make technology accessible and enjoyable for elementary school children."
+        },
+        {
+            "label": "Technology",
+            "id": "html",
+            "name": "HTML"
+        },
+        {
+            "label": "Technology",
+            "id": "css",
+            "name": "CSS"
+        },
+        {
+            "label": "Technology",
+            "id": "javaScript",
+            "name": "JavaScript"
+        },
+        {
+            "label": "Technology",
+            "id": "reactJs",
+            "name": "React.js"
+        },
+        {
+            "label": "Restriction",
+            "id": "limitedBudget",
+            "name": "Limited budget"
+        },
+        {
+            "label": "Restriction",
+            "id": "limitedTime",
+            "name": "Limited time"
+        },
+        {
+            "label": "Ressource",
+            "id": "codingClubMembers",
+            "name": "Coding Club Members"
+        },
+        {
+            "label": "Ressource",
+            "id": "volunteerHours",
+            "name": "Volunteer hours"
+        },
+        {
+            "label": "Ressource",
+            "id": "userFeedback",
+            "name": "User feedback"
+        }
+    ],
+    "relationships": [
+        "createawebbasedplatform|USES_TECH|html",
+        "createawebbasedplatform|USES_TECH|css",
+        "createawebbasedplatform|USES_TECH|javaScript",
+        "createawebbasedplatform|USES_TECH|reactJs",
+        "createawebbasedplatform|RESTRICTED|limitedBudget",
+        "createawebbasedplatform|RESTRICTED|limitedTime",
+        "highschoolcodingclub|HAS_RESSOURCES|codingClubMembers",
+        "highschoolcodingclub|HAS_RESSOURCES|volunteerHours",
+        "highschoolcodingclub|HAS_RESSOURCES|userFeedback",
+        "html|RESTRICTED|limitedTime",
+        "css|RESTRICTED|limitedTime",
+        "javaScript|RESTRICTED|limitedTime",
+        "reactJs|RESTRICTED|limitedTime"
+    ]
+}

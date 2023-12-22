@@ -1,0 +1,27 @@
+{
+    "entities": [
+        {"label": "Project", "id": "thehighschoolcodingclubinanytownusa", "name": "The High School Coding Club in Anytown, USA", "summary": "The High School Coding Club in Anytown, USA aims to bridge the knowledge gap with a unique project targeted at elementary school children. The project aims to create an interactive, web-based platform that introduces basic coding concepts through gamified experiences."},
+        {"label": "Goal", "id": "createaninteractivewebbasedplatformthatintroducesbasiccodingconceptsthroughgamifiedexperiences", "name": "Create an interactive, web-based platform that introduces basic coding concepts through gamified experiences", "summary": "The goal of the project is to create an interactive, web-based platform that introduces basic coding concepts through gamified experiences."},
+        {"label": "Technology", "id": "coding", "name": "coding"},
+        {"label": "Restriction", "id": "none", "name": "none"},
+        {"label": "Ressource", "id": "funding", "name": "funding"},
+        {"label": "Ressource", "id": "resources", "name": "resources"},
+        {"label": "Ressource", "id": "partnerships", "name": "partnerships"},
+        {"label": "Ressource", "id": "localbusinesses", "name": "local businesses"},
+        {"label": "Ressource", "id": "educationalinstitutions", "name": "educational institutions"},
+        {"label": "Ressource", "id": "locallibraries", "name": "local libraries"},
+        {"label": "Ressource", "id": "communitycenters", "name": "community centers"}
+    ],
+    "relationships": [
+        {"head": "createaninteractivewebbasedplatformthatintroducesbasiccodingconceptsthroughgamifiedexperiences", "relationship": "goal|USES_TECH", "tail": "coding"},
+        {"head": "createaninteractivewebbasedplatformthatintroducesbasiccodingconceptsthroughgamifiedexperiences", "relationship": "goal|RESTRICTED", "tail": "none"},
+        {"head": "thehighschoolcodingclubinanytownusa", "relationship": "project|HAS_RESSOURCES", "tail": "funding"},
+        {"head": "thehighschoolcodingclubinanytownusa", "relationship": "project|HAS_RESSOURCES", "tail": "resources"},
+        {"head": "thehighschoolcodingclubinanytownusa", "relationship": "project|HAS_RESSOURCES", "tail": "partnerships"},
+        {"head": "thehighschoolcodingclubinanytownusa", "relationship": "project|HAS_RESSOURCES", "tail": "localbusinesses"},
+        {"head": "thehighschoolcodingclubinanytownusa", "relationship": "project|HAS_RESSOURCES", "tail": "educationalinstitutions"},
+        {"head": "thehighschoolcodingclubinanytownusa", "relationship": "project|HAS_RESSOURCES", "tail": "locallibraries"},
+        {"head": "thehighschoolcodingclubinanytownusa", "relationship": "project|HAS_RESSOURCES", "tail": "communitycenters"},
+        {"head": "coding", "relationship": "technology|RESTRICTED", "tail": "none"}
+    ]
+}

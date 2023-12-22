@@ -1,0 +1,56 @@
+{
+    "entities": [
+        {
+            "label":"Project",
+            "id":"highschoolcodingclub",
+            "name":"High School Coding Club",
+            "summary":"The High School Coding Club in Anytown, USA, aims to create an interactive, web-based platform that introduces basic coding concepts through gamified experiences, targeted at elementary school children. The platform includes coding games, reward badges, character customization, drag-and-drop code blocks with built-in error checking and various features designed to enhance the learning experience. The club has five members and plans to promote and distribute their platform through various strategies ensuring safety and accessibility for all learners."
+        },
+        {
+            "label":"Goal",
+            "id":"interactiveplatform",
+            "name":"Interactive Platform",
+            "summary":"The main goal of the High School Coding Club's project is to create an interactive, web-based platform that introduces basic coding concepts through gamified experiences, making technology accessible and enjoyable for elementary school children. Three coding concepts: loops, conditionals, and variables will be taught through this platform."
+        },
+        {
+            "label":"Technology",
+            "id":"webBasedPlatform",
+            "name":"Web-Based Platform"
+        },
+        {
+            "label":"Technology",
+            "id":"dragAndDropCodeBlocks",
+            "name":"Drag-And-Drop Code Blocks"
+        },
+        {
+            "label":"Restriction",
+            "id":"userSafety",
+            "name":"User Safety"
+        },
+        {
+            "label":"Restriction",
+            "id":"accessibility",
+            "name":"Accessibility"
+        },
+        {
+            "label":"Ressource",
+            "id":"localPartnerships",
+            "name":"Local Partnerships"
+        },
+        {
+            "label":"Ressource",
+            "id":"funding",
+            "name":"Funding"
+        }
+    ],
+    "relationships": [
+        "interactiveplatform|USES_TECH|webBasedPlatform",
+        "interactiveplatform|USES_TECH|dragAndDropCodeBlocks",
+        "interactiveplatform|RESTRICTED|userSafety",
+        "interactiveplatform|RESTRICTED|accessibility",
+        "highschoolcodingclub|HAS_RESSOURCES|localPartnerships",
+        "highschoolcodingclub|HAS_RESSOURCES|funding",
+        "webBasedPlatform|RESTRICTED|userSafety",
+        "dragAndDropCodeBlocks|RESTRICTED|accessibility"
+    ]
+}

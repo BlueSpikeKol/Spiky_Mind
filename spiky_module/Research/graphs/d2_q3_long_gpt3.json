@@ -1,0 +1,16 @@
+{
+    "entities": [
+        {"label": "Project", "id": "highschoolcodingclubinanytownusa", "name": "The High School Coding Club in Anytown, USA", "summary": "The High School Coding Club in Anytown, USA aims to bridge the knowledge gap by creating an interactive, web-based platform to introduce basic coding concepts to elementary school children."},
+        {"label": "Goal", "id": "uniqueproject", "name": "The unique project", "summary": "The goal of the project is to create an interactive, web-based platform that introduces basic coding concepts through gamified experiences, making technology accessible and enjoyable for young learners."},
+        {"label": "Technology", "id": "htmlcssjavascriptreact.jspythondjangoframeworkpostgresql", "name": "HTML, CSS, JavaScript, React.js, Python, Django framework, PostgreSQL"},
+        {"label": "Restriction", "id": "absolute", "name": "absolute", "value": "none"},
+        {"label": "Concern", "id": "nonabsolute", "name": "non-absolute", "value": "none"},
+        {"label": "Ressource", "id": "highschoolstudents", "name": "high school students"},
+        {"label": "Ressource", "id": "elementaryschoolchildren", "name": "elementary school children"}
+    ],
+    "relationships": [
+        "highschoolcodingclubinanytownusa|HAS_RESSOURCES|highschoolstudents",
+        "uniqueproject|USES_TECH|htmlcssjavascriptreact.jspythondjangoframeworkpostgresql",
+        "uniqueproject|HAS_RESSOURCES|elementaryschoolchildren"
+    ]
+}

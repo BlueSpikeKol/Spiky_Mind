@@ -1,0 +1,37 @@
+{
+"entities": [
+    {"label":"Project","id":"thehighschoolcodingclub","name":"The High School Coding Club","summary":"The High School Coding Club in Anytown, USA, aims to create an interactive, web-based platform that introduces basic coding concepts through gamified experiences, making technology accessible and enjoyable for elementary school children."},
+    {"label":"Goal","id":"createaninteractivewebbasedplatform","name":"Create an interactive web-based platform","summary":"The goal of the project is to create an interactive, web-based platform that can introduce basic coding concepts to elementary school children through gamified experiences."},
+    {"label":"Technology","id":"HTML","name":"HTML"},
+    {"label":"Technology","id":"CSS","name":"CSS"},
+    {"label":"Technology","id":"JavaScript","name":"JavaScript"},
+    {"label":"Technology","id":"React.js","name":"React.js"},
+    {"label":"Technology","id":"Python","name":"Python"},
+    {"label":"Technology","id":"Django","name":"Django"},
+    {"label":"Technology","id":"PostgreSQL","name":"PostgreSQL"},
+    {"label":"Restriction","id":"timeLimit","name":"Time Limit"},
+    {"label":"Ressource","id":"fundingFromLocalBusinesses","name":"Funding from Local Businesses"},
+    {"label":"Ressource","id":"collaborationWithEducationalInstitutions","name":"Collaboration with Educational Institutions"},
+    {"label":"Ressource","id":"studentWorkforce","name":"Student Workforce"}
+],
+"relationships": [
+    "createaninteractivewebbasedplatform|USES_TECH|HTML",
+    "createaninteractivewebbasedplatform|USES_TECH|CSS",
+    "createaninteractivewebbasedplatform|USES_TECH|JavaScript",
+    "createaninteractivewebbasedplatform|USES_TECH|React.js",
+    "createaninteractivewebbasedplatform|USES_TECH|Python",
+    "createaninteractivewebbasedplatform|USES_TECH|Django",
+    "createaninteractivewebbasedplatform|USES_TECH|PostgreSQL",
+    "createaninteractivewebbasedplatform|RESTRICTED|timeLimit",
+    "thehighschoolcodingclub|HAS_RESSOURCES|fundingFromLocalBusinesses",
+    "thehighschoolcodingclub|HAS_RESSOURCES|collaborationWithEducationalInstitutions",
+    "thehighschoolcodingclub|HAS_RESSOURCES|studentWorkforce",
+    "HTML|RESTRICTED|timeLimit",
+    "CSS|RESTRICTED|timeLimit",
+    "JavaScript|RESTRICTED|timeLimit",
+    "React.js|RESTRICTED|timeLimit",
+    "Python|RESTRICTED|timeLimit",
+    "Django|RESTRICTED|timeLimit",
+    "PostgreSQL|RESTRICTED|timeLimit"
+]
+}

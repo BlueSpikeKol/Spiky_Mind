@@ -8,15 +8,19 @@ import utils.openai_api.gpt_calling as gpt
 
 """
 TODO:
-    - Supprimer la fonction `create_partial_context` et là remplacer dans toutes les fonctions qui l'utilisaient
+    - Supprimer la fonction `create_partial_context` et la remplacer dans toutes les fonctions qui l'utilisaient
     - Ajouter toutes les docstrings
     - Supprimer le fait de devoir choisir après chaque message de rester dans la sous discussion.
+    - Implémenter les logs pour tous les tokens utilisé par les models pour la génération de la discussion.
+    - Ajouter une fonction générale pour sauvegarder les données.
 """
 
 
 class TestSpiky:
     def __init__(self, format_fn, num_scenario: int = 0, custom_scenario: dict = None, auto_test: bool = True,
-                 test_model: str = "gpt-3.5-turbo", question_model: str = "gpt-4", openai_key: str = "auto",
+                 test_model: str = "gpt-3.5-turbo", form_model: str = "gpt-3.5-turbo",
+                 main_discussion_model: str = "gpt-4", summary_model: str = "gpt-3.5-turbo",
+                 sub_discussion_model: str = "gpt-3.5-turbo", openai_key: str = "auto",
                  encoding: str = "utf-8", path_logs: Path = None, discussion_started: bool = False):
 
         # If you want to test your program on a custom scenario
@@ -53,26 +57,35 @@ class TestSpiky:
         self.auto_test: bool = auto_test
         self.format_fn = format_fn
         self.data: dict = {}
-        self.question_model: str = question_model
         self.encoding: str = encoding
         self.discussion_started: bool = discussion_started
 
+        self.logs = {"form": {"input_tokens": 0, "output_tokens": 0, "total": 0},
+                     "main_discussion": {"ls_inputs": [], "ls_outputs": [], "total_inputs": 0, "total_outputs": 0,
+                                         "total": 0},
+                     "sub_discussion": {"ls_usages": [], "total_inputs": 0, "total_outputs": 0, "total": 0},
+                     "summary_discussion": {"ls_inputs": [], "ls_outputs": [], "total_inputs": 0, "total_outputs": 0,
+                                            "total": 0}, "total_inputs": 0, "total_outputs": 0, "total": 0}
+
         # Select if the tester is a model or a human
+        self.main_discussion_model: str = main_discussion_model
+        self.summary_model: str = summary_model
+        self.form_model: str = form_model
+        self.sub_discussion_model: str = sub_discussion_model
+
         if self.auto_test:
             self.test_model: str = test_model
         else:
             self.test_model: str = "human"
 
-        # Some statistic about the test
-        self.nb_token_question: int = 0
-        self.nb_token_test: int = 0
-
         # Create the AI agents
-        self.gpt_question = gpt.GPTAgent(self.question_model)
+        self.gpt_main_discussion = gpt.GPTAgent(self.main_discussion_model)
+        self.gpt_summary = gpt.GPTAgent(self.summary_model)
+        self.gpt_form = gpt.GPTAgent(self.form_model)
+        self.gpt_sub_discussion = gpt.GPTAgent(self.sub_discussion_model)
 
         if self.auto_test:
             self.gpt_test = gpt.GPTAgent(self.test_model)
-            self.gpt_eval = gpt.GPTAgent(self.test_model)
 
         # Set the key for the openai API
         if openai_key == "auto":
@@ -95,14 +108,68 @@ class TestSpiky:
         """
         messages = [{"role": "user", "content": self.format_fn(self.scenario_input)}]
 
-        self.gpt_question.messages = messages
+        self.gpt_form.messages = messages
 
-        all_data = self.gpt_question.run_agent()
+        all_data = self.gpt_form.run_agent()
         print("Creation of the form:", all_data)
 
-        response_message = {"content": all_data["choices"][0]["message"]["content"], "usage": all_data["usage"]}
+        self.update_logs(["form", "input"], value=all_data["usage"]["prompt_tokens"], is_appending=False)
+        self.update_logs(["form", "output"], value=all_data["usage"]["completion_tokens"], is_appending=False)
+
+        response_message = {"content": all_data["choices"][0]["message"]["content"]}
 
         return response_message
+
+    def update_logs(self, ls_index: list = [], value: int = 0, is_dict: bool = False, dict_value: dict = None,
+                    is_appending: bool = True) -> None:
+        if is_dict:
+            self.logs["sub_discussion"]["ls_usages"].append(dict_value)
+            self.logs["sub_discussion"]["total_inputs"] += dict_value["total_inputs"]
+            self.logs["sub_discussion"]["total_outputs"] += dict_value["total_outputs"]
+            self.logs["sub_discussion"]["total"] += dict_value["total"]
+            self.logs["total_inputs"] += dict_value["total_inputs"]
+            self.logs["total_outputs"] += dict_value["total_outputs"]
+            self.logs["total"] += dict_value["total"]
+
+        elif len(ls_index) == 1:
+            pass
+
+        elif len(ls_index) == 2:
+            i, k = ls_index
+            if is_appending:
+                if "input" in k:
+                    self.logs[i]["ls_inputs"].append(value)
+                    self.logs[i]["total_inputs"] += value
+                    self.logs[i]["total"] += value
+                    self.logs["total_inputs"] += value
+                    self.logs["total"] += value
+
+                elif "output" in k:
+                    self.logs[i]["ls_outputs"].append(value)
+                    self.logs[i]["total_outputs"] += value
+                    self.logs[i]["total"] += value
+                    self.logs["total_outputs"] += value
+                    self.logs["total"] += value
+
+                else:
+                    raise KeyError("Invalid key for the logs. Choose either 'input' or 'output'")
+            else:
+                if "input" in k:
+                    self.logs[i]["input_tokens"] += value
+                    self.logs[i]["total"] += value
+                    self.logs["total_inputs"] += value
+                    self.logs["total"] += value
+
+                elif "output" in k:
+                    self.logs[i]["output_tokens"] += value
+                    self.logs[i]["total"] += value
+                    self.logs["total_outputs"] += value
+                    self.logs["total"] += value
+
+
+        else:
+            raise Exception(f"Invalid input parameter to update the logs.\nls_index: {ls_index}\nvalue: {value}"
+                            f"\ndict_value: {dict_value}")
 
     def fill_form(self, form: dict) -> dict:
         """
@@ -128,8 +195,10 @@ class TestSpiky:
         for i in ls_question:
             msg = (f"Answer the following question with a short sentence. "
                    f"If you think a long sentence or a discussion is needed in order to answer correctly "
-                   f"the question put 'discussion needed'. The context you will use to answer the "
+                   f"the question put 'discussion needed'. You can create information at will."
+                   f"The context you will use to answer the "
                    f"question: \n{self.full_scenario}\nThe question you need to answer:\n{i}")
+
             messages[0]["content"] = msg
             self.gpt_test.messages = messages
             ls_answers.append(self.gpt_test.run_agent()["choices"][0]["message"]["content"])
@@ -143,7 +212,7 @@ class TestSpiky:
         summary_discussions = [i[0][list(i[0].keys())[0]] for i in ls_discussion]
         sub_discussions = [i[1][list(i[1].keys())[0]] for i in ls_discussion]
 
-        return {"usage": None, "content": "\n".join(ls_answers),
+        return {"content": "\n".join(ls_answers),
                 "summary_discussions": summary_discussions, "sub_discussions": sub_discussions}
 
     def fill_form_human(self, form: dict) -> dict:
@@ -179,10 +248,11 @@ class TestSpiky:
         return {"usage": None, "content": "\n".join(ls_answers),
                 "summary_discussions": summary_discussions, "sub_discussions": sub_discussions}
 
-    def create_specified_conversation(self, subject: str) -> tuple:
+    def create_specified_conversation(self, subject: str, nb_max_msg: int = 3) -> tuple:
         """
         Gather information about a specific subject related to the project.
 
+        :param nb_max_msg: The maximum number of message of the subdiscussion when being in auto
         :param subject: str the subject
         :return: All the information gathered
         """
@@ -192,6 +262,13 @@ class TestSpiky:
         ls_questions_answers = []
         answer = ""
         messages = [{"role": "user"}]
+
+        # Save the logs of the entire subdiscussion before updating the general logs.
+        local_logs = {"ls_inputs": [], "ls_outputs": [], "total_inputs": 0, "total_outputs": 0,
+                      "total": 0}
+
+        # Only used when the test is on auto. Allow the conversation to end after a fixed number of messages
+        index = 0
 
         # Keep asking questions on the subject until all the information are gathered
         while not all_information_gathered:
@@ -214,17 +291,40 @@ class TestSpiky:
                    "\nContinue the following conversation by asking a question.\n the conversation: " +
                    "\n".join(ls_questions_answers))
 
-            if self.evaluate_enough_information(self.create_partial_context(ls_questions_answers)):
+            if self.auto_test and index >= nb_max_msg:
+                print("subdiscussion ended by max number of message reached")
                 all_information_gathered = True
+
+            elif not self.auto_test:
+                if self.evaluate_enough_information(
+                        self.create_partial_context(ls_questions_answers)) or index >= nb_max_msg:
+                    print("subdiscussion ended by max number of message reached")
+                    all_information_gathered = True
 
             else:
                 messages[0]["content"] = msg
-                self.gpt_question.messages = messages
+                self.gpt_sub_discussion.messages = messages
 
-                all_data = self.gpt_question.run_agent()
+                all_data = self.gpt_sub_discussion.run_agent()
                 question = all_data["choices"][0]["message"]["content"]
 
+                # Update the local logs
+                local_logs["ls_inputs"].append(all_data["usage"]["prompt_tokens"])
+                local_logs["total_inputs"] += all_data["usage"]["prompt_tokens"]
+
+                local_logs["ls_outputs"].append(all_data["usage"]["completion_tokens"])
+                local_logs["total_outputs"] += all_data["usage"]["completion_tokens"]
+
+                local_logs["total"] += all_data["usage"]["completion_tokens"] + all_data["usage"]["prompt_tokens"]
+
+                index += 1
+
+        self.update_logs(is_dict=True, dict_value=local_logs)
+
         summary_data = self.summarize_information(ls_questions_answers)
+
+        self.update_logs(["summary_discussion", "input"], value=summary_data["usage"]["prompt_tokens"])
+        self.update_logs(["summary_discussion", "output"], value=summary_data["usage"]["completion_tokens"])
 
         result = ({"summary: " + subject: summary_data["choices"][0]["message"]["content"]},
                   {"sub_discussion": ls_questions_answers})
@@ -263,10 +363,10 @@ class TestSpiky:
                                                     f"questions, it is needed to ask more questions in order to have "
                                                     f"a complete answer about the first question asked.\n"
                                                     f"The context:\n{context}"}]
-            self.gpt_eval.update_agent(messages=messages, max_tokens=3, temperature=0.1,
-                                       logit_bias={9891: 10, 2201: 10})
+            self.gpt_summary.update_agent(messages=messages, max_tokens=3, temperature=0.1,
+                                          logit_bias={9891: 10, 2201: 10})
 
-            result = self.gpt_eval.run_agent()["choices"][0]["message"]["content"]
+            result = self.gpt_summary.run_agent()["choices"][0]["message"]["content"]
             print(result)
             return True
         else:
@@ -283,11 +383,12 @@ class TestSpiky:
 
         messages = [{"role": "user", "content": msg}]
 
-        self.gpt_question.messages = messages
+        self.gpt_summary.messages = messages
 
-        return self.gpt_question.run_agent()
+        return self.gpt_summary.run_agent()
 
-    def have_conversation(self, form: dict, answers: dict, previous_discussion: dict = None) -> dict:
+    def have_conversation(self, form: dict, answers: dict, previous_discussion: dict = None,
+                          nb_max_discussion: int = 3) -> dict:
         # Format all the questions and answers form the form in one string
         ls_questions_form = form["content"].split("\n")
         ls_answers_form = answers["content"].split("\n")
@@ -306,7 +407,8 @@ class TestSpiky:
             else:
                 corpus_qa += a + "\n"
 
-        if not previous_discussion is None:
+        if previous_discussion is not None:
+            print("The discussion had already been started previously.")
             for i in previous_discussion["questions"].keys():
                 corpus_qa += previous_discussion["questions"][i] + "\n"
                 corpus_qa += previous_discussion["answers"][i] + "\n"
@@ -319,24 +421,36 @@ class TestSpiky:
         data_discussion = {"questions": {}, "answers": {}, "sub_discussions": []}
 
         while discussion:
-            msg = (f"Ask a question to continue on going conversation. This is the project your are talking about: "
+            msg = (f"Ask a question to continue the on going conversation. This is the project your are talking about: "
                    f"{self.scenario_input}\n And this is the conversation until now: {corpus_qa}")
             messages[0]["content"] = msg
-            self.gpt_question.messages = messages
+            self.gpt_main_discussion.messages = messages
 
             # Create a sub_discussion based on the question generated by the main model
-            question = self.gpt_question.run_agent()["choices"][0]["message"]["content"]
-            result = self.create_specified_conversation(question)
+            all_data = self.gpt_main_discussion.run_agent()
+            question = all_data["choices"][0]["message"]["content"]
+
+            # Update the logs before creating a new subdiscussion
+            self.update_logs(["main_discussion", "input"], value=all_data["usage"]["prompt_tokens"])
+            self.update_logs(["main_discussion", "output"], value=all_data["usage"]["completion_tokens"])
+
+            result = self.create_specified_conversation(question, nb_max_msg=5)
 
             # Save all the information
             data_discussion["questions"][f"Q{index}"] = question
             data_discussion["answers"][f"Q{index}"] = result[0][f"summary: {question}"]
             data_discussion["sub_discussions"].append(result[1]["sub_discussion"])
 
+            # update the Q&A corpus
+            corpus_qa += question + "\n" + result[0][f"summary: {question}"] + "\n"
+
             index += 1
 
             # check if the user want to terminate the discussion
-            discussion = not input("Do you want to stop the discussion? ").upper()[:3] == "yes".upper()
+            if self.auto_test:
+                discussion = index < nb_max_discussion
+            else:
+                discussion = not input("Do you want to stop the discussion? ").upper()[:3] == "yes".upper()
 
         return data_discussion
 
@@ -351,12 +465,16 @@ class TestSpiky:
         :param discussions:
         :return: None
         """
-        data = {"form": {"function": self.format_fn.__name__, "model": self.question_model,
-                         "prompt": self.format_fn(self.scenario_input),
-                         "questions": {"usage": form["usage"]}, "answers": {},
+        data = {"form": {"function": self.format_fn.__name__, "model": self.main_discussion_model,
+                         "project_brief": self.scenario_input,
+                         "questions": {}, "answers": {},
                          "summary_discussions": answers_form["summary_discussions"],
                          "sub_discussions": answers_form["sub_discussions"]},
-                "conversation": {"questions": {}, "answers": {}, "sub_discussion": discussions["sub_discussion"]}}
+                "conversation": {"questions": {}, "answers": {}, "sub_discussions": discussions["sub_discussions"]},
+                "token_used": self.logs,
+                "models": {"main_discussion_model": self.main_discussion_model, "summary_model": self.summary_model,
+                           "test_model": self.test_model, "form_model": self.form_model,
+                           "sub_discussion_model": self.sub_discussion_model}}
 
         ls_question_form = form["content"].split("\n")
         ls_answers_form = answers_form["content"].split("\n")
@@ -387,7 +505,7 @@ class TestSpiky:
         :param answer_form: The answers of the form
         :return: None
         """
-        data = {"function": self.format_fn.__name__, "model": self.question_model,
+        data = {"function": self.format_fn.__name__, "model": self.main_discussion_model,
                 "prompt": self.format_fn(self.scenario_input),
                 "questions": {"usage": form["usage"]}, "answers": {},
                 "summary_discussions": answer_form["summary_discussions"],
@@ -475,9 +593,9 @@ class TestSpiky:
         else:
             answer_form = self.fill_form_human(form)
 
-        all_data = self.have_conversation(form, answer_form)
+        all_data = self.have_conversation(form, answer_form, nb_max_discussion=10)
 
-        self.save_conversation(form, answer_form, all_data)
+        self.save_conversation(form, answer_form, all_data, filename_conv="logs_test_long_conversation_gpt4.json")
 
     def run(self) -> None:
 
@@ -498,9 +616,15 @@ class TestSpiky:
 if __name__ == "__main__":
     import test_querry_gpt as test
 
-    t = TestSpiky(test_model="gpt-3.5-turbo-16k-0613", auto_test=False, format_fn=test.format_msg_9)
+    p = Path(os.getcwd()) / "logs"
+
+    t = TestSpiky(test_model="gpt-3.5-turbo-16k-0613", main_discussion_model="gpt-4",
+                  summary_model="gpt-3.5-turbo-16k-0613", form_model="gpt-4",
+                  sub_discussion_model="gpt-3.5-turbo-16k-0613", auto_test=True,
+                  format_fn=test.format_msg_9, num_scenario=0, path_logs=p)
 
     # print(t.full_scenario)
     print(t.path_logs)
 
-    t.run()
+    # t.run()
+    t.test_conversation()
