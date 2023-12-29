@@ -1,5 +1,6 @@
 import json
-
+import os
+from pathlib import Path
 import utils.openai_api.models as models
 
 class TokenPool:
@@ -7,15 +8,17 @@ class TokenPool:
     Class to manage and track token usage in various pools.
     """
 
-    def __init__(self, file_path="token_pools.json"):
+    def __init__(self):
         """
         Initialize the TokenPool object.
 
         Parameters:
             file_path (str): The path to the JSON file where token pool data is stored.
         """
+        current_script_path = Path(__file__).resolve()
+        parent_folder = current_script_path.parent
+        self.file_path = parent_folder.joinpath('token_pools.json')
         self.pools = {}
-        self.file_path = file_path
         self.load_data()
 
     def load_data(self):
@@ -97,11 +100,20 @@ class TokenPool:
             completion (dict): The completion data.
             token_pools_list (list): The list of token pools to update.
         """
+        if completion is None:
+            print("Completion data is None, skipping.")
+            return
         model = completion.get('model', 'unknown')
         usage = completion.get('usage', {})
         tokens_used = usage.get('total_tokens', 0)
         prompt_tokens = usage.get('prompt_tokens', 0)
         output_tokens = usage.get('completion_tokens', 0)
+
+        choices = completion.get('choices', [])
+        if len(choices) > 0:
+            first_choice = choices[0]
+            message = first_choice.get('message', {})
+            content = message.get('content', 'N/A')
 
         model_prices = models.ModelType.MODEL_PRICES.get(model, {'input': 0, 'output': 0})
         total_cost = (model_prices['input'] * prompt_tokens + model_prices['output'] * output_tokens) / 1000

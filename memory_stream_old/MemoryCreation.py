@@ -1,7 +1,5 @@
 import os
 import MemoryObject
-import MemoryStreamAccess
-import openai
 import spacy
 import re
 from gpt_api_old import AI_entities as AI, AI_trainer
@@ -10,7 +8,7 @@ import uuid
 from scipy.cluster.hierarchy import linkage, fcluster, dendrogram
 import matplotlib.pyplot as plt
 import numpy as np
-from utils import config_retrieval
+from utils import persistance_access
 
 MAXIMUM_TOKENS_16K = 14000
 
