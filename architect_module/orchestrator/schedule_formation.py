@@ -220,7 +220,7 @@ class ProjectSchedule:
         initial_diagram_creation_agent = self.gpt_manager.create_agent(system_prompt=system_prompt,
                                                                        model=ModelType.CHAT_GPT4,
                                                                        temperature=0.4, max_tokens=700,
-                                                                       messages="empty")  # Replace with actual agent creation logic
+                                                                       messages="empty")
 
         for count in range(1, max_iterations + 1):
             # Check if 'message' is None
