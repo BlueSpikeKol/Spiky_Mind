@@ -1,0 +1,34 @@
+{
+    "entities": [
+        {"label":"Project","id":"thehighschoolcodingclub","name":"The High School Coding Club","summary":"The High School Coding Club in Anytown, USA, is undertaking a 15-week long project with a budget of $200. The aim is to create a web-based platform that introduces basic coding concepts through gamified experiences to elementary school children. Five club members will participate in the project, dedicating significant time and effort. No specific marketing or outreach budget has been mentioned. The club aims to ensure the platform's accessibility, user-friendliness, engaging content, and continuous improvements based on user feedback."},
+        {"label":"Goal","id":"createaninteractivewebbasedplatform","name":"Create an interactive, web-based platform","summary":"The goal of the project is to introduce basic coding concepts to elementary school children through an interactive, web-based platform."},
+        {"label":"Technology","id":"HTML","name":"HTML"},
+        {"label":"Technology","id":"CSS","name":"CSS"},
+        {"label":"Technology","id":"JavaScript","name":"JavaScript"},
+        {"label":"Technology","id":"ReactJs","name":"React.js"},
+        {"label":"Restriction","id":"budgetLimit","name":"Limited Budget", "value":"$200"},
+        {"label":"Restriction","id":"timeframe","name":"Fixed timeframe", "value":"15 weeks"},
+        {"label":"Concern","id":"userFeedback","name":"User Feedback", "value":"Needs consistent"},
+        {"label":"Concern","id":"platformMaintenance","name":"Platform Maintenance", "value":"Post-launch sustainability and improvement"},
+        {"label":"Ressource","id":"highSchoolCodingClubMembers","name":"High School Coding Club Members"},
+        {"label":"Ressource","id":"donationsAndPartnerships","name":"Donations and Partnerships"}
+    ],
+    "relationships": [
+        "createaninteractivewebbasedplatform|USES_TECH|HTML", 
+        "createaninteractivewebbasedplatform|USES_TECH|CSS", 
+        "createaninteractivewebbasedplatform|USES_TECH|JavaScript", 
+        "createaninteractivewebbasedplatform|USES_TECH|ReactJs", 
+        "createaninteractivewebbasedplatform|RESTRICTED|budgetLimit", 
+        "createaninteractivewebbasedplatform|RESTRICTED|timeframe", 
+        "createaninteractivewebbasedplatform|CONCERNED|userFeedback", 
+        "createaninteractivewebbasedplatform|CONCERNED|platformMaintenance", 
+        "createaninteractivewebbasedplatform|HAS_RESSOURCES|highSchoolCodingClubMembers", 
+        "createaninteractivewebbasedplatform|HAS_RESSOURCES|donationsAndPartnerships", 
+        "thehighschoolcodingclub|HAS_RESSOURCES|highSchoolCodingClubMembers",
+        "thehighschoolcodingclub|HAS_RESSOURCES|donationsAndPartnerships",
+        "HTML|RESTRICTED|budgetLimit", 
+        "CSS|RESTRICTED|timeframe", 
+        "JavaScript|CONCERNED|userFeedback", 
+        "ReactJs|CONCERNED|platformMaintenance"
+    ]
+}

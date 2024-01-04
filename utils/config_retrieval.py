@@ -1,4 +1,5 @@
 import configparser
+from pathlib import Path
 from dataclasses import dataclass, asdict
 import os
 
@@ -30,7 +31,7 @@ class PineconeConfig:
     environment: str
 
 class ConfigManager:
-    def __init__(self, config_path=r'C:\Users\philippe\PycharmProjects\Spiky_Mind\config.ini'):
+    def __init__(self, config_path = CONFIG_FILE):
         config = configparser.ConfigParser()
 
         # Check if the file was read successfully

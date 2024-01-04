@@ -3,7 +3,11 @@ import json
 import pathlib
 from pathlib import Path
 
-import openai
+from langchain.graphs import Neo4jGraph
+from langchain.chains import GraphCypherQAChain
+from langchain.prompts.prompt import PromptTemplate
+from langchain.chat_models.openai import ChatOpenAI
+
 from neo4j import GraphDatabase
 
 import utils.openai_api.gpt_calling as gpt
@@ -132,6 +136,48 @@ Question: {question}
 $ctext
 """
 
+config = config_retrieval.ConfigManager()
+
+llm = ChatOpenAI(
+    temperature = 0,
+    openai_api_key=config.openai.api_key,
+    model="gpt-4"
+)
+
+
+CYPHER_QA_TEMPLATE = """You are an assistant that helps to form nice and human understandable answers.
+The information part contains the provided information that you must use to construct an answer.
+The provided information is authoritative, you must never doubt it or try to use your internal knowledge to correct it.
+Make the answer sound as a response to the question. Do not mention that you based the result on the given information.
+If the provided information is empty, say that you don't know the answer.
+Final answer should be easily readable and structured.
+Information:
+{context}
+
+Question: {question}
+Helpful Answer:"""
+
+qa_prompt = PromptTemplate(
+    input_variables=["context", "question"], template=CYPHER_QA_TEMPLATE
+)
+
+cypher_prompt = PromptTemplate(
+    template = QUERY_PROMPT_TEMPLATE_1,
+    input_variables = ["schema", "question"]
+)
+def query_graph(user_input):
+    graph = Neo4jGraph(url=config.neo4j.host, username=config.neo4j.user, password=config.neo4j.password)
+    chain = GraphCypherQAChain.from_llm(
+        llm=llm,
+        graph=graph,
+        verbose=True,
+        return_intermediate_steps=True,
+        cypher_prompt=cypher_prompt,
+        qa_prompt=qa_prompt
+        )
+    result = chain(user_input)
+    return result
+
 
 def load_data_main_discussion(path: pathlib.Path) -> str:
     with open(path, "r") as f:
@@ -177,49 +223,51 @@ def save_graph(path: Path, data: str) -> None:
         f.write(data)
 
 
-def create_cypher(path_data: Path) -> str:
-    with open(path_data, "r") as f:
-        try:
-            data = json.load(f)
-        except json.decoder.JSONDecodeError as e:
-            raise json.decoder.JSONDecodeError(f"The following error occurred when trying to read the data from the "
-                                               f"following file\nfile: {path_data}\nError: {e}")
-
+def generate_cypher(json_obj):
     e_statements = []
     r_statements = []
 
     e_label_map = {}
 
-    for entity in data["entities"]:
-        label = entity["label"]
-        id = entity["id"]
-        id.replace("-", "").replace("_", "")
-        properties = {k: v for k, v in entity.items() if k not in ["label", "id"]}
+    # loop through our json object
+    for i, obj in enumerate(json_obj):
+        print(f"Generating cypher for file {i+1} of {len(json_obj)}")
 
-        cypher = f'MERGE (n:{label} {{id: "{id}"}})'
-        if properties:
-            props_str = ", ".join(
-                [f'n.{key} = "{val}"' for key, val in properties.items()]
-            )
-            cypher += f" ON CREATE SET {props_str}"
-        e_statements.append(cypher)
-        e_label_map[id] = label
+        # Process entities if they exist in this part of the json_obj
+        if "entities" in obj:
+            for entity in obj["entities"]:
+                label = entity["label"]
+                id = entity["id"]
+                id = id.replace("-", "").replace("_", "")
+                properties = {k: v for k, v in entity.items() if k not in ["label", "id"]}
 
-    for rs in data["relationships"]:
-        src_id, rs_type, tgt_id = rs.split("|")
-        src_id = src_id.replace("-", "").replace("_", "")
-        tgt_id = tgt_id.replace("-", "").replace("_", "")
+                cypher = f'MERGE (n:{label} {{id: "{id}"}})'
+                if properties:
+                    props_str = ", ".join(
+                        [f'n.{key} = "{val}"' for key, val in properties.items()]
+                    )
+                    cypher += f" ON CREATE SET {props_str}"
+                e_statements.append(cypher)
+                e_label_map[id] = label
 
-        src_label = e_label_map[src_id]
-        tgt_label = e_label_map[tgt_id]
+        # Process relationships if they exist in this part of the json_obj
+        if "relationships" in obj:
+            for rs in obj["relationships"]:
+                src_id, rs_type, tgt_id = rs.split("|")
+                src_id = src_id.replace("-", "").replace("_", "")
+                tgt_id = tgt_id.replace("-", "").replace("_", "")
 
-        cypher = f'MERGE (a:{src_label} {{id: "{src_id}"}}) MERGE (b:{tgt_label} {{id: "{tgt_id}"}}) MERGE (a)-[:{rs_type}]->(b)'
-        r_statements.append(cypher)
+                src_label = e_label_map.get(src_id, "UnknownLabel")
+                tgt_label = e_label_map.get(tgt_id, "UnknownLabel")
+
+                cypher = f'MERGE (a:{src_label} {{id: "{src_id}"}}) MERGE (b:{tgt_label} {{id: "{tgt_id}"}}) MERGE (a)-[:{rs_type}]->(b)'
+                r_statements.append(cypher)
 
     with open("cyphers.txt", "w") as outfile:
         outfile.write("\n".join(e_statements + r_statements))
 
     return e_statements + r_statements
+
 
 
 def create_db(url: str, user: str, password: str, data: list) -> None:
@@ -234,7 +282,7 @@ def create_db(url: str, user: str, password: str, data: list) -> None:
                 f.write(f"{stmt} - Exception: {e}\n")
 
 
-def get_data_db(template: str, data: str, model: str, url: str, user: str, password: str) -> str:
+def get_data_db(template: str, data: str, model: str, url: str, user: str, password: str) -> str: #TODO replace using the langchain lib(function query_graph above)
     """
     Need to add some processing for the comprehension of the output data
     :param password:
@@ -269,24 +317,56 @@ def get_data_db(template: str, data: str, model: str, url: str, user: str, passw
         with open("failed_statements.txt", "a") as f:
             f.write(f"{q} - Exception: {e}\n")
 
-
-if __name__ == '__main__':
-    path_folder = Path("C:/Users/emile/OneDrive/Bureau/programme/Spiky_Mind/spiky_module/Research/logs")
-    path_graph = Path("C:/Users/emile/OneDrive/Bureau/programme/Spiky_Mind/spiky_module/Research/graphs")
-
-    ls_filename_model = [("logs_test_short_conversation_gpt4.json", "gpt-3.5-turbo-16k-0613", "d2_q3_short_gpt3.json"),
-                         ("logs_test_long_conversation_gpt4.json", "gpt-3.5-turbo-16k-0613", "d2_q3_long_gpt3.json"),
-                         ("logs_test_short_conversation_gpt4.json", "gpt-4", "d2_q3_short_gpt4.json"),
-                         ("logs_test_long_conversation_gpt4.json", "gpt-4", "d2_q3_long_gpt4.json"), ]
-
-    """
+def create_json_from_conversation(path_folder, path_graph, ls_filename_model: list[str]) -> str:
+    graph_name = None
     for filename, model, graph_name in ls_filename_model:
         d = load_data_main_discussion(path_folder / filename)
-        graph = create_graph(PROJECT_PROMPT_TEMPLATE_3, d, model)
-        save_graph(path_graph / graph_name, graph)
-    """
-    # d = create_cypher(path_graph / "d2_q2_short_gpt4.json")
-    # create_db("neo4j+s://ba0b31b5.databases.neo4j.io", "neo4j", "HeSO-YmrspoQdlyGclo4mtslUcVG8cf7IRmN3bymOOQ", d)
-    print(get_data_db(QUERY_PROMPT_TEMPLATE_1, "Which tech's goal has the greatest number of restriction?",
-                      "gpt-4", "neo4j+s://ba0b31b5.databases.neo4j.io", "neo4j",
-                      "HeSO-YmrspoQdlyGclo4mtslUcVG8cf7IRmN3bymOOQ"))
+        # graph = create_graph(PROJECT_PROMPT_TEMPLATE_3, d, model)
+        # save_graph(path_graph / graph_name, graph)
+    return graph_name
+
+def pipeline(path_folder, path_graph, ls_filename_model): #ls_filename_model is a list that allows testing
+    filename = create_json_from_conversation(path_folder, path_graph, ls_filename_model)
+
+    json_path = path_graph / filename
+    with open(json_path, 'r') as file:
+        json_data = json.load(file)
+
+    # Splitting the json_data into two separate dictionaries
+    json_list = [
+        {"entities": json_data.get("entities", [])},
+        {"relationships": json_data.get("relationships", [])}
+    ]
+
+    d = generate_cypher(json_list)
+
+    create_db("neo4j+s://" + config.neo4j.host, config.neo4j.user, config.neo4j.password, d)
+    # test the db, no need to do previous steps if there is already a db
+    query_result = query_graph("Which tech's goal has the greatest number of restriction?")
+    print(query_result)
+
+if __name__ == '__main__':
+    current_script_path = Path(__file__).resolve()
+    parent_folder = current_script_path.parent
+    path_folder = parent_folder.joinpath('logs')
+    path_graph = parent_folder.joinpath('graphs')
+
+    # # ls_filename_model = [("logs_test_short_conversation_gpt4.json", "gpt-3.5-turbo-16k-0613", "d2_q3_short_gpt3.json"),
+    #                      ("logs_test_long_conversation_gpt4.json", "gpt-3.5-turbo-16k-0613", "d2_q3_long_gpt3.json"),
+    #                      ("logs_test_short_conversation_gpt4.json", "gpt-4", "d2_q3_short_gpt4.json"),
+    #                      ("logs_test_long_conversation_gpt4.json", "gpt-4", "d2_q3_long_gpt4.json"), ]
+
+    ls_filename_model = [("logs_test_short_conversation_gpt4.json", "gpt-4", "pipeline_test.json")]
+
+    pipeline(path_folder, path_graph, ls_filename_model)
+
+    # for filename, model, graph_name in ls_filename_model:
+    #     d = load_data_main_discussion(path_folder / filename)
+    #     graph = create_graph(PROJECT_PROMPT_TEMPLATE_3, d, model)
+    #     save_graph(path_graph / graph_name, graph)
+    #
+    # # d = create_cypher(path_graph / "d2_q2_short_gpt4.json")
+    # # create_db("neo4j+s://ba0b31b5.databases.neo4j.io", "neo4j", "HeSO-YmrspoQdlyGclo4mtslUcVG8cf7IRmN3bymOOQ", d)
+    # print(get_data_db(QUERY_PROMPT_TEMPLATE_1, "Which tech's goal has the greatest number of restriction?",
+    #                   "gpt-4", "neo4j+s://ba0b31b5.databases.neo4j.io", "neo4j",
+    #                   "HeSO-YmrspoQdlyGclo4mtslUcVG8cf7IRmN3bymOOQ"))

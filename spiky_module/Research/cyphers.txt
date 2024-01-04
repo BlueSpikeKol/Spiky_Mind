@@ -1,0 +1,28 @@
+MERGE (n:Project {id: "thehighschoolcodingclub"}) ON CREATE SET n.name = "The High School Coding Club", n.summary = "The High School Coding Club in Anytown, USA, is undertaking a 15-week long project with a budget of $200. The aim is to create a web-based platform that introduces basic coding concepts through gamified experiences to elementary school children. Five club members will participate in the project, dedicating significant time and effort. No specific marketing or outreach budget has been mentioned. The club aims to ensure the platform's accessibility, user-friendliness, engaging content, and continuous improvements based on user feedback."
+MERGE (n:Goal {id: "createaninteractivewebbasedplatform"}) ON CREATE SET n.name = "Create an interactive, web-based platform", n.summary = "The goal of the project is to introduce basic coding concepts to elementary school children through an interactive, web-based platform."
+MERGE (n:Technology {id: "HTML"}) ON CREATE SET n.name = "HTML"
+MERGE (n:Technology {id: "CSS"}) ON CREATE SET n.name = "CSS"
+MERGE (n:Technology {id: "JavaScript"}) ON CREATE SET n.name = "JavaScript"
+MERGE (n:Technology {id: "ReactJs"}) ON CREATE SET n.name = "React.js"
+MERGE (n:Restriction {id: "budgetLimit"}) ON CREATE SET n.name = "Limited Budget", n.value = "$200"
+MERGE (n:Restriction {id: "timeframe"}) ON CREATE SET n.name = "Fixed timeframe", n.value = "15 weeks"
+MERGE (n:Concern {id: "userFeedback"}) ON CREATE SET n.name = "User Feedback", n.value = "Needs consistent"
+MERGE (n:Concern {id: "platformMaintenance"}) ON CREATE SET n.name = "Platform Maintenance", n.value = "Post-launch sustainability and improvement"
+MERGE (n:Ressource {id: "highSchoolCodingClubMembers"}) ON CREATE SET n.name = "High School Coding Club Members"
+MERGE (n:Ressource {id: "donationsAndPartnerships"}) ON CREATE SET n.name = "Donations and Partnerships"
+MERGE (a:Goal {id: "createaninteractivewebbasedplatform"}) MERGE (b:Technology {id: "HTML"}) MERGE (a)-[:USES_TECH]->(b)
+MERGE (a:Goal {id: "createaninteractivewebbasedplatform"}) MERGE (b:Technology {id: "CSS"}) MERGE (a)-[:USES_TECH]->(b)
+MERGE (a:Goal {id: "createaninteractivewebbasedplatform"}) MERGE (b:Technology {id: "JavaScript"}) MERGE (a)-[:USES_TECH]->(b)
+MERGE (a:Goal {id: "createaninteractivewebbasedplatform"}) MERGE (b:Technology {id: "ReactJs"}) MERGE (a)-[:USES_TECH]->(b)
+MERGE (a:Goal {id: "createaninteractivewebbasedplatform"}) MERGE (b:Restriction {id: "budgetLimit"}) MERGE (a)-[:RESTRICTED]->(b)
+MERGE (a:Goal {id: "createaninteractivewebbasedplatform"}) MERGE (b:Restriction {id: "timeframe"}) MERGE (a)-[:RESTRICTED]->(b)
+MERGE (a:Goal {id: "createaninteractivewebbasedplatform"}) MERGE (b:Concern {id: "userFeedback"}) MERGE (a)-[:CONCERNED]->(b)
+MERGE (a:Goal {id: "createaninteractivewebbasedplatform"}) MERGE (b:Concern {id: "platformMaintenance"}) MERGE (a)-[:CONCERNED]->(b)
+MERGE (a:Goal {id: "createaninteractivewebbasedplatform"}) MERGE (b:Ressource {id: "highSchoolCodingClubMembers"}) MERGE (a)-[:HAS_RESSOURCES]->(b)
+MERGE (a:Goal {id: "createaninteractivewebbasedplatform"}) MERGE (b:Ressource {id: "donationsAndPartnerships"}) MERGE (a)-[:HAS_RESSOURCES]->(b)
+MERGE (a:Project {id: "thehighschoolcodingclub"}) MERGE (b:Ressource {id: "highSchoolCodingClubMembers"}) MERGE (a)-[:HAS_RESSOURCES]->(b)
+MERGE (a:Project {id: "thehighschoolcodingclub"}) MERGE (b:Ressource {id: "donationsAndPartnerships"}) MERGE (a)-[:HAS_RESSOURCES]->(b)
+MERGE (a:Technology {id: "HTML"}) MERGE (b:Restriction {id: "budgetLimit"}) MERGE (a)-[:RESTRICTED]->(b)
+MERGE (a:Technology {id: "CSS"}) MERGE (b:Restriction {id: "timeframe"}) MERGE (a)-[:RESTRICTED]->(b)
+MERGE (a:Technology {id: "JavaScript"}) MERGE (b:Concern {id: "userFeedback"}) MERGE (a)-[:CONCERNED]->(b)
+MERGE (a:Technology {id: "ReactJs"}) MERGE (b:Concern {id: "platformMaintenance"}) MERGE (a)-[:CONCERNED]->(b)
