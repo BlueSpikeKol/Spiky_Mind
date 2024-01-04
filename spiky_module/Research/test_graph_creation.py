@@ -2,6 +2,7 @@ import os
 import json
 import pathlib
 from pathlib import Path
+from utils import config_retrieval
 
 from langchain.graphs import Neo4jGraph
 from langchain.chains import GraphCypherQAChain

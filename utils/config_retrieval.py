@@ -3,6 +3,10 @@ from pathlib import Path
 from dataclasses import dataclass, asdict
 import os
 
+current_script_path = Path(__file__).resolve()
+parent_folder = current_script_path.parent.parent
+CONFIG_FILE = parent_folder.joinpath('config.ini')
+
 
 # Define the individual data classes for each section of the configuration.
 # Each field in the data classes serves as a hint for both types and the structure of the config.
@@ -19,6 +23,15 @@ class MySQLConfig:
     user: str
     password: str
     database: str
+
+    def as_dict(self):
+        return asdict(self)
+
+@dataclass(frozen=True)
+class Neo4jConfig:
+    host: str
+    user: str
+    password: str
 
     def as_dict(self):
         return asdict(self)
@@ -60,6 +73,13 @@ class ConfigManager:
                 environment=config['pinecone']['environment']
             )
 
+        if 'neo4j' in config:
+            self.neo4j = Neo4jConfig(
+                host=config['neo4j']['host'],
+                user=config['neo4j']['user'],
+                password=config['neo4j']['password']
+            )
+
 # To add a new config section:
     # 1. Define a new dataclass above, annotating all fields with their expected types.
     # 2. Make sure the dataclass has the attribute `frozen=True` to ensure immutability.
@@ -71,3 +91,5 @@ class ConfigManager:
     #            ...
     #        )
     # 4. The instance variable `self.your_new_section_variable` will now hold the config for that section.
+
+
