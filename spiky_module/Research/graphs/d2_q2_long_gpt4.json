@@ -1,0 +1,101 @@
+{
+"entities": [
+    {
+    "label": "Project",
+    "id": "highschoolcodingclub",
+    "name": "High School Coding Club",
+    "summary": "The High School Coding Club in Anytown, USA, is creating a web-based platform that introduces basic coding concepts to elementary school children through gamified experiences. The project is currently in the Coding the Website phase and will later move onto the Testing and Debugging phase. With HTML, CSS, JavaScript, React.js, Python, Django framework, and PostgreSQL, the team aims to inspire an interest in coding and technology. To secure long-term funding and resources, they plan to form partnerships with local businesses and educational institutions."
+    },
+    {
+    "label": "Goal",
+    "id": "engagingyounglearnerstocode",
+    "name": "Engaging young learners to code",
+    "summary": "The primary goal of the project is to spark curiosity and foster a love for coding and technology at a young age. This would be achieved by designing a platform that teaches coding logic, syntax, and problem-solving skills through engaging games and puzzles, and rewards users with badges upon completion of challenges."
+    },
+    {
+    "label": "Technology",
+    "id": "HTML",
+    "name": "HTML"
+    },
+    {
+    "label": "Technology",
+    "id": "CSS",
+    "name": "CSS"
+    },
+    {
+    "label": "Technology",
+    "id": "JavaScript",
+    "name": "JavaScript"
+    },
+    {
+    "label": "Technology",
+    "id": "ReactJS",
+    "name": "React.js"
+    },
+    {
+    "label": "Technology",
+    "id": "Python",
+    "name": "Python"
+    },
+    {
+    "label": "Technology",
+    "id": "DjangoFramework",
+    "name": "Django framework"
+    },
+    {
+    "label": "Technology",
+    "id": "PostgreSQL",
+    "name": "PostgreSQL"
+    },
+    {
+    "label": "Restriction",
+    "id": "timelines",
+    "name": "Timelines",
+    "value": "End of Week 12 (Coding the website phase)"
+    },
+    {
+    "label": "Ressource",
+    "id": "partnerships",
+    "name": "Partnerships"
+    },
+    {
+    "label": "Ressource",
+    "id": "feedback",
+    "name": "Feedback"
+    },
+    {
+    "label": "Ressource",
+    "id": "socialMedia",
+    "name": "Social media"
+    },
+    {
+    "label": "Ressource",
+    "id": "openSourceContributions",
+    "name": "Open-source contributions"
+    }
+],
+"relationships": [
+    "engagingyounglearnerstocode|USES_TECH|HTML",
+    "engagingyounglearnerstocode|USES_TECH|CSS",
+    "engagingyounglearnerstocode|USES_TECH|JavaScript",
+    "engagingyounglearnerstocode|USES_TECH|ReactJS",
+    "engagingyounglearnerstocode|USES_TECH|Python",
+    "engagingyounglearnerstocode|USES_TECH|DjangoFramework",
+    "engagingyounglearnerstocode|USES_TECH|PostgreSQL",
+    "engagingyounglearnerstocode|RESTRICTED|timelines",
+    "engagingyounglearnerstocode|HAS_RESSOURCES|partnerships",
+    "engagingyounglearnerstocode|HAS_RESSOURCES|feedback",
+    "engagingyounglearnerstocode|HAS_RESSOURCES|socialMedia",
+    "highschoolcodingclub|HAS_RESSOURCES|partnerships",
+    "highschoolcodingclub|HAS_RESSOURCES|feedback",
+    "highschoolcodingclub|HAS_RESSOURCES|socialMedia",
+    "highschoolcodingclub|HAS_RESSOURCES|openSourceContributions",
+    "HTML|RESTRICTED|timelines",
+    "CSS|RESTRICTED|timelines",
+    "JavaScript|RESTRICTED|timelines",
+    "ReactJS|RESTRICTED|timelines",
+    "Python|RESTRICTED|timelines",
+    "DjangoFramework|RESTRICTED|timelines",
+    "PostgreSQL|RESTRICTED|timelines"
+]
+}

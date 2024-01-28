@@ -1,0 +1,36 @@
+{
+    "entities": [
+        {"label":"Project","id":"highschoolcodingclubinanytownusa","name":"High School Coding Club","summary":"The High School Coding Club in Anytown, USA, aims to bridge this knowledge gap with a unique project targeted at elementary school children. The goal? To create an interactive, web-based platform that introduces basic coding concepts through gamified experiences, making technology accessible and enjoyable for the youngest learners."},
+        {"label":"Goal","id":"codingconceptsthroughgamifiedexperiences","name":"coding concepts through gamified experiences","summary":"To create an interactive, web-based platform that introduces basic coding concepts through gamified experiences, making technology accessible and enjoyable for the youngest learners."},
+        {"label":"Technology","id":"htmlcssjavascript","name":"HTML, CSS, JavaScript"},
+        {"label":"Technology","id":"reactjs","name":"React.js"},
+        {"label":"Technology","id":"pythonbaseddjango","name":"Python-based Django"},
+        {"label":"Technology","id":"aws","name":"AWS"},
+        {"label":"Restriction","id":"technicalissues","name":"technical issues"},
+        {"label":"Restriction","id":"userengagement","name":"user engagement"},
+        {"label":"Restriction","id":"privacyandsecurityconcerns","name":"privacy and security concerns"},
+        {"label":"Restriction","id":"contentrelevanceandeffectiveness","name":"content relevance and effectiveness"},
+        {"label":"Ressource","id":"funding","name":"funding"},
+        {"label":"Ressource","id":"partnerships","name":"partnerships"},
+        {"label":"Ressource","id":"localbusinesses","name":"local businesses"},
+        {"label":"Ressource","id":"educationalinstitutions","name":"educational institutions"}
+    ],
+    "relationships": [
+        "highschoolcodingclubinanytownusa|USES_TECH|htmlcssjavascript",
+        "highschoolcodingclubinanytownusa|USES_TECH|reactjs",
+        "highschoolcodingclubinanytownusa|USES_TECH|pythonbaseddjango",
+        "highschoolcodingclubinanytownusa|USES_TECH|aws",
+        "codingconceptsthroughgamifiedexperiences|USES_TECH|htmlcssjavascript",
+        "codingconceptsthroughgamifiedexperiences|USES_TECH|reactjs",
+        "codingconceptsthroughgamifiedexperiences|USES_TECH|pythonbaseddjango",
+        "codingconceptsthroughgamifiedexperiences|USES_TECH|aws",
+        "highschoolcodingclubinanytownusa|RESTRICTED|technicalissues",
+        "highschoolcodingclubinanytownusa|RESTRICTED|userengagement",
+        "highschoolcodingclubinanytownusa|RESTRICTED|privacyandsecurityconcerns",
+        "highschoolcodingclubinanytownusa|RESTRICTED|contentrelevanceandeffectiveness",
+        "highschoolcodingclubinanytownusa|HAS_RESSOURCES|funding",
+        "highschoolcodingclubinanytownusa|HAS_RESSOURCES|partnerships",
+        "highschoolcodingclubinanytownusa|HAS_RESSOURCES|localbusinesses",
+        "highschoolcodingclubinanytownusa|HAS_RESSOURCES|educationalinstitutions"
+    ]
+}

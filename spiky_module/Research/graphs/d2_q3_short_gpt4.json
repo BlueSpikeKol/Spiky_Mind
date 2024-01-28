@@ -1,0 +1,40 @@
+{
+    "entities": [
+        {"label":"Project","id":"highschoolcodingclub","name":"High School Coding Club","summary":"The High School Coding Club in Anytown, USA, aims to create an interactive, web-based platform that introduces basic coding concepts through gamified experiences, targeting elementary school children. The focus is to build an intuitive, user-friendly interface using HTML, CSS, JavaScript, and React.js. The project is estimated to take approximately 15 weeks to complete with ongoing maintenance and enhancements based on user feedback. Five club members are expected to be involved in the project."},
+        {"label":"Goal","id":"interactivecodingplatform","name":"Interactive Coding Platform","summary":"The goal of the High School Coding Club is to create an interactive web-based platform that simplifies coding for elementary school children. This is achieved through different gamified experiences, interactive features, drag-and-drop coding blocks and puzzles. The platform plans to be user-friendly and visually appealing, making coding accessible and enjoyable for even the youngest learners."},
+        {"label":"Technology","id":"html","name":"HTML"},
+        {"label":"Technology","id":"css","name":"CSS"},
+        {"label":"Technology","id":"javaScript","name":"JavaScript"},
+        {"label":"Technology","id":"reactJs","name":"React.js"},
+        {"label":"Restriction","id":"projectDuration","name":"Project Duration", "value":"15 weeks"},
+        {"label":"Restriction","id":"budget","name":"Budget", "value":"$200"},
+        {"label":"Ressource","id":"clubMembers","name":"Club Members"},
+        {"label":"Ressource","id":"feedback","name":"Feedback"},
+        {"label":"Ressource","id":"partnerships","name":"Partnerships"},
+        {"label":"Ressource","id":"donations","name":"Donations"}
+    ],
+    "relationships": [
+        "interactivecodingplatform|USES_TECH|html",
+        "interactivecodingplatform|USES_TECH|css",
+        "interactivecodingplatform|USES_TECH|javaScript",
+        "interactivecodingplatform|USES_TECH|reactJs",
+        "interactivecodingplatform|RESTRICTED|projectDuration",
+        "interactivecodingplatform|RESTRICTED|budget",
+        "interactivecodingplatform|HAS_RESSOURCES|clubMembers",
+        "interactivecodingplatform|HAS_RESSOURCES|feedback",
+        "interactivecodingplatform|HAS_RESSOURCES|partnerships",
+        "interactivecodingplatform|HAS_RESSOURCES|donations",
+        "highschoolcodingclub|HAS_RESSOURCES|clubMembers",
+        "highschoolcodingclub|HAS_RESSOURCES|feedback",
+        "highschoolcodingclub|HAS_RESSOURCES|partnerships",
+        "highschoolcodingclub|HAS_RESSOURCES|donations",
+        "html|RESTRICTED|projectDuration",
+        "css|RESTRICTED|projectDuration",
+        "javaScript|RESTRICTED|projectDuration",
+        "reactJs|RESTRICTED|projectDuration",
+        "html|RESTRICTED|budget",
+        "css|RESTRICTED|budget",
+        "javaScript|RESTRICTED|budget",
+        "reactJs|RESTRICTED|budget"
+    ]
+}

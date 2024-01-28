@@ -1,0 +1,40 @@
+{
+    "entities": [
+        {"label":"Project","id":"highschoolcodingclub","name":"High School Coding Club","summary":"The High School Coding Club in Anytown, USA, is launching a project for elementary school children. The project aims to create a web-based platform to introduce basic coding concepts through gamified experiences. The project intends to use HTML, CSS, JavaScript with React.js for frontend development, Python-based Django framework for backend development, and AWS for hosting. The platform must comply with WCAG guidelines to enhance accessibility."},
+        {"label":"Goal","id":"createaninteractivewebbasedplatform","name":"Create an interactive web-based platform", "summary":"The goal of the project is to introduce basic coding concepts via an interactive, web-based platform with gamified experiences. The platform is to be user-friendly and accessible, teaching concepts like loops, conditionals, and variables. The goal also includes collaboration with educators and making platform engaging by continuous updates and fun graphics."},
+        {"label":"Technology","id":"HTML","name":"HTML"},
+        {"label":"Technology","id":"CSS","name":"CSS"},
+        {"label":"Technology","id":"JavaScript","name":"JavaScript"},
+        {"label":"Technology","id":"React.js","name":"React.js"},
+        {"label":"Technology","id":"Python-basedDjangoFramework","name":"Python-based Django Framework"},
+        {"label":"Technology","id":"AWS","name":"AWS"},
+        {"label":"Restriction","id":"WCAGGuidelines","name":"WCAG Guidelines"},
+        {"label":"Restriction","id":"UserEngagement","name":"User Engagement"},
+        {"label":"Restriction","id":"PrivacyAndSecurity","name":"Privacy and Security"},
+        {"label":"Restriction","id":"ContentRelevance","name":"Content Relevance"},
+        {"label":"Ressource","id":"feedbackLoops","name":"Feedback Loops"},
+        {"label":"Ressource","id":"gamifiedExperiences","name":"Gamified Experiences"},
+        {"label":"Ressource","id":"collaborationTeachers","name":"Collaboration with Teachers"}
+    ],
+    "relationships": [
+        "createaninteractivewebbasedplatform|USES_TECH|HTML",
+        "createaninteractivewebbasedplatform|USES_TECH|CSS",
+        "createaninteractivewebbasedplatform|USES_TECH|JavaScript",
+        "createaninteractivewebbasedplatform|USES_TECH|React.js",
+        "createaninteractivewebbasedplatform|USES_TECH|Python-basedDjangoFramework",
+        "createaninteractivewebbasedplatform|USES_TECH|AWS",
+        "highschoolcodingclub|HAS_RESSOURCES|feedbackLoops",
+        "highschoolcodingclub|HAS_RESSOURCES|gamifiedExperiences",
+        "highschoolcodingclub|HAS_RESSOURCES|collaborationTeachers",
+        "createaninteractivewebbasedplatform|RESTRICTED|WCAGGuidelines",
+        "createaninteractivewebbasedplatform|RESTRICTED|UserEngagement",
+        "createaninteractivewebbasedplatform|RESTRICTED|PrivacyAndSecurity",
+        "createaninteractivewebbasedplatform|RESTRICTED|ContentRelevance",
+        "HTML|RESTRICTED|WCAGGuidelines",
+        "CSS|RESTRICTED|WCAGGuidelines",
+        "JavaScript|RESTRICTED|WCAGGuidelines",
+        "React.js|RESTRICTED|WCAGGuidelines",
+        "Python-basedDjangoFramework|RESTRICTED|WCAGGuidelines",
+        "AWS|RESTRICTED|WCAGGuidelines"
+    ]
+}

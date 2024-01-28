@@ -1,0 +1,36 @@
+Entities:
+1. Project:
+   - id: highschoolcodingclubinanytownusa
+   - name: High School Coding Club in Anytown, USA
+   - summary: The High School Coding Club in Anytown, USA aims to bridge the knowledge gap by creating an interactive web-based platform that introduces coding concepts to elementary school children through gamified experiences. The platform focuses on making technology accessible and enjoyable for young learners.
+
+2. Goal:
+   - id: createaninteractivewebbasedplatform
+   - name: Create an interactive web-based platform
+   - summary: The goal of the project is to create an interactive web-based platform that introduces basic coding concepts to elementary school children through gamified experiences. The platform aims to make technology accessible and enjoyable for the youngest learners.
+
+3. Technology:
+   - id: html
+   - name: HTML
+   - id: css
+   - name: CSS
+   - id: javascript
+   - name: JavaScript
+   - id: reactjs
+   - name: React.js
+
+4. Restriction:
+   - id: none
+
+5. Concern:
+   - id: none
+
+6. Ressource:
+   - id: frontenddeveloper
+   - name: Frontend developer
+
+Relationships:
+- createaninteractivewebbasedplatform|USES_TECH|html
+- createaninteractivewebbasedplatform|USES_TECH|css
+- createaninteractivewebbasedplatform|USES_TECH|javascript
+- createaninteractivewebbasedplatform|USES_TECH|reactjs

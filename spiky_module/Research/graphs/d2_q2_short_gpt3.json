@@ -1,0 +1,42 @@
+{
+"entities": [
+    {"label":"Project","id":"highschoolcodingclubinanytownusa","name":"High School Coding Club in Anytown, USA","summary":"The High School Coding Club in Anytown, USA, aims to bridge the knowledge gap with a project targeted at elementary school children by creating an interactive, web-based platform that introduces coding concepts through gamified experiences."},
+    {"label":"Goal","id":"createaninteractivewebbasedplatform","name":"Create an interactive, web-based platform","summary":"To create an interactive, web-based platform that introduces basic coding concepts through gamified experiences, making technology accessible and enjoyable for elementary school children."},
+    {"label":"Technology","id":"htmlcssjavascriptreactjs","name":"HTML, CSS, JavaScript, React.js"},
+    {"label":"Restriction","id":"expectedparticipation","name":"Expected Participation","value":"unknown"},
+    {"label":"Restriction","id":"totalbudget","name":"Total Budget","value":"$200"},
+    {"label":"Restriction","id":"duration","name":"Duration","value":"15 weeks"},
+    {"label":"Restriction","id":"dedicatetoprject","name":"Dedicate to Project","value":"unknown"},
+    {"label":"Restriction","id":"gamifiedexperiences","name":"Gamified Experiences","value":"unknown"},
+    {"label":"Restriction","id":"numberofmember","name":"Number of Members","value":"5"},
+    {"label":"Restriction","id":"marketingbudget","name":"Marketing Budget","value":"unknown"},
+    {"label":"Restriction","id":"numberofschools","name":"Number of Schools","value":"unknown"},
+    {"label":"Restriction","id":"volunteerhoursneeded","name":"Volunteer Hours Needed","value":"unknown"},
+    {"label":"Ressource","id":"frontenddeveloper","name":"Frontend Developer"},
+    {"label":"Ressource","id":"ideationplanninggamedesigntestingmarketingmaintenanceenhancements","name":"Ideation, Planning, Game and Puzzle Design, Testing, Marketing, Maintenance and Enhancements"},
+    {"label":"Ressource","id":"draganddropcodeblockspuzzleschallengesloopsconditionalsvariables","name":"Drag-and-drop Code Blocks, Puzzles, Challenges, Loops, Conditionals, Variables"},
+    {"label":"Ressource","id":"userfeedbackeducationaltrends","name":"User Feedback, Educational Trends"},
+    {"label":"Ressource","id":"teachersstudents","name":"Teachers, Students"},
+    {"label":"Ressource","id":"fundingsresourcesopensourcecontributions","name":"Fundings, Resources, Open-source Contributions"},
+    {"label":"Ressource","id":"localbusinesseseducationalinstitutions","name":"Local Businesses, Educational Institutions"}
+],
+"relationships": [
+    "highschoolcodingclubinanytownusa|HAS_RESSOURCES|frontenddeveloper",
+    "highschoolcodingclubinanytownusa|HAS_RESSOURCES|ideationplanninggamedesigntestingmarketingmaintenanceenhancements",
+    "highschoolcodingclubinanytownusa|RESTRICTED|expectedparticipation",
+    "highschoolcodingclubinanytownusa|RESTRICTED|totalbudget",
+    "highschoolcodingclubinanytownusa|RESTRICTED|duration",
+    "highschoolcodingclubinanytownusa|RESTRICTED|dedicatetoprject",
+    "highschoolcodingclubinanytownusa|RESTRICTED|gamifiedexperiences",
+    "highschoolcodingclubinanytownusa|RESTRICTED|numberofmember",
+    "highschoolcodingclubinanytownusa|RESTRICTED|marketingbudget",
+    "highschoolcodingclubinanytownusa|RESTRICTED|numberofschools",
+    "highschoolcodingclubinanytownusa|RESTRICTED|volunteerhoursneeded",
+    "createaninteractivewebbasedplatform|USES_TECH|htmlcssjavascriptreactjs",
+    "createaninteractivewebbasedplatform|HAS_RESSOURCES|draganddropcodeblockspuzzleschallengesloopsconditionalsvariables",
+    "createaninteractivewebbasedplatform|HAS_RESSOURCES|userfeedbackeducationaltrends",
+    "createaninteractivewebbasedplatform|HAS_RESSOURCES|teachersstudents",
+    "createaninteractivewebbasedplatform|HAS_RESSOURCES|fundingsresourcesopensourcecontributions",
+    "createaninteractivewebbasedplatform|HAS_RESSOURCES|localbusinesseseducationalinstitutions"
+]
+}

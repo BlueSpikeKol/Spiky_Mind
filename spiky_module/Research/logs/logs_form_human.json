@@ -1,0 +1,63 @@
+{
+    "function": "format_msg_9",
+    "model": "gpt-4",
+    "prompt": "Ask question to gather only quantitative information about the following project. Make sure your question are simple and general. The format of your questions should be: <question> <answer>. Do not include the answer.The High School Coding Club in Anytown, USA, aims to bridge this knowledge gap with a unique project targeted at elementary school children. The goal? To create an interactive, web-based platform that introduces basic coding concepts through gamified experiences, making technology accessible and enjoyable for the youngest learners.",
+    "form": {
+        "usage": {
+            "prompt_tokens": 105,
+            "completion_tokens": 201,
+            "total_tokens": 306
+        },
+        "Q0": "1. How many high school students are participating in the Coding Club project?",
+        "Q1": "2. What is the projected budget for the Coding Club project?",
+        "Q2": "3. How many elementary school children are targeted to benefit from this project?",
+        "Q3": "4. How many hours per week is allotted for the project development?",
+        "Q4": "5. How many games or gamified experiences are planned for the web-based platform?",
+        "Q5": "6. How many basic coding concepts will be introduced through this platform?",
+        "Q6": "7. On average, how long should each game or experience on the platform last?",
+        "Q7": "8. What is the targeted launch date for this interactive platform?",
+        "Q8": "9. How many teachers or instructors are involved in the development of the project?",
+        "Q9": "10. What is the estimated number of hours needed to complete the project? ",
+        "Q10": "11. How many schools in Anytown, USA will the project reach? ",
+        "Q11": "12. Over the course of a year, how many updates are planned for the platform?",
+        "Q12": "13. What is the cost for maintaining the web-based platform on a yearly basis?"
+    },
+    "answers": {
+        "usage": null,
+        "Q0": "12",
+        "Q1": "10000$",
+        "Q2": "at first 3000",
+        "Q3": "on average 30h",
+        "Q4": "discussion needed",
+        "Q5": "hopefully all of them",
+        "Q6": "each level of each game should last between 5 to 15min depending on the difficulty",
+        "Q7": "in one year from now",
+        "Q8": "there are 5 different teachers involved in this project",
+        "Q9": "N/A",
+        "Q10": "3",
+        "Q11": "discussion needed",
+        "Q12": "It will depend on the number of users using the web-based platform."
+    },
+    "summary_discussions": [
+        "The web-based platform plans to launch with four different gamified experiences aimed at teaching programming. These will cover basic concepts like variables, loops, conditions, etc., as well as specific programming languages like Python and C, and object-oriented programming. The games are designed to equip students with enough knowledge to code complex programs upon completion. The developers are currently collaborating with teachers and designers to build games that are both fun and effective in teaching programming concepts.",
+        "Annually, the platform plans to have at least one update between the initial closed beta launch (exclusive to specified schools) and the global release. This is aimed at fixing any discovered problems. Future updates will incorporate programming languages such as C++, Java, JavaScript, HTML, CSS, and SQL. More languages may be added later. The platform aims to engage young children by collaborating with teachers and designers to develop fun, educational games tailored to teach programming concepts."
+    ],
+    "sub_discussions": [
+        [
+            "Answer the following question with the information you have for now.\n 5. How many games or gamified experiences are planned for the web-based platform?",
+            "at the beginning 4 different games will be available. One to learn the basic concepts of programming such as variables, loop, conditions ect... There will ba a game to learn python, one to learn C and one to learn about the oriented object programming.",
+            "6. What are the specific elements or concepts of programming that the games will cover?",
+            "The games will cover enough concepts such that the student will be able to code complex programmes after completing their formations",
+            "7. Can you provide more details on how these games will teach the concepts of programming to the students?",
+            "We are currently working with teachers and deisgners in order to build funs games that will be able to teach the students programming concepts."
+        ],
+        [
+            "Answer the following question with the information you have for now.\n 12. Over the course of a year, how many updates are planned for the platform?",
+            "There will at least one update between the first launch (which is a closed beta only available to specified scholls) and the global released after we will try to fiw all the problems that will be found. Later other programming language ill be added.",
+            "13. Can you clarify which programming languages are planned to be added in these updates?",
+            "We planned to add C++, Java, Javascrypt, HTML, CSS and SQL. Later on other programming could be added but we are not considering them for now.",
+            "14. What measures are being taken to make this platform user-friendly and engaging for young children?",
+            "We are currently working with teachers and deisgners in order to build funs games that will be able to teach the students programming concepts."
+        ]
+    ]
+}

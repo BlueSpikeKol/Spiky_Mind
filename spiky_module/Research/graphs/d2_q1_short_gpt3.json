@@ -1,0 +1,58 @@
+{
+  "entities": [
+    {
+      "label": "Project",
+      "id": "highschoolcodingclubinanytownusa",
+      "name": "High School Coding Club",
+      "summary": "The High School Coding Club in Anytown, USA, aims to bridge this knowledge gap with a unique project targeted at elementary school children. The goal? To create an interactive, web-based platform that introduces basic coding concepts through gamified experiences, making technology accessible and enjoyable for the youngest learners."
+    },
+    {
+      "label": "Goal",
+      "id": "createaninteractivewebbasedplatform",
+      "name": "create an interactive, web-based platform",
+      "summary": "The goal of the project is to create an interactive, web-based platform that introduces basic coding concepts through gamified experiences, making technology accessible and enjoyable for elementary school children."
+    },
+    {
+      "label": "Technology",
+      "id": "html",
+      "name": "HTML"
+    },
+    {
+      "label": "Technology",
+      "id": "css",
+      "name": "CSS"
+    },
+    {
+      "label": "Technology",
+      "id": "javascript",
+      "name": "JavaScript"
+    },
+    {
+      "label": "Technology",
+      "id": "reactjs",
+      "name": "React.js"
+    },
+    {
+      "label": "Restriction",
+      "id": "budget",
+      "name": "budget"
+    },
+    {
+      "label": "Ressource",
+      "id": "volunteerhours",
+      "name": "volunteer hours"
+    }
+  ],
+  "relationships": [
+    "highschoolcodingclubinanytownusa|USES_TECH|html",
+    "highschoolcodingclubinanytownusa|USES_TECH|css",
+    "highschoolcodingclubinanytownusa|USES_TECH|javascript",
+    "highschoolcodingclubinanytownusa|USES_TECH|reactjs",
+    "highschoolcodingclubinanytownusa|RESTRICTED|budget",
+    "highschoolcodingclubinanytownusa|HAS_RESSOURCES|volunteerhours",
+    "html|RESTRICTED|budget",
+    "css|RESTRICTED|budget",
+    "javascript|RESTRICTED|budget",
+    "reactjs|RESTRICTED|budget"
+  ]
+}

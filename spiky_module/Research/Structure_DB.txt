@@ -1,0 +1,51 @@
+Structure de la DB:
+
+Chaque projet a un node `Project` qui est la base de l'arbre.
+L'entièreté de la DB va être construite autour des nodes `Goal` qui peuvent être attaché au projet ou à d'autres objectifs
+
+
+Every labels that a goal can have:
+	- Goal
+	- Requirements
+	- Scope (in certain case is not easy to determine)
+	- Ressources (ex: People, Budget, Equipment ect...)
+	- Risks
+	- Schedule (not always determined)
+	- Constraints
+
+Variables of a Risk:
+	- Description
+	- Impact
+	- Severity
+	- Likelihood of happening
+
+Analysis on Risk:
+	- Proposed solution
+	- Migration approach
+
+Types of Constraints:
+	- Internal controls
+	- Approvals
+	- Regulatory
+	- Ressource Constraints
+	- Dependencies
+
+
+Generation of the DB:
+Method 1 (will use a lot of tokens):
+First analyse every data available to extract all the main goal of the project.
+For each goal, analyse the data again to find all the labels described above.
+If a new goal is found repeat the same process for it.
+
+To enable a precise analysis of the data, break them into the following part:
+	- The form (only the answer to the question or the summarized subdiscussion)
+	- Every subdiscussion from the main discussion
+	- If needed the subdiscussion from the form
+
+Problem of this solution:
+Doesn't allow relation between the labels of goal.
+Like labels from a goal are completely independent from label of another goal.
+
+
+
+

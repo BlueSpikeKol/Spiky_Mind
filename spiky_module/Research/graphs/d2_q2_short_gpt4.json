@@ -1,0 +1,67 @@
+{
+    "entities": [
+        {
+            "label": "Project",
+            "id": "thehighschoolcodingclubinanytownusa",
+            "name": "The High School Coding Club in Anytown, USA",
+            "summary": "A unique project targeted at elementary school children with a goal to create an interactive, web-based platform that introduces basic coding concepts through gamified experiences, making technology accessible and enjoyable for the youngest learners. The club aims to provide an engaging and accessible learning experience for young learners. Feedback will be carefully analyzed and incorporated into platform maintenance."
+        },
+        {
+            "label": "Goal",
+            "id": "createaninteractivewebbasedplatform",
+            "name": "Create an interactive web-based platform",
+            "summary": "The project aims to introduce basic coding concepts to elementary school children by creating an engaging, user-friendly, and interactive web-based platform. This is expected to bridge the knowledge gap and make learning technology fun for young learners."
+        },
+        {
+            "label": "Technology",
+            "id": "HTML",
+            "name": "HTML"
+        },
+        {
+            "label": "Technology",
+            "id": "CSS",
+            "name": "CSS"
+        },
+        {
+            "label": "Technology",
+            "id": "JavaScript",
+            "name": "JavaScript"
+        },
+        {
+            "label": "Technology",
+            "id": "ReactJs",
+            "name": "React.js"
+        },
+        {
+            "label": "Restriction",
+            "id": "projectDuration",
+            "name": "Project Duration",
+            "value": "15 weeks"
+        },
+        {
+            "label": "Restriction",
+            "id": "projectBudget",
+            "name": "Project Budget",
+            "value": "$200"
+        },
+        {
+            "label": "Ressource",
+            "id": "highSchoolCodingClub",
+            "name": "High School Coding Club"
+        }
+    ],
+    "relationships": [
+        "createaninteractivewebbasedplatform|USES_TECH|HTML",
+        "createaninteractivewebbasedplatform|USES_TECH|CSS",
+        "createaninteractivewebbasedplatform|USES_TECH|JavaScript",
+        "createaninteractivewebbasedplatform|USES_TECH|ReactJs",
+        "createaninteractivewebbasedplatform|RESTRICTED|projectDuration",
+        "createaninteractivewebbasedplatform|RESTRICTED|projectBudget",
+        "createaninteractivewebbasedplatform|HAS_RESSOURCES|highSchoolCodingClub",
+        "thehighschoolcodingclubinanytownusa|HAS_RESSOURCES|highSchoolCodingClub",
+        "HTML|RESTRICTED|projectBudget",
+        "CSS|RESTRICTED|projectBudget",
+        "JavaScript|RESTRICTED|projectBudget",
+        "ReactJs|RESTRICTED|projectBudget"
+    ]
+}
