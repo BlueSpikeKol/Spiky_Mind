@@ -6,3 +6,10 @@ class ConversationType(Enum):
     FREESTYLE = 3
 
 
+class ConversationEndType(Enum):
+    INFORMATION_GATHERED = 1
+    X_MESSAGES_EXCHANGED = 2
+    USER_ENDED = 3
+    BOT_ENDED = 4
+    TIMEOUT = 5
+

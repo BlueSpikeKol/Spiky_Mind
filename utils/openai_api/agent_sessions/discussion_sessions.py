@@ -5,7 +5,7 @@ from utils.openai_api.agent_sessions.trajectory import ConversationTrajectory
 from utils.openai_api.agent_sessions.message_types import UserMessage, AIMessage, SystemMessage, Message
 from utils.openai_api.models import ModelType
 from utils.openai_api.gpt_calling import GPTAgent, GPTManager
-from utils.openai_api.agent_sessions.convo_types import ConversationType
+from utils.openai_api.agent_sessions.convo_types import ConversationType, ConversationEndType
 from utils.openai_api.agent_sessions.memory_types import MemoryType
 
 
@@ -13,7 +13,8 @@ class DiscussionSession:
     def __init__(self, subject=None, agent: GPTAgent = None,
                  conversation_type: ConversationType = ConversationType.FREESTYLE,
                  memory_type: MemoryType = MemoryType.LAST_X_MESSAGES, last_x_messages: int = 3,
-                 summarize_result=False):
+                 summarize_result=False, conversation_end_type: ConversationEndType = ConversationEndType.USER_ENDED,
+                 end_info=None, end_controlled_by_user=True):
         """
         :param subject: the subject of a conversation is very important if the agent is asking questions and leading
         the discussion. Here is an example of a good subject to lead a discussion: "We need to determine what are the
@@ -23,6 +24,11 @@ class DiscussionSession:
         :param memory_type:
         :param last_x_messages: only necessary when memory_type is LAST_X_MESSAGES
         :param summarize_result: if True, the result of the discussion will be summarized and returned as a string along.
+        :param conversation_end_type: the type of end of discussion. Will determine the mechanism to end the discussion.
+        :param end_info: additional information to end the discussion. For example, if conversation_end_type is set to
+        ConversationEndType.X_MESSAGES_EXCHANGED, end_info will be the number of messages exchanged before ending the
+        discussion.
+        TODO: standardize the end_info parameter
         """
         self.agent = agent
         self.subject = subject
@@ -32,6 +38,9 @@ class DiscussionSession:
         self.trajectory = ConversationTrajectory(self.subject, self.conversation_type, self.memory_type)
         self.last_x_messages = last_x_messages
         self.gpt_manager = GPTManager()
+        self.conversation_end_type = conversation_end_type
+        self.end_info = end_info
+        self.end_controlled_by_user = end_controlled_by_user
 
     def start_session(self, testing=True):
         all_information_gathered = False
@@ -54,8 +63,8 @@ class DiscussionSession:
         if self.conversation_type == ConversationType.USER_ANSWERS:
             # Generate initial question and get user's answer
             if not self.trajectory.rounds:  # Only if it's the first round
-                # ai_question = self.generate_initial_question(self.subject)
-                ai_question = 'testing'
+                ai_question = self.generate_initial_question(self.subject)
+                #ai_question = 'testing'
                 self.trajectory.initial_question = ai_question
                 user_answer = input(ai_question)
             else:
@@ -99,6 +108,38 @@ class DiscussionSession:
         ai_message.is_marked = True
 
     def check_end_of_discussion(self, answer, memory: Message):
+        # Dispatcher logic
+        if self.conversation_end_type == ConversationEndType.INFORMATION_GATHERED:
+            end_decision, explanation = self.end_by_information_gathered(answer, memory)
+        elif self.conversation_end_type == ConversationEndType.X_MESSAGES_EXCHANGED:
+            end_decision, explanation = self.end_by_message_count()
+        elif self.conversation_end_type == ConversationEndType.USER_ENDED:
+            end_decision, explanation = self.final_user_confirmation(memory, explanation=None)
+            return end_decision, explanation
+        else:
+            raise NotImplementedError("The specified end type is not implemented.")
+
+        # Final user confirmation if end_controlled_by_user is True
+        if self.end_controlled_by_user:
+            return self.final_user_confirmation(memory, explanation=explanation)
+        else:
+            return end_decision, explanation
+
+    def final_user_confirmation(self, memory: Message, explanation=None):
+        # Final user confirmation logic
+        if explanation is not None:
+            print(explanation)
+        print(memory.content)
+        user_confirmation = input(
+            "Do you still wish to continue the discussion considering the information above? (yes/no): ").strip().lower()
+        if user_confirmation == 'yes':
+
+            return False, "The user has chosen to continue the discussion. While having this information:" + explanation
+        else:
+            return True, "The user has chosen to end the discussion. While having this information:" + explanation
+
+    def end_by_information_gathered(self, answer, memory: Message):
+        # Logic to determine if enough information has been gathered
         logic_agent = PresetAgents().get_agent(PresetAgents.LOGIC_GATE)
         logic_prompt = f"From the following context, evaluate if, for the person asking questions, it is needed to ask more questions to have a complete understanding of the subject.\nContext:\n{memory.content}\nLast Answer:\n{answer}"
         logic_agent.update_agent(messages=logic_prompt)
@@ -106,18 +147,24 @@ class DiscussionSession:
         logic_result = logic_agent.get_text()
 
         if "yes" in logic_result.lower():
-            user_confirmation = input(
-                "Spiky thinks that there is enough information on this subject, do you wish to proceed? (yes/no): ").strip().lower()
-            return user_confirmation == 'yes'
+            return True, "The discussion seems to have covered all necessary information."
         else:
-            # Ask the user if they wish to continue the conversation
-            user_confirmation = input(
-                "It seems more information might be needed. Do you want to continue discussing this topic? (yes/no): ").strip().lower()
-            return user_confirmation != 'yes'  # Continue if user says anything other than 'yes'
+            information_prompt = f"From the following context, evaluate, for the person asking questions, what other questions to ask in order to have a complete understanding of the subject.\nContext:\n{memory.content}\nLast Answer:\n{answer}"
+            information_agent = self.gpt_manager.create_agent(ModelType.GPT_3_5_TURBO, messages=information_prompt,
+                                                              max_tokens=300)
+            information_agent.run_agent()
+            information_result = information_agent.get_text()
+            return False, "Here are bonus questions to gather more information for the proper understanding of the discussion:\n\n" + information_result
+
+    def end_by_message_count(self):
+        rounds_left = self.end_info - len(self.trajectory.rounds)
+        if rounds_left <= 0:
+            return True, f"The message exchange limit of {self.end_info} has been reached."
+        else:
+            return False, f"There are {rounds_left} rounds left before reaching the message limit."
 
     def generate_initial_question(self, subject):
-        self.get_context_on_subject(
-            subject)  # this function should be called from outside of this class, but will be here for now.
+        #self.get_context_on_subject(subject) TODO: Implement logic for getting context on subject
         prompt = f'Give me an opening question that would quickstart any discussion of any subject. This is the subject of this particular session: <{subject}>. Your opening question must be 1-2 sentences long. Give that question between quotes ""'
         create_question_agent = self.gpt_manager.create_agent(ModelType.GPT_3_5_TURBO, messages=prompt, max_tokens=100)
         create_question_agent.run_agent()
