@@ -219,12 +219,16 @@ mindmap
 ```
           Do not forget that the nodes of this mindmap should not be verbs that describe direct actions(cook the potatoes) but rather verbs that describe higher level steps(prepare meal).
         """
+        testing = True
         natural_l_query = "Can you list all the types of relationships present in my graph database." + "Could you provide a list of all the node types, or labels, that are used in my graph database?" + "Can you show me how all the nodes are connected to my 'Goal' nodes, including the names and IDs of these nodes and their relationships?"
-        #         project_context = self.memory_access.neo4j_handler.direct_query_graph(
-        #             query=["CALL db.relationshipTypes()", "CALL db.labels()", """MATCH (g:Goal)-[r]-(n)
-        # RETURN g.name AS GoalName, g.id AS GoalID, r.name AS RelationshipName, r.id AS RelationshipID, n.name AS ConnectedNodeName, n.id AS ConnectedNodeID"""],
-        #             natural_l_query=natural_l_query, is_interpreted=True)
-        project_context = "The goal node in your graph database, specifically the one with the goal of 'Create an interactive, web-based platform', is connected to several other nodes. These connected nodes include various technologies like HTML, CSS, JavaScript, and React.js, which are used to achieve this goal. There are also restrictions in place, such as a limited budget and a fixed timeframe. The resources available for this goal include High School Coding Club Members and Donations and Partnerships. User Feedback and Platform Maintenance are also concerns related to this goal. Each of these nodes and their relationships contribute to the overall structure and function of your graph database."
+        if testing:
+            project_context = "The goal node in your graph database, specifically the one with the goal of 'Create an interactive, web-based platform', is connected to several other nodes. These connected nodes include various technologies like HTML, CSS, JavaScript, and React.js, which are used to achieve this goal. There are also restrictions in place, such as a limited budget and a fixed timeframe. The resources available for this goal include High School Coding Club Members and Donations and Partnerships. User Feedback and Platform Maintenance are also concerns related to this goal. Each of these nodes and their relationships contribute to the overall structure and function of your graph database."
+        else:
+            project_context = self.memory_access.neo4j_handler.direct_query_graph(
+                query=["CALL db.relationshipTypes()", "CALL db.labels()", """MATCH (g:Goal)-[r]-(n)
+            RETURN g.name AS GoalName, g.id AS GoalID, r.name AS RelationshipName, r.id AS RelationshipID, n.name AS ConnectedNodeName, n.id AS ConnectedNodeID"""],
+                natural_l_query=natural_l_query, is_interpreted=True)
+
         message_creation_template = "Above is the information relative to a project you need to assist with, big or small, led by a human." \
                                     "Your goal is to give an order to the ai project manager that encapsulates the information you were given" \
                                     "and frames it into the context of a mermaid map. Do not use the information above directly in your text.  here is what you must do:\n" \
@@ -240,28 +244,30 @@ mindmap
             max_tokens=1000,
             messages=message_creation_template
         )
-        # message_creator.run_agent()
-        message = message_creator.get_text()
-        message = """Dear AI Project Manager,
+        if testing:
+            message = """Dear AI Project Manager,
 
-You have been selected for your demonstrated competence in handling complex projects. We have an exciting new assignment for you that will utilize your skills in project management, strategic planning, and process creation.
+            You have been selected for your demonstrated competence in handling complex projects. We have an exciting new assignment for you that will utilize your skills in project management, strategic planning, and process creation.
 
-The project comprises building an engaging, web-based platform. This will involve the use of technologies such as HTML, CSS, JavaScript, and React.js. Your process should encapsulate the steps required to master these technologies and identify the points where they intersect to create the final product.
+            The project comprises building an engaging, web-based platform. This will involve the use of technologies such as HTML, CSS, JavaScript, and React.js. Your process should encapsulate the steps required to master these technologies and identify the points where they intersect to create the final product.
 
-You will need to consider constraints, such as budget limitations and tight deadlines. The existing resources at your disposal include a group of eager High School Coding Club members, along with funds from Donations and Partnerships. Your process should account for efficient use of these resources and include strategies to overcome constraints.
+            You will need to consider constraints, such as budget limitations and tight deadlines. The existing resources at your disposal include a group of eager High School Coding Club members, along with funds from Donations and Partnerships. Your process should account for efficient use of these resources and include strategies to overcome constraints.
 
-A significant aspect of the project is ensuring user satisfaction and maintaining the platform. Your process should therefore include steps to gather and incorporate user feedback and outline a plan for regular maintenance of the platform.
+            A significant aspect of the project is ensuring user satisfaction and maintaining the platform. Your process should therefore include steps to gather and incorporate user feedback and outline a plan for regular maintenance of the platform.
 
-Remember, your role is not to merely parrot this information but to reflect on it and create a comprehensive process. This process will serve as a roadmap in the form of a mermaid diagram, where each node represents a high-level task derived from the information provided. 
+            Remember, your role is not to merely parrot this information but to reflect on it and create a comprehensive process. This process will serve as a roadmap in the form of a mermaid diagram, where each node represents a high-level task derived from the information provided. 
 
-The structure of this mermaid diagram is akin to an HDDL (HTN) format where each node can be broken down into sub-tasks. This will provide a clear and detailed representation of the entire project, making it easier for the human team to follow and implement.
+            The structure of this mermaid diagram is akin to an HDDL (HTN) format where each node can be broken down into sub-tasks. This will provide a clear and detailed representation of the entire project, making it easier for the human team to follow and implement.
 
-We trust in your capabilities to manage this project efficiently and anticipate a detailed and well-structured process plan.
+            We trust in your capabilities to manage this project efficiently and anticipate a detailed and well-structured process plan.
 
-Best of luck on your endeavor.
+            Best of luck on your endeavor.
 
-Sincerely,
-[Your Name]"""
+            Sincerely,
+            [Your Name]"""
+        else:
+            message_creator.run_agent()
+            message = message_creator.get_text()
         initial_diagram_creator = self.gpt_manager.create_agent(
             system_prompt=system_prompt,
             model=ModelType.CHAT_GPT4_old,
@@ -269,38 +275,41 @@ Sincerely,
             max_tokens=700,
             messages=message
         )
-        # initial_diagram_creator.run_agent()
-        initial_diagram = initial_diagram_creator.get_text()
-        initial_diagram = """```mermaid
-mindmap
-  root((Web-based Platform Project))
-    Project Scope
-      Create an interactive, web-based platform
-      Web Platform Creation
-        Technology Stack
-          HTML
-          CSS
-          JavaScript
-          React.js
-        Team Composition
-          High School Coding Club Members
-        Financial Resources
-          Donations
-          Partnerships
-    Project Constraints
-      Limited Budget
-      Fixed Timeframe
-    User Experience
-      User Feedback
-        Collection
-        Analysis
-        Integration
-    Platform Maintenance
-      Regular Updates
-      Bug Fixes
-      New Features
-      Performance Optimization
-```"""
+        if testing:
+            initial_diagram = """```mermaid
+            mindmap
+              root((Web-based Platform Project))
+                Project Scope
+                  Create an interactive, web-based platform
+                  Web Platform Creation
+                    Technology Stack
+                      HTML
+                      CSS
+                      JavaScript
+                      React.js
+                    Team Composition
+                      High School Coding Club Members
+                    Financial Resources
+                      Donations
+                      Partnerships
+                Project Constraints
+                  Limited Budget
+                  Fixed Timeframe
+                User Experience
+                  User Feedback
+                    Collection
+                    Analysis
+                    Integration
+                Platform Maintenance
+                  Regular Updates
+                  Bug Fixes
+                  New Features
+                  Performance Optimization
+            ```"""
+        else:
+            initial_diagram_creator.run_agent()
+            initial_diagram = initial_diagram_creator.get_text()
+
         message_review_template = 'Above is the data relative to a project you need to assist with, big or small, led by a human' \
                                   'Below is the mindmap that resulted from it. do you think that information that was intended to be in the mindmap is missing?' \
                                   'If so, make a list of elements that were not included in the mindmap, but that were in the information given above. do not mention an element if its not missing or if its unclear or if they are synonyms (like restriction and constraints). ' \
@@ -314,13 +323,14 @@ mindmap
                                   'Below is the mindmap:'
         confirmation_agent = self.gpt_manager.create_agent(
             messages=project_context + '\n\n' + message_review_template + initial_diagram,
-            model=ModelType.CHAT_GPT4_old, temperature=0.1, max_tokens=300)
-        confirmation_agent.run_agent()
-        confirmation_message = confirmation_agent.get_text()
-
-        missing_items_pattern = r'\{\d+\..+?\}'
-        # missing_items_found = re.search(missing_items_pattern, confirmation_message)
-        missing_items_found = False
+            model=ModelType.GPT_4_TURBO, temperature=0.1, max_tokens=300)
+        if testing:
+            missing_items_found = False
+        else:
+            confirmation_agent.run_agent()
+            confirmation_message = confirmation_agent.get_text()
+            missing_items_pattern = r'\{\d+\..+?\}'
+            missing_items_found = re.search(missing_items_pattern, confirmation_message)
 
         if missing_items_found:
             missing_items_message = missing_items_found.group()

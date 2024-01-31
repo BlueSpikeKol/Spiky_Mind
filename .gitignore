@@ -20,3 +20,5 @@ var/
 .installed.cfg
 *.egg
 .idea/
+utils/openai_api/token_pools.json
+
