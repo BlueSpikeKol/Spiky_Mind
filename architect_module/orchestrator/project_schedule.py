@@ -19,12 +19,10 @@ class ProjectSchedule:
     def __init__(self):
         self.data_visualizer = None
         self.gpt_manager = GPTManager()
-        # self.memory_access = persistance_access.MemoryStreamAccess()
+        self.memory_access = persistance_access.MemoryStreamAccess()
         self.mindmap = None
-        self.project_schedule = None
         self.domain_file_text = None
         self.problem_file_text = None
-        self.initialize_schedule()
 
     def visualize_schedule(self):
         if self.mindmap is None:
@@ -239,7 +237,7 @@ mindmap
                                     "4. Explain that the structure of that mermaid mindmap is made to show that every node(representing a part of the process) is a compound task that can be broken down into other subaltern tasks to accomplish the goal a bit like in HDDL (HTN) format.\n"
         message_creator = self.gpt_manager.create_agent(
             system_prompt=project_context,
-            model=ModelType.CHAT_GPT4_old,
+            model=ModelType.GPT_4_TURBO,
             temperature=0.7,
             max_tokens=1000,
             messages=message_creation_template

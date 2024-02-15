@@ -13,7 +13,7 @@ ENCODING = "utf-8"
 def request_first_message(msg: str) -> dict:
     """
     First test function to try to get the question from chatGPT depending on the project you have
-    :param msg: Ty pe of project you have
+    :param msg: Type of project you have
     :return: The answer from chatGPT
     """
     msg = f"Give me all the relevant topic of information I should ask the user for the following project.\n" + msg

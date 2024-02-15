@@ -1,4 +1,6 @@
 import re
+import json
+from typing import List, Optional, Tuple
 
 from utils.openai_api.agent_sessions.agent_presets import PresetAgents
 from utils.openai_api.agent_sessions.trajectory import ConversationTrajectory
@@ -7,14 +9,15 @@ from utils.openai_api.models import ModelType
 from utils.openai_api.gpt_calling import GPTAgent, GPTManager
 from utils.openai_api.agent_sessions.convo_types import ConversationType, ConversationEndType
 from utils.openai_api.agent_sessions.memory_types import MemoryType
+from utils.openai_api.agent_sessions.trajectory_listener import TrajectoryListenerCategorizer
 
 
 class DiscussionSession:
-    def __init__(self, subject=None, agent: GPTAgent = None,
+    def __init__(self, discussion_name=None, subject=None, agent: GPTAgent = None,
                  conversation_type: ConversationType = ConversationType.FREESTYLE,
                  memory_type: MemoryType = MemoryType.LAST_X_MESSAGES, last_x_messages: int = 3,
                  summarize_result=False, conversation_end_type: ConversationEndType = ConversationEndType.USER_ENDED,
-                 end_info=None, end_controlled_by_user=True):
+                 end_info=None, end_controlled_by_user=True, save_conversation: bool = False, save_path: str = None):
         """
         :param subject: the subject of a conversation is very important if the agent is asking questions and leading
         the discussion. Here is an example of a good subject to lead a discussion: "We need to determine what are the
@@ -30,6 +33,7 @@ class DiscussionSession:
         discussion.
         TODO: standardize the end_info parameter
         """
+        self.discussion_name = discussion_name
         self.agent = agent
         self.subject = subject
         self.conversation_type = conversation_type
@@ -41,59 +45,126 @@ class DiscussionSession:
         self.conversation_end_type = conversation_end_type
         self.end_info = end_info
         self.end_controlled_by_user = end_controlled_by_user
+        self.save_conversation = save_conversation
+        self.save_path = save_path
+        self.listeners = []
 
     def start_session(self, testing=True):
         all_information_gathered = False
-
+        next_message = None
         while not all_information_gathered:
-            end_of_discussion = self.handle_single_round_convo()
+            end_of_discussion, next_message = self.handle_single_round_convo(AI_message=next_message)
             if end_of_discussion:
                 break
+        if self.save_conversation:
+            self.save_conversation_to_json()
         if testing:
             final_output = self.trajectory.display_trajectory(display_directly=False)
             return final_output
-        else:
-            return self.trajectory
+        self.end_session()
 
-    def handle_single_round_convo(self):
+    def end_session(self):
+        for listener in self.listeners:
+            listener.on_session_end(self.trajectory)
+
+    def on_user_message(self, user_message):
+        context = ""
+        for listener in self.listeners:
+            context = listener.on_new_user_msg(user_message)
+        return context
+
+    def register_listener(self, listener):
+        self.listeners.append(listener)
+
+    # TODO make sure that listeners can be tested here
+    def process_message_pair(self, message_pair: List[Tuple[str, str]]) -> Tuple[
+        Optional[UserMessage], Optional[AIMessage]]:
+        user_message, ai_message = None, None
+        for speaker, message in message_pair:
+            if speaker == "Project Manager":  # Assuming "Project Manager" represents the user
+                user_message = UserMessage(message)
+            elif speaker == "AI Assistant":
+                ai_message = AIMessage(message)
+        return user_message, ai_message
+
+    # Use the adjusted function in insert_premade_conversation
+    def insert_premade_conversation(self, premade_conversation: List[Tuple[str, str]],
+                                    premade_categories: Optional[List[str]] = None) -> None:
+        if premade_conversation and premade_conversation[0][0] == "AI Assistant":
+            self.trajectory.initial_question = premade_conversation[0][1]
+
+        for i in range(0, len(premade_conversation), 2):
+            message_pair = premade_conversation[i:i + 2]
+            user_message, ai_message = self.process_message_pair(message_pair)
+
+            # Ensure both messages are present before adding the round
+            if user_message and ai_message:
+                self.trajectory.add_round(user_message, ai_message, {})
+
+                if premade_categories and i // 2 < len(premade_categories):
+                    category = premade_categories[i // 2]
+                    self.trajectory.rounds[-1].set_category(category)
+                else:
+                    last_round = self.trajectory.rounds[-1]
+                    for listener in self.listeners:
+                        listener.on_new_round(last_round, self.subject)
+
+        # Optionally print categorization results for testing
+        for listener in self.listeners:
+            if isinstance(listener, TrajectoryListenerCategorizer):
+                print("Categorization results:\n", listener.get_categorization_results())
+
+    def handle_single_round_convo(self, AI_message=None):  # if the format is AI-User and not User-AI
+        # TODO needs testing
         user_answer = None
+        ai_answer = None
+        ai_message = None
+        user_message = None
         if not self.agent:
             self.agent = PresetAgents().get_agent(self.conversation_type)
 
         if self.conversation_type == ConversationType.USER_ANSWERS:
-            # Generate initial question and get user's answer
-            if not self.trajectory.rounds:  # Only if it's the first round
-                ai_question = self.generate_initial_question(self.subject)
-                #ai_question = 'testing'
-                self.trajectory.initial_question = ai_question
-                user_answer = input(ai_question)
-            else:
-                user_answer = input(self.trajectory.rounds[-1].ai_message.content)
+            if not self.trajectory.rounds and not self.trajectory.initial_question:
+                # Generate initial question for the first round if not already set
+                self.trajectory.initial_question = self.generate_initial_question(self.subject)
+                print(self.trajectory.initial_question)
+
+            if self.trajectory.initial_question:
+                if self.trajectory.rounds:
+                    user_answer = input(AI_message + "\nYour turn: ")
+                    ai_message = AIMessage(AI_message)
+                else:
+                    user_answer = input("\nYour turn:")
+                    ai_message = AIMessage(self.trajectory.initial_question)
+                user_message = UserMessage(user_answer)
 
         elif self.conversation_type == ConversationType.BOT_ANSWERS:
-            # TODO: Implement logic for bot answering user's questions
+            # Implement logic for bot answering user's questions
             pass
 
         elif self.conversation_type == ConversationType.FREESTYLE:
-            # TODO: Implement freestyle conversation logic
+            # Implement freestyle conversation logic
             pass
 
-        # Update agent with the trajectory and get AI's response
-        memory = self.update_memory(user_answer)
-        self.agent.run_agent()
-        ai_answer = self.agent.get_text()
+        # Update context and memory based on the user's answer
+        context = self.on_user_message(user_answer)
+        memory = self.update_memory(user_answer, bonus_info=context)
 
-        user_message = UserMessage(user_answer)
-        ai_message = AIMessage(ai_answer)
-
-        # Mark messages if memory type is MARKED_MESSAGES
-        if self.memory_type == MemoryType.MARKED_MESSAGES:
-            self.mark_round_messages(user_message, ai_message)
-
+        # Add the round to the trajectory
         completion_data = self.extract_completion_data()
         self.trajectory.add_round(user_message, ai_message, completion_data)
+        last_round = self.trajectory.rounds[-1]
+
+        # Notify listeners about the new round
+        for listener in self.listeners:
+            listener.on_new_round(last_round, self.subject)
+        self.agent.run_agent()
+        ai_answer = self.agent.get_text()
         end_of_discussion = self.check_end_of_discussion(ai_answer, memory)
-        return end_of_discussion
+        if self.trajectory.initial_question:
+            return end_of_discussion, ai_answer
+        else:
+            return end_of_discussion, None
 
     def mark_round_messages(self, user_message, ai_message, criteria=None):
         """
@@ -164,7 +235,7 @@ class DiscussionSession:
             return False, f"There are {rounds_left} rounds left before reaching the message limit."
 
     def generate_initial_question(self, subject):
-        #self.get_context_on_subject(subject) TODO: Implement logic for getting context on subject
+        # self.get_context_on_subject(subject) TODO: Implement logic for getting context on subject
         prompt = f'Give me an opening question that would quickstart any discussion of any subject. This is the subject of this particular session: <{subject}>. Your opening question must be 1-2 sentences long. Give that question between quotes ""'
         create_question_agent = self.gpt_manager.create_agent(ModelType.GPT_3_5_TURBO, messages=prompt, max_tokens=100)
         create_question_agent.run_agent()
@@ -207,7 +278,7 @@ class DiscussionSession:
 
         return {'total_cost': total_cost, 'input_cost': input_cost, 'output_cost': output_cost}
 
-    def update_memory(self, user_answer):
+    def update_memory(self, user_answer, bonus_info=None):
         messages_to_update = []
 
         # Get previous conversation rounds based on memory type
@@ -260,6 +331,13 @@ class DiscussionSession:
         # TODO: Implement logic for summarizing the discussion, there will be multiple, like round by round, or the
         # whole discussion in one go etc.
         pass
+
+    def save_conversation_to_json(self):
+        if self.save_path is not None:
+            with open(self.save_path, 'w') as file:
+                json.dump(self.trajectory.to_dict(), file, indent=4)
+        else:
+            print("Save path not provided. Conversation not saved.")
 
 
 if __name__ == "__main__":

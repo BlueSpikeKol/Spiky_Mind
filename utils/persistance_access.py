@@ -1,25 +1,106 @@
 import uuid
-from collections import Counter
 import numpy as np
-from sklearn.cluster import KMeans
+import pinecone
 import mysql.connector
+from typing import Tuple, List
+import re
+
 from mysql.connector import Error as MySQLError
 from mysql.connector import InterfaceError, DatabaseError
-import pinecone
+from collections import Counter
+from sklearn.cluster import KMeans
+from neo4j import GraphDatabase
 
 from utils import config_retrieval
 from utils.openai_api.gpt_calling import GPTManager
 from utils.openai_api.models import ModelType
-from spiky_module.Research.test_graph_creation import Neo4jGraphHandler
 
 config_manager = config_retrieval.ConfigManager()
 
 
-class MemoryStreamAccess:
+class Neo4jDatabaseManager:
+    def __init__(self):
+        self.uri = config_manager.neo4j.host_url
+        self.user = config_manager.neo4j.user
+        self.password = config_manager.neo4j.password
+        self.driver = GraphDatabase.driver(self.uri, auth=(self.user, self.password))
+
+    def close(self):
+        """Closes the database connection."""
+        self.driver.close()
+
+    def execute_queries(self, queries):
+        results = []
+        with self.driver.session() as session:
+            # Ensure queries is a list for uniform processing
+            if not isinstance(queries, list):
+                queries = [queries]
+
+            for query in queries:
+                # Check if query is a tuple of (query_string, params)
+                if isinstance(query, tuple) and len(query) == 2:
+                    query_string, params = query
+                    query_string = self.escape_special_characters(query_string)
+                    # Use parameters to safely pass data
+                    result = session.run(query_string, parameters=params).data()
+                elif isinstance(query, str):
+                    query = self.escape_special_characters(query)
+                    # For simple string queries without parameters (not recommended for data insertion)
+                    result = session.run(query).data()
+                else:
+                    raise TypeError("query must be a string or a tuple of (query_string, params)")
+                results.extend(result)
+
+        # Return logic remains unchanged
+        if not results:
+            return None
+        return results[0] if len(results) == 1 else results
+
+    def escape_special_characters(self, query):
+        """
+        Escapes special characters in a query string, avoiding double-escaping.
+        """
+        # Define patterns and their replacements
+        patterns = {
+            # Match a double quote not preceded by a backslash or preceded by an even number of backslashes
+            r'(?<!\\)(?:\\\\)*"': r'\\"',
+            # Match newline characters
+            '\n': '\\n',
+            # Add more patterns as needed
+        }
+
+        for pattern, replacement in patterns.items():
+            query = re.sub(pattern, replacement, query)
+
+        # Handle the specific case of '\\\\"' being transformed to '\\\"'
+        # This reverses the transformation if it incorrectly escaped '\\\\"' (an already correctly escaped quote in JSON within the string)
+        query = re.sub(r'\\\\\\"', r'\\"', query)
+
+        return query
+
+    def prepare_query(self, query_string, params):
+        """
+        Prepares a Cypher query string by embedding parameters directly into the query.
+
+        Parameters:
+        - query_string: The Cypher query string with placeholders for parameters.
+        - params: A dictionary of parameters to embed into the query string.
+
+        Returns:
+        - A prepared query string with parameters embedded.
+        """
+        # Example implementation, adjust based on your parameter placeholders and escaping needs
+        for key, value in params.items():
+            safe_value = str(value).replace("'", "\\'")  # Simple escaping, adjust as necessary
+            query_string = query_string.replace(f"${key}", safe_value)
+        return query_string
+
+
+class MemoryStreamAccess:  # TODO find a way to reduce the times this class is initialized, there could be too many connections and time lost
     def __init__(self):
         self.mysql_config = config_manager.mysql.as_dict()
         self.pinecone_index = config_manager.pinecone.index_name
-        self.neo4j_handler = Neo4jGraphHandler()
+        self.neo4j_handler = Neo4jDatabaseManager()  # check above to see its usage
         self.gpt_manager = GPTManager()
         try:
             self.mydb = mysql.connector.connect(**self.mysql_config)
@@ -46,7 +127,62 @@ class MemoryStreamAccess:
         if self.mydb:
             self.mydb.close()
 
+    def query_similar_vectors_with_text(self, vector: List[float], k: int = 5) -> List[Tuple[str, float, str]]:
+        """
+        Queries the Pinecone database for the top k most similar vectors to the given vector and retrieves their associated text from MySQL.
 
+        Parameters:
+            vector (List[float]): The query vector.
+            k (int): The number of similar vectors to retrieve.
+
+        Returns:
+            List[Tuple[str, float, str]]: A list of tuples, where each tuple contains the ID of a similar vector, its similarity score, and its associated text.
+        """
+        similar_vectors = self.query_similar_vectors(vector, k)
+        if not similar_vectors:
+            return []
+
+        # Extract vector IDs from the query results
+        vector_ids = [vector_id for vector_id, _ in similar_vectors]
+
+        # Fetch the associated text for each vector ID from MySQL
+        vector_texts = self.fetch_vector_texts_by_ids(vector_ids)
+
+        # Combine the IDs, scores, and texts into a single list of tuples
+        combined_results = []
+        for vector_id, score in similar_vectors:
+            text = vector_texts.get(vector_id, "Text not found.")
+            combined_results.append((vector_id, score, text))
+
+        return combined_results
+
+    def query_similar_vectors(self, vector: List[float], k: int = 5) -> List[Tuple[str, float]]:
+        """
+        Queries the Pinecone database for the top k most similar vectors to the given vector.
+
+        Parameters:
+            vector (List[float]): The query vector.
+            k (int): The number of similar vectors to retrieve.
+
+        Returns:
+            List[Tuple[str, float]]: A list of tuples, where each tuple contains the ID of a similar vector and its similarity score.
+        """
+        if not self.index:
+            print("Pinecone index is not initialized.")
+            return []
+
+        try:
+            # Query Pinecone for the top k most similar vectors
+            query_result = self.index.query(queries=[vector], top_k=k)
+            matches = query_result['matches'][0]  # Assuming single query
+
+            # Extract and return the IDs and scores of the top k matches
+            similar_vectors = [(match['id'], match['score']) for match in matches]
+            return similar_vectors
+
+        except Exception as e:
+            print(f"Error querying Pinecone for similar vectors: {e}")
+            return []
 
     def get_vectors_whitelist(self, whitelist):
         """
@@ -306,6 +442,33 @@ class MemoryStreamAccess:
             print(f"General Error: {e}")
 
         return None
+
+    def fetch_vector_texts_by_ids(self, vector_ids: List[str]) -> dict:
+        """
+        Fetches the associated text for a list of vector IDs from MySQL.
+
+        Parameters:
+            vector_ids (List[str]): The list of vector IDs.
+
+        Returns:
+            dict: A dictionary mapping vector IDs to their associated text.
+        """
+        if not self.mydb or not self.mycursor:
+            print("MySQL database is not initialized.")
+            return {}
+
+        vector_texts = {}
+        try:
+            # Construct a query to fetch the text for each vector ID
+            format_strings = ','.join(['%s'] * len(vector_ids))
+            query = f"SELECT id, content FROM vector_storage WHERE id IN ({format_strings})"
+            self.mycursor.execute(query, tuple(vector_ids))
+            for vector_id, text in self.mycursor.fetchall():
+                vector_texts[vector_id] = text
+        except Exception as e:
+            print(f"Error fetching vector texts from MySQL: {e}")
+
+        return vector_texts
 
 
 """

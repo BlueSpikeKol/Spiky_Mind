@@ -4,10 +4,26 @@ from utils.openai_api.agent_sessions.memory_types import MemoryType
 
 
 class ConversationRound:
-    def __init__(self, user_message: UserMessage, ai_message: AIMessage, metrics: dict):
+    def __init__(self, user_message: UserMessage, ai_message: AIMessage, metrics: dict, category=None):
         self.user_message = user_message
         self.ai_message = ai_message
         self.metrics = metrics
+        self.category = category  # New attribute for storing the round's category
+
+    def to_dict(self):
+        # Include the category in the dictionary representation of the round
+        return {
+            "user_message": self.user_message.content,
+            "ai_message": self.ai_message.content,
+            "metrics": self.metrics,
+            "is_marked": getattr(self, 'is_marked', False),  # Default to False if not set
+            "category": self.category
+        }
+
+    def set_category(self, category):
+        # Method to set the category of the round
+        self.category = category
+
 
 
 class ConversationTrajectory:
@@ -80,3 +96,14 @@ class ConversationTrajectory:
                 round_output += "AI: {}\n".format(round.ai_message.content)
             round_output += "----\n"  # Separator line
         return round_output
+
+    def to_dict(self):
+        trajectory_dict = {
+            "subject": self.subject,
+            "conversation_type": self.conversation_type.name_id,
+            "initial_question": self.initial_question,
+            "memory_type": self.memory_type.name_id,
+            "system_prompt": self.system_prompt,
+            "rounds": [round.to_dict() for round in self.rounds]
+        }
+        return trajectory_dict
