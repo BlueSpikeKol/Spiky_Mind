@@ -121,6 +121,62 @@ class MemoryStreamAccess:  # TODO find a way to reduce the times this class is i
             self.index = None
         print(self.index.describe_index_stats())
 
+    def similarity_comparison(self, comparison_list_id: List[str], single_id: str, top_k: int = 5) -> List[Tuple[str, float]]:
+        """
+        Compares a list of parent IDs against a single ID to find the top k most similar parents.
+
+        :param parent_ids: List of parent IDs to compare.
+        :param single_id: The single ID to compare against the list.
+        :param top_k: The number of top similar items to return.
+        :return: A list of tuples containing the parent ID and its similarity score, sorted by similarity.
+        """
+        # Retrieve vectors for all IDs using the whitelist function
+        all_ids = comparison_list_id + [single_id]
+        vectors, missing_ids = self.get_vectors_whitelist(all_ids)
+
+        if missing_ids:
+            print(f"Missing vectors for IDs: {missing_ids}")
+
+        # Extract the vector for the single ID
+        single_vector = np.array(vectors[single_id])
+
+        # Calculate similarity scores
+        similarities = []
+        for parent_id in comparison_list_id:
+            parent_vector = np.array(vectors[parent_id])
+            similarity_score = np.dot(single_vector, parent_vector) / (
+                        np.linalg.norm(single_vector) * np.linalg.norm(parent_vector))  # Cosine similarity
+            similarities.append((parent_id, similarity_score))
+
+        # Sort by similarity score in descending order and return top k results
+        top_similarities = sorted(similarities, key=lambda x: x[1], reverse=True)[:top_k]
+
+        return top_similarities
+
+    def text_similarity(self, text1: str, text2: str) -> float:
+        """
+        Computes the similarity score between two pieces of text by vectorizing them and calculating the cosine similarity.
+
+        :param text1: The first piece of text to compare.
+        :param text2: The second piece of text to compare.
+        :return: A float representing the similarity score between the two texts.
+        """
+        # Vectorize the first piece of text
+        vectorizer_agent = self.gpt_manager.create_agent(model=ModelType.TEXT_EMBEDDING_ADA, messages="")
+        vectorizer_agent.update_agent(messages=text1)
+        vectorizer_agent.run_agent()
+        vector1 = vectorizer_agent.get_vector()
+
+        # Vectorize the second piece of text
+        vectorizer_agent.update_agent(messages=text2)
+        vectorizer_agent.run_agent()
+        vector2 = vectorizer_agent.get_vector()
+
+        # Calculate cosine similarity between the two vectors
+        similarity_score = np.dot(vector1, vector2) / (np.linalg.norm(vector1) * np.linalg.norm(vector2))
+
+        return similarity_score
+
     def stream_close(self):
         if self.mycursor:
             self.mycursor.close()
@@ -192,12 +248,12 @@ class MemoryStreamAccess:  # TODO find a way to reduce the times this class is i
             whitelist (list): List of vector IDs to include in retrieval.
 
         Returns:
-            A dictionary with vector names as keys and vectors as values,
+            A tuple containing a dictionary with vector names as keys and vectors as values,
             and a list of IDs that did not return any data.
         """
         if not self.index:
             print("Pinecone index is not initialized.")
-            return {}
+            return {}, []
 
         batch_size = 250
         all_vectors = {}
@@ -205,12 +261,9 @@ class MemoryStreamAccess:  # TODO find a way to reduce the times this class is i
 
         for i in range(0, len(whitelist), batch_size):
             batch = whitelist[i:i + batch_size]
-
-            # Count occurrences of each ID
             id_counts = Counter(batch)
             duplicates = [id for id, count in id_counts.items() if count > 1]
 
-            # Print duplicate IDs if any
             if duplicates:
                 print(f"Duplicate IDs in batch {i // batch_size + 1}: {duplicates}")
 
@@ -218,7 +271,6 @@ class MemoryStreamAccess:  # TODO find a way to reduce the times this class is i
                 response = self.index.fetch(ids=batch)
                 returned_vectors = response.get('vectors', {})
 
-                # Check for missing IDs in this batch
                 for id in batch:
                     if id not in returned_vectors:
                         missing_ids.append(id)
@@ -231,7 +283,7 @@ class MemoryStreamAccess:  # TODO find a way to reduce the times this class is i
             except Exception as e:
                 print(f"Error retrieving batch from Pinecone: {e}")
 
-        return all_vectors
+        return all_vectors, missing_ids
 
     def group_vectors(self, whitelist, k=5):
         """
@@ -265,17 +317,21 @@ class MemoryStreamAccess:  # TODO find a way to reduce the times this class is i
 
         return grouped_vectors
 
-    def add_to_pinecone(self, vector_name, vector_text):
+    def add_to_pinecone(self, vector_name, vector_text, return_id=False):
         """
         Adds or updates a single entry in the Pinecone database and MySQL.
 
         Parameters:
             vector_name (str): The name of the vector.
             vector_text (str): The description of the vector.
+            return_id (bool): If True, returns the ID of the vector added to Pinecone.
+
+        Returns:
+            The ID of the vector added to Pinecone if return_id is True. Otherwise, returns None.
         """
         if not self.index:
             print("Pinecone index is not initialized.")
-            return
+            return None
 
         # Replace spaces with underscores in vector_name
         vector_name = vector_name.replace(" ", "_")
@@ -300,11 +356,15 @@ class MemoryStreamAccess:  # TODO find a way to reduce the times this class is i
             try:
                 self.index.upsert(vectors=[(vector_id, vector)])
                 print(f"Vector with ID '{vector_id}' added or updated in Pinecone.")
+                if return_id:
+                    return vector_id
             except Exception as e:
                 print(f"Error inserting into Pinecone: {e}")
 
         except Exception as e:
             print(f"Error inserting into MySQL: {e}")
+
+        return None if not return_id else vector_id
 
     def delete_from_pinecone(self, vector_ids=None, delete_all=False):
         """

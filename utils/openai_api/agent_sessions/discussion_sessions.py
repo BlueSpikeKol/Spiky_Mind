@@ -1,10 +1,14 @@
 import re
 import json
-from typing import List, Optional, Tuple
+from pathlib import Path
+import random
+from typing import List, Optional, Tuple, Dict
+from dataclasses import dataclass
 
 from utils.openai_api.agent_sessions.agent_presets import PresetAgents
-from utils.openai_api.agent_sessions.trajectory import ConversationTrajectory
-from utils.openai_api.agent_sessions.message_types import UserMessage, AIMessage, SystemMessage, Message
+from utils.openai_api.agent_sessions.trajectory import UserAITrajectory
+from utils.openai_api.agent_sessions.message_types import UserMessage, AIMessage, SystemMessage, Message, \
+    DebaterMessage, PresidentMessage
 from utils.openai_api.models import ModelType
 from utils.openai_api.gpt_calling import GPTAgent, GPTManager
 from utils.openai_api.agent_sessions.convo_types import ConversationType, ConversationEndType
@@ -39,7 +43,7 @@ class DiscussionSession:
         self.conversation_type = conversation_type
         self.memory_type = memory_type
         self.summarize_result = summarize_result
-        self.trajectory = ConversationTrajectory(self.subject, self.conversation_type, self.memory_type)
+        self.trajectory = UserAITrajectory(self.subject, self.conversation_type, self.memory_type)
         self.last_x_messages = last_x_messages
         self.gpt_manager = GPTManager()
         self.conversation_end_type = conversation_end_type
@@ -52,8 +56,10 @@ class DiscussionSession:
     def start_session(self, testing=True):
         all_information_gathered = False
         next_message = None
+        AI_debaters = None
         while not all_information_gathered:
-            end_of_discussion, next_message = self.handle_single_round_convo(AI_message=next_message)
+            end_of_discussion, next_message, AI_debaters = self.handle_single_round_convo(AI_message=next_message,
+                                                                                          AI_debaters=AI_debaters)
             if end_of_discussion:
                 break
         if self.save_conversation:
@@ -114,57 +120,144 @@ class DiscussionSession:
             if isinstance(listener, TrajectoryListenerCategorizer):
                 print("Categorization results:\n", listener.get_categorization_results())
 
-    def handle_single_round_convo(self, AI_message=None):  # if the format is AI-User and not User-AI
-        # TODO needs testing
-        user_answer = None
-        ai_answer = None
-        ai_message = None
-        user_message = None
-        if not self.agent:
-            self.agent = PresetAgents().get_agent(self.conversation_type)
+    def handle_single_round_convo(self, AI_debaters=None, AI_message=None):
+        # Retrieve messages for the round
+        user_message, ai_message, president_message, debater_message, AI_debaters = self.retrieve_messages(AI_debaters,
+                                                                                                           AI_message)
+
+        # Update memory and save the messages into the trajectory
+        end_of_discussion = self.update_and_save(
+            user_message=user_message,
+            ai_message=ai_message,
+            president_message=president_message,
+            debater_message=debater_message
+        )
+
+        return end_of_discussion, ai_message, AI_debaters
+
+    def retrieve_messages(self, AI_debaters=None, AI_message=None):
+        user_message, ai_message = None, None
+        president_message, debater_message = None, None
 
         if self.conversation_type == ConversationType.USER_ANSWERS:
-            if not self.trajectory.rounds and not self.trajectory.initial_question:
-                # Generate initial question for the first round if not already set
-                self.trajectory.initial_question = self.generate_initial_question(self.subject)
-                print(self.trajectory.initial_question)
-
-            if self.trajectory.initial_question:
-                if self.trajectory.rounds:
-                    user_answer = input(AI_message + "\nYour turn: ")
-                    ai_message = AIMessage(AI_message)
-                else:
-                    user_answer = input("\nYour turn:")
-                    ai_message = AIMessage(self.trajectory.initial_question)
-                user_message = UserMessage(user_answer)
+            # Handling AI-User interactions
+            user_answer = input("\nYour turn: " if not self.trajectory.rounds else AI_message + "\nYour turn: ")
+            ai_message = AIMessage(AI_message if self.trajectory.rounds else self.trajectory.initial_question)
+            user_message = UserMessage(user_answer)
 
         elif self.conversation_type == ConversationType.BOT_ANSWERS:
-            # Implement logic for bot answering user's questions
+            # Placeholder for BOT_ANSWERS logic
             pass
 
         elif self.conversation_type == ConversationType.FREESTYLE:
-            # Implement freestyle conversation logic
+            # Placeholder for FREESTYLE logic
             pass
 
-        # Update context and memory based on the user's answer
-        context = self.on_user_message(user_answer)
-        memory = self.update_memory(user_answer, bonus_info=context)
+        elif self.conversation_type == ConversationType.AI_DEBATE:
+            # Handling Session President-Debater interactions
+            if not AI_debaters:
+                AI_debaters = self.recruit_AI_debaters()
 
-        # Add the round to the trajectory
-        completion_data = self.extract_completion_data()
-        self.trajectory.add_round(user_message, ai_message, completion_data)
+            if self.agent.agent_name != "Session President":
+                for debater in AI_debaters:
+                    if debater.agent_name != "Session President":
+                        self.agent = debater
+
+            self.agent.run_agent()
+            president_message = PresidentMessage(self.agent.get_text())
+            responding_agent = self.agent_answer_chooser(AI_debaters, president_message)
+
+            if responding_agent:
+                responding_agent.update_agent(messages=president_message.content)
+                responding_agent.run()
+                debater_message = DebaterMessage(responding_agent.get_text())
+            else:
+                debater_message = DebaterMessage(
+                    "Cannot Process Directives: No available debaters or no debaters interested in responding.")
+
+        return user_message, ai_message, president_message, debater_message, AI_debaters
+
+    def update_and_save(self, user_message=None, ai_message=None, president_message=None, debater_message=None,
+                        metrics=None, category=None):
+        # Update context and memory based on the messages
+        context = self.on_user_message(user_message or president_message)
+        memory = self.update_memory(user_message or president_message, bonus_info=context)
+
+        # Determine the type of round and add it to the trajectory
+        if self.conversation_type == ConversationType.USER_ANSWERS:
+            self.trajectory.add_round(user_message, ai_message, metrics, category)
+        elif self.conversation_type == ConversationType.AI_DEBATE:
+            self.trajectory.add_round(president_message, debater_message, metrics, category)
+
+        # Handle post-round logic
         last_round = self.trajectory.rounds[-1]
-
-        # Notify listeners about the new round
         for listener in self.listeners:
             listener.on_new_round(last_round, self.subject)
-        self.agent.run_agent()
-        ai_answer = self.agent.get_text()
-        end_of_discussion = self.check_end_of_discussion(ai_answer, memory)
-        if self.trajectory.initial_question:
-            return end_of_discussion, ai_answer
-        else:
-            return end_of_discussion, None
+
+        end_of_discussion = self.check_end_of_discussion(ai_message or debater_message, memory)
+        return end_of_discussion
+
+    def recruit_AI_debaters(self):
+        def recruit_AI_debaters() -> List[GPTAgent]:
+            chosen_agents = []
+            current_script_path = Path(__file__).resolve()
+            parent_folder = current_script_path.parent
+            file_path = parent_folder.joinpath('agent_roles_permanent.json')
+            agent_roles, agent_context = get_roles(file_path)
+            president_description = """You are the president of a debate circle whose goal is to discuss a 
+            project and you must explore the project organically. Your job is never to propose solutions, but to expose 
+            problems, logic fallacies, and explore the subject in order to avoid blind spots. Never flip roles 
+            with the debaters! You share a common interest with the debaters to solve issues and advance the 
+            project. Never forget that the main task is to lead the other debaters so they can solve problems in 
+            the project. If the debaters cannot answer or find your directives unclear they will answer with [
+            Cannot Process Directives: <Reason for incompletion>]. Use open-ended questions to avoid forcing specific
+            participants to answer.
+
+            When presented with a numbered list of items to discuss, you are to address each item sequentially, 
+            focusing on one issue at a time without introducing multiple items simultaneously. Only talk about the
+            next item when the words [NEXT ITEM] are displayed.
+
+            The debaters have a very short memory, so reminders of prior conclusions are necessary for continuity."""
+            president_name = "Session President"
+            president_agent = self.gpt_manager.create_agent(
+                model=ModelType.GPT_3_5_TURBO, messages="", system_prompt=president_description,
+                agent_name=president_name, temperature=0.4)
+            chosen_agents.append(president_agent)
+
+            # Randomly select roles for the debate, ensuring at least 3 agents are selected
+            num_agents_to_recruit = max(3, len(agent_roles))
+            chosen_roles = random.sample(agent_roles, num_agents_to_recruit)
+
+            for role in chosen_roles:
+                if role in agent_context:
+                    additional_instructions = "If you find that the question you have been asked is unclear and need" \
+                                              "further information, simply write [Cannot Process Directives:" \
+                                              " <Reason for incompletion>]"
+                    agent = self.gpt_manager.create_agent(
+                        model=ModelType.GPT_3_5_TURBO, messages="",
+                        system_prompt=agent_context[role] + additional_instructions, agent_name=role,
+                        temperature=0.65)
+                    chosen_agents.append(agent)
+                else:
+                    print(f"Failed to add agent: {role} due to no matching context.")
+
+            return chosen_agents
+
+        def get_roles(file_path: Path) -> (List[str], Dict[str, str]):
+            with open(file_path, 'r') as f:
+                agent_context = json.load(f)
+
+            # Convert keys to lowercase for uniformity
+            agent_context = {k.lower(): v for k, v in agent_context.items()}
+            agent_roles = list(agent_context.keys())
+
+            return agent_roles, agent_context
+
+        return recruit_AI_debaters()
+
+    def agent_answer_chooser(self, debater_agents, president_message=None):
+        # Example: Randomly choose a debater agent to respond
+        return random.choice(debater_agents)
 
     def mark_round_messages(self, user_message, ai_message, criteria=None):
         """
@@ -278,9 +371,8 @@ class DiscussionSession:
 
         return {'total_cost': total_cost, 'input_cost': input_cost, 'output_cost': output_cost}
 
-    def update_memory(self, user_answer, bonus_info=None):
+    def update_memory(self, main_agent_answer, bonus_info=None):
         messages_to_update = []
-
         # Get previous conversation rounds based on memory type
         if self.memory_type == MemoryType.LAST_X_MESSAGES:
             messages_to_update = self.trajectory.trim_return_rounds(self.last_x_messages)
@@ -300,8 +392,8 @@ class DiscussionSession:
         else:
             raise ValueError("Unsupported memory type")
 
-        if user_answer is not None:
-            messages_to_update.append(UserMessage(user_answer))
+        if main_agent_answer is not None:
+            messages_to_update.append(UserMessage(main_agent_answer))
 
         # Check if the initial question is already in the system prompt
         initial_question_prompt = f"This is the initial question of this discussion: {self.trajectory.initial_question}"

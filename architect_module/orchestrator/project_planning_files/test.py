@@ -1,4 +1,4 @@
-from utils.persistance_access import MemoryStreamAccess
+from project_memory.persistance_access import MemoryStreamAccess
 vector_name = 'test'
 vector_text = "This is a test, please do not consider important"
 vector_id = vector_name + 'Engineering a DC Motor > Documentation > User Guide > Maintenance > Belt/Chain Tensioning-830511a7-2605-4abd-93e1-77b770d07365'

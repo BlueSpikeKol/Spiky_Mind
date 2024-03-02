@@ -1,7 +1,7 @@
 import uuid
 
 from architect_module.orchestrator.project_schedule import ProjectSchedule
-from utils.persistance_access import MemoryStreamAccess
+from project_memory.persistance_access import MemoryStreamAccess
 from utils.openai_api.agent_sessions.discussion_sessions import DiscussionSession
 
 MOCK_PROJECT_FORM = {
@@ -47,6 +47,21 @@ MOCK_PROJECT_FORM = {
     "9. Charting the Sub-Objectives": {
         "Sub-Objectives": "Designing the interactive platform, developing curriculum content, engaging with schools for pilot testing, and establishing a feedback loop for continuous improvement.",
         "Timeline for Sub-Objectives": "The project is segmented into four main phases, each with its own set of tasks and deadlines, aligning with the overall 15-week project timeline."
+    }
+}
+
+BONUS_SUB_OBJECTIVE1 = {
+    "Ensuring Accessibility and Inclusivity": {
+        "Description": "Develop and integrate features for platform accessibility to a wider range of users, including those with disabilities, adhering to WCAG standards.",
+        "Rationale": "Expanding reach and aligning with educational inclusivity principles, ensuring usability for users with various disabilities.",
+        "Timeline": "From ideation through development and testing, with continuous refinement to ensure core accessibility in design and functionality."
+    }
+}
+BONUS_SUB_OBJECTIVE2 = {
+    "Community Building and Engagement": {
+        "Description": "Establish a program to involve students, educators, and coding enthusiasts in the platform's development and promotion, including forums, mentorship programs, and collaborations.",
+        "Rationale": "Fostering a supportive learning environment, providing valuable insights for improvement, increasing adoption, and creating a community sense among users.",
+        "Timeline": "Start in early phases with outreach and evolve into a structured program by the testing phase with established communication channels and activities."
     }
 }
 

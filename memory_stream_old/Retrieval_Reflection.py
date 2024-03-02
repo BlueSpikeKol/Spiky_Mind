@@ -1,5 +1,4 @@
 from memory_stream_old import MemoryObject
-from utils import persistance_access
 from gpt_api_old import AI_entities as AI
 
 

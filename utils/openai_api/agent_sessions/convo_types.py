@@ -4,6 +4,7 @@ class ConversationType(Enum):
     USER_ANSWERS = 1
     BOT_ANSWERS = 2
     FREESTYLE = 3
+    AI_DEBATE = 4
 
 
 class ConversationEndType(Enum):

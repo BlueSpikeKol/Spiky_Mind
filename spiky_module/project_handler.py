@@ -2,16 +2,14 @@ from typing import List
 import uuid
 import re
 import json
-import datetime
 from pathlib import Path
 
-from spiky_module.project_object import Project
 from architect_module.orchestrator.project_schedule import ProjectSchedule
-from utils.persistance_access import MemoryStreamAccess
+from project_memory.persistance_access import MemoryStreamAccess
 from utils.openai_api.agent_sessions.discussion_sessions import DiscussionSession
 from utils.openai_api.gpt_calling import GPTAgent, GPTManager
 from utils.openai_api.models import ModelType
-from utils.openai_api.agent_sessions.convo_types import ConversationType, ConversationEndType
+from utils.openai_api.agent_sessions.convo_types import ConversationType
 from utils.openai_api.agent_sessions.memory_types import MemoryType
 from utils.openai_api.agent_sessions.trajectory_listener import TrajectoryListenerCategorizer
 from utils.decision_records.decision_records_handler import DecisionRecordHandler
@@ -508,17 +506,17 @@ class ProjectHandler:
         self.project.set_project_name(project_name)
         print(WELCOME_INSTRUCTIONS2)
         print(PROJECT_FORM_INSTRUCTIONS.replace("{$name}", TESTING_NAME))
+        #TODO: make sure that Information Nodes are created as well as Concept nodes(create their functions first, then implement)
+
         # self.re_execute_failed_queries()
-        #self.project.create_project_form()
-        #nodes_precypher = self.form_to_nodes(self.project.initial_form)
-        #self.add_nodes_to_graph_db(nodes_precypher)
-        self.pair_nodes_without_drf()
-        self.handle_general_conversation()
-        # all conversations should be saved in the vector db.
-        # General information cannot be put in the graph db because it would just float around
+        # self.project.create_project_form()
+        # nodes_precypher = self.form_to_nodes(self.project.initial_form)
+        # self.add_nodes_to_graph_db(nodes_precypher)
+        # self.pair_nodes_without_drf()
 
         # Initialize and set a ProjectSchedule
         project_schedule = ProjectSchedule()
+        project_schedule.initialize_schedule()  # includes Discussion Sessions to build the action tree
         self.project.set_project_schedule(project_schedule)
 
     def sanitize_string(self, s):
@@ -557,7 +555,8 @@ class ProjectHandler:
             sanitized_source_id = self.sanitize_string(node['name_id'])
             for target_id in node['connected_to']:
                 sanitized_target_id = self.sanitize_string(target_id)
-                target_node = next((n for n in nodes if self.sanitize_string(n['name_id']) == sanitized_target_id), None)
+                target_node = next((n for n in nodes if self.sanitize_string(n['name_id']) == sanitized_target_id),
+                                   None)
                 if target_node:
                     relationships = self.determine_relationships(node, target_node)
                     for relationship in relationships:

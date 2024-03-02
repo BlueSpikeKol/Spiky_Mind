@@ -1,4 +1,3 @@
-import os
 import json
 import random
 from typing import Union, List, Any
@@ -14,7 +13,7 @@ from neo4j import GraphDatabase
 
 from utils.openai_api.gpt_calling import GPTManager
 from utils.openai_api.models import ModelType
-from utils.persistance_access import MemoryStreamAccess
+from project_memory.persistance_access import MemoryStreamAccess
 
 """
 TODO:

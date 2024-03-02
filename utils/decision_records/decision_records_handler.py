@@ -4,7 +4,7 @@ from typing import List, Dict, Optional
 import re
 
 from utils.decision_records.decision_records import DecisionRecord, RecordType
-from utils.persistance_access import MemoryStreamAccess
+from project_memory.persistance_access import MemoryStreamAccess
 from utils.openai_api.gpt_calling import GPTManager
 from utils.openai_api.models import ModelType
 
