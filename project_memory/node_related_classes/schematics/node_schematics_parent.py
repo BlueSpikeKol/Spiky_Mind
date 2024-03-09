@@ -9,20 +9,30 @@ from project_memory.persistance_access import MemoryStreamAccess
 
 @dataclass
 class NodeSchematic:
-    description: str
-    description_vector_id: str
-    creation_context: str
-    name: str
-    name_id: str
-    label: str
-    sub_label: Optional[str] = None
-    properties: Dict[str, str] = field(default_factory=dict)
-    # Each dict contains 'label', 'class_type', and 'relationship' keys
-    parent_relationship_map: List[Dict[str, str]] = field(default_factory=list)
+    # Consolidating related attributes into lists of dictionaries
+    descriptions: List[Dict[str, str]] = field(default_factory=lambda: [
+        {"description": "", "vector_id": ""}
+    ])
+    names: List[Dict[str, str]] = field(default_factory=lambda: [
+        {"name": "", "name_id": ""}
+    ])
+    labels: List[Dict[str, Optional[str]]] = field(default_factory=lambda: [
+        {"label": "", "sub_label": None}
+    ])
+    properties: Dict[str, str] = field(default_factory=dict)  # Properties are typed as Facts
+    Domain: List[Dict[str, str]] = field(default_factory=list)
+    Range: List[Dict[str, str]] = field(default_factory=list)
     """
-    parent_relationship_map=[
+    Example for Domain and Range:
+    Domain=[
         {"label": "ParentLabel1", "class_type": "ParentClass1", "relationship": "RELATIONSHIP_TYPE1"},
-        {"label": "ParentLabel2", "class_type": "ParentClass2", "relationship": "RELATIONSHIP_TYPE2"}]"""
+        {"label": "ParentLabel2", "class_type": "ParentClass2", "relationship": "RELATIONSHIP_TYPE2"}
+    ],
+    Range=[
+        {"label": "ChildLabel1", "class_type": "ChildClass1", "relationship": "RELATIONSHIP_TYPE1"},
+        {"label": "ChildLabel2", "class_type": "ChildClass2", "relationship": "RELATIONSHIP_TYPE2"}
+    ]
+    """
 
     def __post_init__(self):
         if isinstance(self, ConceptNodeSchematic):
@@ -58,38 +68,33 @@ class NodeSchematic:
     def upload_as_cypher_query(self, memory_stream: MemoryStreamAccess):
         """
         Constructs and executes a Cypher query string for uploading the node to a Neo4J database,
-        treating sub_label as additional labels.
+        taking into account the specific structure of properties for different node types.
         """
-        # Convert all relevant dataclass fields to a dictionary for Cypher query
-        properties = {k: v for k, v in asdict(self).items() if
-                      v is not None and k not in ['sub_label', 'relationships']}
+        # Initial setup for labels
+        label_str = ":".join([d['label'] for d in self.labels])  # Construct label string from labels list
 
-        # Handle dynamic labels (main label + sub_labels)
-        labels = self.label  # Main label
-        if hasattr(self, 'sub_label') and self.sub_label:  # Check if sub_labels exist and are not empty
-            sub_labels = ":" + ":".join(self.sub_label) if isinstance(self.sub_label, list) else ":" + self.sub_label
-        else:
-            sub_labels = ""
+        # Prepare properties for Cypher query
+        properties_cypher = {}
+        for key, value in self.properties.items():
+            # For FactNodeSchematic, directly use the value
+            if isinstance(self, FactNodeSchematic):
+                properties_cypher[key] = value
+            # For ConceptNodeSchematic and RelationshipNodeSchematic, handle references to FactNodeSchematic
+            elif isinstance(self, (ConceptNodeSchematic, RelationshipNodeSchematic)) and isinstance(value,
+                                                                                                    FactNodeSchematic):
+                # Assuming the value to be the name or another simple identifier from FactNodeSchematic
+                properties_cypher[key] = f"'{value.names[0]['name']}'"
 
-        # Prepare properties string for Cypher query
-        properties_str = ', '.join([f"{k}: ${k}" for k in properties.keys()])
-        query = f"MERGE (n:{labels}{sub_labels} {{name_id: $name_id}}) SET n += {{{properties_str}}}"
+        # Convert properties to Cypher string format
+        properties_str = ', '.join([f"{k}: {v}" for k, v in properties_cypher.items()])
 
-        # Execute the query using the provided Neo4jDatabaseManager instance
-        result = memory_stream.neo4j_handler.execute_queries((query, properties))
+        # Construct the Cypher query
+        query = f"MERGE (n:{label_str} {{name_id: $name_id}}) SET n += {{{properties_str}}}"
+
+        # Execute the query
+        result = memory_stream.neo4j_handler.execute_queries(
+            (query, {"name_id": self.names[0]['name_id'], **properties_cypher}))
         return result
-
-
-@dataclass
-class ConceptNodeSchematic(NodeSchematic):
-    """
-    Schematic for Concept nodes.
-    """
-    label: str = "Concept"
-
-    def __post_init__(self):
-        super().__post_init__()
-        self.label = "Concept"  # Ensures the label is always "Concept" for instances of this class
 
 
 @dataclass
@@ -104,12 +109,24 @@ class FactNodeSchematic(NodeSchematic):
 
 
 @dataclass
-class RelationshipNodeSchematic(NodeSchematic):
+class ConceptNodeSchematic(NodeSchematic):
     """
-    Schematic for Relationship meta-nodes.
-    To avoid putting properties in the relationships, we use a meta-node to have greater control.
+    Schematic for Concept nodes.
     """
+    properties: Dict[str, FactNodeSchematic] = field(default_factory=dict)
 
     def __post_init__(self):
         super().__post_init__()
-        self.label = "Relationship"  # Ensures the label is always "Relationship" for instances of this class
+        self.label = "Concept"
+
+@dataclass
+class RelationshipNodeSchematic(NodeSchematic):
+    """
+    Schematic for Relationship meta-nodes.
+    """
+    properties: Dict[str, FactNodeSchematic] = field(default_factory=dict)
+
+    def __post_init__(self):
+        super().__post_init__()
+        self.label = "Relationship"
+
