@@ -4,7 +4,15 @@ import pinecone
 import mysql.connector
 from typing import Tuple, List
 import re
+import tempfile
+import os
+import json
 
+import requests
+from requests.auth import HTTPDigestAuth
+from SPARQLWrapper import SPARQLWrapper, JSON, POST, GET, DIGEST
+from owlready2 import *
+import rdflib
 from mysql.connector import Error as MySQLError
 from mysql.connector import InterfaceError, DatabaseError
 from collections import Counter
@@ -100,8 +108,9 @@ class MemoryStreamAccess:  # TODO find a way to reduce the times this class is i
     def __init__(self):
         self.mysql_config = config_manager.mysql.as_dict()
         self.pinecone_index = config_manager.pinecone.index_name
-        self.neo4j_handler = Neo4jDatabaseManager()  # check above to see its usage
         self.gpt_manager = GPTManager()
+        self.virtuoso_auth = HTTPDigestAuth(config_manager.virtuoso.user, config_manager.virtuoso.password)
+        self.virtuoso_endpoint = config_manager.virtuoso.sparql_endpoint
         try:
             self.mydb = mysql.connector.connect(**self.mysql_config)
             self.mycursor = self.mydb.cursor()
@@ -121,7 +130,176 @@ class MemoryStreamAccess:  # TODO find a way to reduce the times this class is i
             self.index = None
         print(self.index.describe_index_stats())
 
-    def similarity_comparison(self, comparison_list_id: List[str], single_id: str, top_k: int = 5) -> List[Tuple[str, float]]:
+    def query_sparql_endpoint(self, query, auth=None, update=False):
+        endpoint = "http://localhost:8890/sparql-auth"
+
+        # Setup for digest authentication
+        if auth is None:
+            auth = HTTPDigestAuth('dba', 'hhggRSe6DFZPcqze')
+
+
+        # Ensure the endpoint returns JSON
+        headers = {"Accept": "application/sparql-results+json"}  # This line is crucial
+        if update:
+            headers["Content-Type"] = "application/sparql-update"
+        else:
+            headers["Content-Type"] = "application/sparql-query"
+
+        try:
+            response = requests.post(endpoint, auth=auth, headers=headers, data=query)
+            response.raise_for_status()
+
+            # Parse the JSON response
+            results = json.loads(response.text)  # This line converts the response text to a Python dictionary
+
+            print(response.status_code, results)  # Adjust logging as needed
+
+            return results  # Now this returns a dictionary as expected
+
+        except requests.exceptions.HTTPError as e:
+            print(f"HTTP Error performing SPARQL operation: {e.response.status_code} {e.response.text}")
+        except Exception as e:
+            print(f"Error performing SPARQL operation: {e}")
+
+    def upload_ontology_to_virtuoso(self, graph_uri=None, auth=None, replace=True, file_path=None, file_contents=None):
+        # Hardcoded endpoint for Virtuoso SPARQL Graph CRUD operations
+        endpoint = self.virtuoso_endpoint + "/sparql-graph-crud"
+        headers = {"Content-Type": "application/rdf+xml"}
+        if auth is None:
+            auth = HTTPDigestAuth('dba', 'hhggRSe6DFZPcqze')
+        if graph_uri is None:
+            graph_uri = "http://spikymind.org/data/myprojectontology"
+        if file_path:
+            with open(file_path, 'rb') as file:
+                file_contents = file.read()
+        else:
+            if file_contents is None:
+                print("No file path or contents provided.")
+                return
+        if replace:
+            # Use PUT request to replace the target completely
+            response = requests.put(f"{endpoint}?graph-uri={graph_uri}", data=file_contents, headers=headers, auth=auth)
+        else:
+            # Use POST request to append new information
+            response = requests.post(f"{endpoint}?graph-uri={graph_uri}", data=file_contents, headers=headers,
+                                     auth=auth)
+
+        if response.status_code in [200, 201]:
+            print("Ontology uploaded successfully.")
+        else:
+            print(f"Failed to upload ontology: {response.status_code} - {response.reason}")
+            print(f"Response body: {response.text}")
+            print(f"File contents: {file_contents}")
+
+    def download_ontology_from_graph(self, graph_uri=None, save_path=None, auth=None):
+        headers = {
+            "Accept": "application/rdf+xml",  # Request RDF/XML response
+            "Content-Type": "application/sparql-query"  # Indicate SPARQL query in the request body
+        }
+        # SPARQL CONSTRUCT query to retrieve all triples from the specified graph
+        if graph_uri is None:
+            graph_uri = "http://spikymind.org/data/myprojectontology"
+        sparql_query = f"""
+        CONSTRUCT {{
+            ?s ?p ?o .
+        }} WHERE {{
+            GRAPH <{graph_uri}> {{
+                ?s ?p ?o .
+            }}
+        }}
+        """
+        sparql_query_endpoint = self.virtuoso_endpoint + "/sparql-auth"
+        if save_path is None:
+            current_script_path = os.path.abspath(__file__)
+            spiky_mind_dir = current_script_path.split('Spiky_Mind', 1)[0] + 'Spiky_Mind'
+
+            # Now construct the path to the ontology file
+            save_path = os.path.join(spiky_mind_dir, 'project_memory', 'ontologies', 'basic_ontology.rdf')
+        try:
+            response = requests.post(sparql_query_endpoint, data=sparql_query, headers=headers, auth=auth)
+            if response.status_code == 200:
+                with open(save_path, 'wb') as file:
+                    file.write(response.content)
+                print(f"Ontology data successfully downloaded and saved to {save_path}.")
+            else:
+                print(f"Failed to download ontology data: {response.status_code} - {response.reason}")
+        except Exception as e:
+            print(f"Error downloading ontology data: {e}")
+
+    def execute_sparql_query(self, query, graph_uri=None, auth=None):
+        """
+        Executes a SPARQL query against a Virtuoso endpoint with fallback to CRUD endpoint for complex operations.
+
+        Parameters:
+        - query: The SPARQL query string.
+        - graph_uri: The URI of the graph for CRUD operations. Defaults to a predefined graph URI if not specified.
+        - auth: Authentication credentials, if required (default: None).
+
+        Returns:
+        A requests.Response object containing the query result or operation status, or None if the operation fails.
+
+        Examples:
+        - SELECT query:
+          execute_sparql_query("SELECT * WHERE {?s ?p ?o} LIMIT 10")
+
+        - INSERT query with fallback:
+          execute_sparql_query("INSERT DATA { GRAPH <http://example.org> { <http://example.org/subject> <http://example.org/predicate> <http://example.org/object> . } }", "http://example.org")
+
+        - DELETE query with fallback:
+          execute_sparql_query("DELETE DATA { GRAPH <http://example.org> { <http://example.org/subject> <http://example.org/predicate> <http://example.org/object> . } }", "http://example.org")
+
+        Note: For INSERT and DELETE operations, ensure your endpoint URL points to an update-capable URL if it is different.
+        Note: Complex Insertion and Deletion operations may require the use of the Virtuoso SPARQL Graph CRUD endpoint.
+        """
+        if auth is None:
+            auth = self.virtuoso_auth
+        if graph_uri is None:
+            graph_uri = "http://spikymind.org/data/myprojectontology"
+        endpoint = self.virtuoso_endpoint + "/sparql-auth"
+        # crud_endpoint = self.virtuoso_endpoint + "/sparql-graph-crud"
+        headers = {"Accept": "application/sparql-results+json"} if query.strip().upper().startswith(
+            ("SELECT", "ASK")) else {"Content-Type": "application/sparql-update"}
+
+        method = requests.get if query.strip().upper().startswith(("SELECT", "ASK")) else requests.post
+        response = method(endpoint, params={"query": query} if method == requests.get else None,
+                          data=query if method == requests.post else None, headers=headers, auth=auth)
+
+        # If the operation fails, return None
+        if response.status_code not in range(200, 300):
+            print("Operation failed. Status code:", response.status_code)
+            print(" Response Error:", response.reason)
+            success = False
+            return success
+
+        return response
+
+    def perform_reasoning(self, graph_uri=None, save_path=None):
+        # Download the ontology from the graph URI if not already available locally
+        if save_path is None:
+            current_script_path = os.path.abspath(__file__)
+            spiky_mind_dir = current_script_path.split('Spiky_Mind', 1)[0] + 'Spiky_Mind'
+
+            # Now construct the path to the ontology file
+            save_path = os.path.join(spiky_mind_dir, 'project_memory', 'ontologies', 'reasoning_ontology.rdf')
+
+        if not os.path.exists(save_path):
+            self.download_ontology_from_graph(graph_uri=graph_uri, save_path=save_path, auth=self.virtuoso_auth)
+
+        # Load the ontology into Owlready2
+        onto = get_ontology(f"file://{save_path}").load()
+
+        # Perform reasoning
+        with onto:
+            sync_reasoner_hermit(infer_property_values=True)
+
+        # Save the reasoned ontology back to the same file or a new file
+        reasoned_save_path = save_path.replace('.rdf', '_is_reasoned.rdf')
+        onto.save(file=reasoned_save_path)
+
+        print(f"Reasoning completed. Reasoned ontology saved to {reasoned_save_path}.")
+
+    def similarity_comparison(self, comparison_list_id: List[str], single_id: str, top_k: int = 5) -> List[
+        Tuple[str, float]]:
         """
         Compares a list of parent IDs against a single ID to find the top k most similar parents.
 
@@ -145,7 +323,7 @@ class MemoryStreamAccess:  # TODO find a way to reduce the times this class is i
         for parent_id in comparison_list_id:
             parent_vector = np.array(vectors[parent_id])
             similarity_score = np.dot(single_vector, parent_vector) / (
-                        np.linalg.norm(single_vector) * np.linalg.norm(parent_vector))  # Cosine similarity
+                    np.linalg.norm(single_vector) * np.linalg.norm(parent_vector))  # Cosine similarity
             similarities.append((parent_id, similarity_score))
 
         # Sort by similarity score in descending order and return top k results

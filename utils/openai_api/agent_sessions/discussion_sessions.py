@@ -45,13 +45,13 @@ class DiscussionSession:
         self.summarize_result = summarize_result
         self.trajectory = UserAITrajectory(self.subject, self.conversation_type, self.memory_type)
         self.last_x_messages = last_x_messages
-        self.gpt_manager = GPTManager()
         self.conversation_end_type = conversation_end_type
         self.end_info = end_info
         self.end_controlled_by_user = end_controlled_by_user
         self.save_conversation = save_conversation
         self.save_path = save_path
         self.listeners = []
+        self.gpt_manager = GPTManager()
 
     def start_session(self, testing=True):
         all_information_gathered = False

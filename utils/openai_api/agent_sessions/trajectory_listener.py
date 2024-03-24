@@ -1,14 +1,16 @@
 import re
 from pathlib import Path
-from typing import List
+from typing import List, Union
 import numpy as np
+import spacy
 
 from utils.openai_api.agent_sessions.message_types import UserMessage, AIMessage
 from utils.openai_api.gpt_calling import GPTManager
 from utils.openai_api.models import ModelType
 from utils.openai_api.agent_sessions.agent_presets import PresetAgents
-from utils.openai_api.agent_sessions.trajectory import UserAIRound
+from utils.openai_api.agent_sessions.trajectory import UserAIRound, PresidentDebaterTrajectory
 from project_memory.persistance_access import MemoryStreamAccess
+from project_memory.ontology_manager import OntologyManager
 
 """ Here are the ways to detect, using nlp techniques, if a decision is being made, which would trigger the addition of information to the project using DRF technique.
 1. Anticipating Consequences
@@ -56,12 +58,13 @@ Conclusion
 While these approaches are ambitious and require significant advancements in AI, machine learning, and user interface design, they represent a direction towards more autonomous and intelligent systems for knowledge management. Balancing the reduction of user interactions with the maintenance of high-quality, relevant knowledge capture will be key to the success of such systems.
 """
 
+
 # Todo: Implement the above techniques to detect decision making in the conversation and add the information to the project using DRF technique.
 class TrajectoryListener:
-    def __init__(self):
+    def __init__(self, memory_stream: MemoryStreamAccess):
         self.round_history = []  # Stores all rounds observed by the listener
         self.gpt_manager = GPTManager()
-        self.memory_stream = MemoryStreamAccess()
+        self.memory_stream = memory_stream
 
     def on_new_round(self, last_round: UserAIRound, objective):
         """
@@ -255,8 +258,8 @@ class TrajectoryListenerGraphSearch(TrajectoryListener):
 
 
 class TrajectoryListenerFactDetector(TrajectoryListener):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, memory_stream: MemoryStreamAccess):
+        super().__init__(memory_stream=memory_stream)
 
     def on_new_round(self, last_round: UserAIRound, objective: str) -> None:
         # Check if the round contains a decision-making context
@@ -448,6 +451,51 @@ class TrajectoryListenerFactDetector(TrajectoryListener):
         return technique_dict
 
 
+class TrajectoryListenerOntologyTermDetector:
+    def __init__(self, memory_stream: MemoryStreamAccess, ontology_manager: OntologyManager):
+        # Load the spaCy model for NLP tasks
+        self.memory_stream = memory_stream
+        self.ontology_manager = ontology_manager
+        self.nlp = spacy.load("en_core_web_lg")
+
+    def on_new_round(self, last_round: Union[UserAIRound, PresidentDebaterTrajectory]):
+        """
+        Analyzes a new round with NLP techniques and prepares the analysis for triple store integration.
+
+        :param last_round: The last round that was added to the trajectory.
+        """
+        user_analysis = self.analyze_text(last_round.initiator_message.content + last_round.responder_message.content)
+        ai_analysis = self.analyze_text(last_round.responder_message.content)
+        print()
+
+    def analyze_text(self, text: str):
+        """
+        Performs NLP analysis on the given text using spaCy for tasks like NER and dependency parsing.
+
+        :param text: The text to be analyzed.
+        :return: A dictionary containing the analysis results.
+        """
+        doc = self.nlp(text)
+        entities = [(ent.text, ent.label_) for ent in doc.ents]
+        tokens = [(token.text, token.dep_, token.tag_) for token in doc]
+
+        analysis = {
+            "entities": entities,
+            "tokens": tokens
+        }
+        return analysis
+
+    def integrate_with_triple_store(self, user_analysis, ai_analysis):
+        """
+        Takes the NLP analysis results and integrates them into a triple store.
+        This is a placeholder method to be implemented based on your triple store's API.
+
+        :param user_analysis: The analysis result of the user's message.
+        :param ai_analysis: The analysis result of the AI's response.
+        """
+        self.memory_stream.upload_ontology_to_virtuoso()
+
+
 user_message_content = """
 Given our tight budget constraints, I've been thinking we might need to explore alternative technologies. 
 What if we can't secure the necessary resources for our preferred stack? We should have a backup plan.
@@ -461,19 +509,19 @@ Conflict could arise if the team isn't on board with the backup technologies.
 """
 # TODO: this message above is complex and could create multiple information detected, we will need to handle more than a single object in the future.
 
-# Assuming UserMessage and AIMessage are initialized properly elsewhere
-user_message = UserMessage(content=user_message_content)
-ai_message = AIMessage(content=ai_message_content)
-
-# Creating a UserAIRound instance with the simulated conversation
-last_round = UserAIRound(user_message=user_message, ai_message=ai_message, metrics={}, category="Project Discussion")
-
-# Assuming the trajectory listener is initialized properly
-trajectory_listener = TrajectoryListenerFactDetector()
-
-# Injecting the round into the trajectory listener's detection process
-trajectory_listener.on_new_round(last_round=last_round, objective="Enhancing User Experience")
-print()
+# # Assuming UserMessage and AIMessage are initialized properly elsewhere
+# user_message = UserMessage(content=user_message_content)
+# ai_message = AIMessage(content=ai_message_content)
+#
+# # Creating a UserAIRound instance with the simulated conversation
+# last_round = UserAIRound(user_message=user_message, ai_message=ai_message, metrics={}, category="Project Discussion")
+#
+# # Assuming the trajectory listener is initialized properly
+# trajectory_listener = TrajectoryListenerFactDetector()
+#
+# # Injecting the round into the trajectory listener's detection process
+# trajectory_listener.on_new_round(last_round=last_round, objective="Enhancing User Experience")
+# print()
 
 # At this point, the trajectory listener would process the conversation,
 # detect decision-making contexts, and potentially ask for user confirmation if automated detection is unsure.
