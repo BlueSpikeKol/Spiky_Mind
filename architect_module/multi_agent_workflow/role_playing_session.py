@@ -9,7 +9,7 @@ from utils.openai_api.gpt_calling import GPTAgent, GPTManager
 
 from utils.openai_api.models import ModelType
 from architect_module.multi_agent_workflow import agent_recruitment, conversation_splitter, main_vs_side
-from architect_module.function_creation import create_new_function
+from architect_module.function_creation_old import create_new_function
 
 
 class RoundManager:

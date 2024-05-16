@@ -1,4 +1,3 @@
-import os
 import json
 import random
 from typing import Union, List, Any
@@ -14,6 +13,7 @@ from neo4j import GraphDatabase
 
 from utils.openai_api.gpt_calling import GPTManager
 from utils.openai_api.models import ModelType
+from project_memory.persistance_access import MemoryStreamAccess
 
 """
 TODO:
@@ -339,7 +339,7 @@ $ctext
 """
 
 
-class Neo4jGraphHandler:
+class ProjectDataHandler:
     def __init__(self):
         current_script_path = Path(__file__).resolve()
         parent_folder = current_script_path.parent
@@ -354,6 +354,7 @@ class Neo4jGraphHandler:
             model="gpt-4"
         )
         self.gpt_manager = GPTManager()
+        self.memory_access = MemoryStreamAccess()
 
     def gen_all_data(self, filename: str):
         with open(self.path_folder / filename, "r") as f:
@@ -657,7 +658,7 @@ class Neo4jGraphHandler:
 
         return e_statements + r_statements
 
-    def create_db(self, data: list) -> None:
+    def create_db(self, data: list) -> None: #TODO: use the persistance access
         url = self.config.neo4j.host_url
         user = self.config.neo4j.user
         password = self.config.neo4j.password
@@ -749,15 +750,15 @@ class Neo4jGraphHandler:
         Union[str, List[str]]: The result of the query or queries. If is_interpreted is True and a list of queries is provided, returns a single concatenated string.
         """
         if isinstance(query, str):
-            return self._execute_direct_query(query)
+            return self.memory_access.neo4j_handler.query_graph(query)
         elif isinstance(query, list):
-            results = [self._execute_direct_query(q) for q in query]
+            results = [self.memory_access.neo4j_handler.query_graph(q) for q in query]
             if is_interpreted:
                 db_results_concatenated = ".\n".join(str(result) for result in results)
                 db_query = " ".join(query)
                 system_prompt = CYPHER_QA_TEMPLATE.format(context=db_results_concatenated,
                                                           question=db_query + natural_l_query)
-                model_type = ModelType.CHAT_GPT4_old if use_chat_gpt4 else ModelType.GPT_3_5_TURBO
+                model_type = ModelType.GPT_4_TURBO if use_chat_gpt4 else ModelType.GPT_3_5_TURBO
                 interpretation_agent = self.gpt_manager.create_agent(model=model_type, max_tokens=500, temperature=0.4,
                                                                      messages=system_prompt)
                 interpretation_agent.run_agent()
@@ -767,29 +768,6 @@ class Neo4jGraphHandler:
                 return results
         else:
             raise ValueError("Query must be a string or a list of strings")
-
-    def _execute_direct_query(self, query: str):
-        """
-        Executes a single query string directly against the Neo4j graph database.
-
-        This method is intended to be used internally by the direct_query_graph method for executing individual queries.
-
-        Parameters:
-        query (str): The Cypher query string to be executed.
-
-        Returns:
-        str: The result of executing the query.
-        """
-        url = self.config.neo4j.host_url
-        user = self.config.neo4j.user
-        password = self.config.neo4j.password
-        driver = GraphDatabase.driver(url, auth=(user, password))
-
-        with driver.session() as session:
-            result = session.run(query).data()
-
-        driver.close()
-        return result
 
     def create_json_from_conversation(self, ls_filename_model: list[str]) -> str:
         graph_name = None
@@ -837,11 +815,11 @@ class Neo4jGraphHandler:
 
 
 if __name__ == '__main__':
-    handler = Neo4jGraphHandler()
+    handler = ProjectDataHandler()
 
     # handler.generate_labels("logs_test_short_conversation_gpt4.json", ModelType.GPT_4_TURBO, debug=True)
 
-    ls_filename_model = ("logs_test_short_conversation_gpt4.json", ModelType.CHAT_GPT4_old, "new_pipeline_test.json")
+    ls_filename_model = ("logs_test_short_conversation_gpt4.json", ModelType.GPT_4_TURBO, "new_pipeline_test.json")
     handler.new_pipeline(ls_filename_model)
 
     # with open(handler.path_graph / "dict_all_data.json", "r") as f:

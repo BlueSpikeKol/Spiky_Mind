@@ -27,6 +27,7 @@ class MySQLConfig:
     def as_dict(self):
         return asdict(self)
 
+
 @dataclass(frozen=True)
 class Neo4jConfig:
     host_url: str
@@ -43,8 +44,15 @@ class PineconeConfig:
     api_key: str
     environment: str
 
+@dataclass(frozen=True)
+class VirtuosoConfig:
+    sparql_endpoint: str
+    user: str
+    password: str
+
+
 class ConfigManager:
-    def __init__(self, config_path = CONFIG_FILE):
+    def __init__(self, config_path=CONFIG_FILE):
         config = configparser.ConfigParser()
 
         # Check if the file was read successfully
@@ -79,17 +87,21 @@ class ConfigManager:
                 user=config['neo4j']['user'],
                 password=config['neo4j']['password']
             )
+        if 'virtuoso' in config:
+            self.virtuoso = VirtuosoConfig(
+                sparql_endpoint=config['virtuoso'].get('sparql_endpoint', ''),
+                user=config['virtuoso'].get('user', ''),
+                password=config['virtuoso'].get('password', '')
+            )
 
 # To add a new config section:
-    # 1. Define a new dataclass above, annotating all fields with their expected types.
-    # 2. Make sure the dataclass has the attribute `frozen=True` to ensure immutability.
-    # 3. In this ConfigManager's `__init__` method, add a condition to check for the section's presence:
-    #    if 'your_new_section_name' in config:
-    #        self.your_new_section_variable = YourNewDataClass(
-    #            attribute1=config['your_new_section_name']['attribute1'],
-    #            attribute2=config['your_new_section_name']['attribute2'],
-    #            ...
-    #        )
-    # 4. The instance variable `self.your_new_section_variable` will now hold the config for that section.
-
-
+# 1. Define a new dataclass above, annotating all fields with their expected types.
+# 2. Make sure the dataclass has the attribute `frozen=True` to ensure immutability.
+# 3. In this ConfigManager's `__init__` method, add a condition to check for the section's presence:
+#    if 'your_new_section_name' in config:
+#        self.your_new_section_variable = YourNewDataClass(
+#            attribute1=config['your_new_section_name']['attribute1'],
+#            attribute2=config['your_new_section_name']['attribute2'],
+#            ...
+#        )
+# 4. The instance variable `self.your_new_section_variable` will now hold the config for that section.

@@ -32,7 +32,7 @@ def main():
         result_dict[item_key] = processed_value
 
     # Save the dictionary to a JSON file
-    with open('agent_roles_permanent.json', 'w') as json_file:
+    with open('../../utils/openai_api/agent_sessions/agent_roles_permanent.json', 'w') as json_file:
         json.dump(result_dict, json_file, indent=4)
 
 

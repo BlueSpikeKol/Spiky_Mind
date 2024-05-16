@@ -2,8 +2,8 @@ from PyQt6.QtWidgets import QApplication, QGraphicsScene
 from PyQt6.QtCore import Qt
 import sys
 
-from front_end.pyqt_scene_objects.pyqt_scene_view import TreeSceneView
-from front_end.pyqt_scene_objects.pyqt_objects import NodeItem, EdgeItem
+from front_end.pyqt_scene_objects_old.pyqt_scene_view import TreeSceneView
+from front_end.pyqt_scene_objects_old.pyqt_objects import NodeItem, EdgeItem
 
 class DataVisualizer:
     def __init__(self, data):

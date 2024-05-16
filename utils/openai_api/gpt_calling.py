@@ -9,7 +9,7 @@ import utils.openai_api.token_pools as token_pools
 from utils.openai_api.models import ModelType, ModelManager
 from utils import config_retrieval
 from utils.openai_api.agent_sessions.message_types import SystemMessage, UserMessage, AIMessage
-from utils.openai_api.agent_sessions.trajectory import ConversationTrajectory
+from utils.openai_api.agent_sessions.trajectory import UserAITrajectory
 
 EXAMPLE_CHAT_COMPLETION = """
 {
@@ -60,7 +60,7 @@ class GPTAgentHandler:
         self.agent = agent
 
     def validate_and_format_messages(self, messages):
-        if isinstance(messages, ConversationTrajectory):
+        if isinstance(messages, UserAITrajectory):
             return self.format_trajectory_messages(messages)
         elif isinstance(messages, UserMessage):
             return messages.content

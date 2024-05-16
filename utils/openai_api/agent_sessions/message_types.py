@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+
 @dataclass
 class Message:
     content: str
@@ -20,3 +21,13 @@ class UserMessage(Message):
 class AIMessage(Message):
     def __init__(self, content: str):
         super().__init__(content, 'assistant')
+
+
+class DebaterMessage(Message):
+    def __init__(self, content: str):
+        super().__init__(content, 'debater')
+
+
+class PresidentMessage(Message):
+    def __init__(self, content: str):
+        super().__init__(content, 'president')

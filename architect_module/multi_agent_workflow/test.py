@@ -1,6 +1,6 @@
 import role_playing_session
 # from architect_module.multi_agent_workflow.conversation_splitter import ConversationSplitter
-# from architect_module.function_creation.create_new_function import FunctionCreator
+# from architect_module.function_creation_old.create_new_function import FunctionCreator
 from architect_module.multi_agent_workflow.role_playing_session import ConversationManager
 from utils.openai_api.gpt_calling import GPTManager
 import textwrap
