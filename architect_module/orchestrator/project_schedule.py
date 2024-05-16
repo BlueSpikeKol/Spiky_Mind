@@ -229,7 +229,7 @@ class ProjectSchedule:
 
     def user_convo_to_expand_knowledge(self, base_mindmap):
         high_level_objective_session = self.create_discussion_session(
-            discussion_name="High Level Objectives exploration", subject=)
+            discussion_name="High Level Objectives exploration", subject="High Level Objectives")
 
         return base_mindmap
 

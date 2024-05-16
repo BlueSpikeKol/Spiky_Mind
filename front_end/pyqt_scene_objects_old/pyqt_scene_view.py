@@ -2,7 +2,7 @@ from PyQt6.QtWidgets import QGraphicsScene, QGraphicsView
 from PyQt6.QtGui import QPainter
 from PyQt6.QtCore import Qt
 
-from front_end.pyqt_scene_objects.pyqt_objects import NodeItem
+from front_end.pyqt_scene_objects_old.pyqt_objects import NodeItem
 
 class TreeSceneView(QGraphicsView):
     def __init__(self, scene, visualizer):

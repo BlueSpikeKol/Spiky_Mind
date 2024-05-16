@@ -5,7 +5,7 @@ from typing import Union, List
 
 from utils.openai_api.gpt_calling import GPTAgent
 from utils.openai_api.models import ModelType
-from front_end.chat_interface import ChatInterface
+from front_end.chat_interface_old import ChatInterface
 
 
 class SpikyChatHandler:
