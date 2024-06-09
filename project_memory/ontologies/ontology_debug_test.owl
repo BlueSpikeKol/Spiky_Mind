@@ -1,0 +1,421 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+         xmlns:owl="http://www.w3.org/2002/07/owl#"
+         xml:base="http://test.org/onto.owl"
+         xmlns="http://test.org/onto.owl#"
+         xmlns:owlr="http://www.lesfleursdunormal.fr/static/_downloads/owlready_ontology.owl#">
+
+<owl:Ontology rdf:about="http://test.org/onto.owl"/>
+
+<owl:ObjectProperty rdf:about="#has_administration_route">
+  <rdfs:domain rdf:resource="#Drug"/>
+  <rdfs:range rdf:resource="#AdministrationRoute"/>
+  <owlr:python_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">administration_routes</owlr:python_name>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#has_for_active_principle">
+  <rdfs:domain rdf:resource="#Drug"/>
+  <rdfs:range rdf:resource="#ActivePrinciple"/>
+  <owlr:python_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">active_principles</owlr:python_name>
+</owl:ObjectProperty>
+
+<owl:Class rdf:about="#Drug">
+  <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+  <rdfs:subClassOf>
+    <owl:Class>
+      <owl:oneOf rdf:parseType="Collection">
+        <rdf:Description rdf:about="#drug5"/>
+        <rdf:Description rdf:about="#drug3"/>
+        <rdf:Description rdf:about="#drug6"/>
+        <rdf:Description rdf:about="#drug2"/>
+        <rdf:Description rdf:about="#drug4"/>
+        <rdf:Description rdf:about="#drug1"/>
+      </owl:oneOf>
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#has_administration_route"/>
+      <owl:allValuesFrom>
+        <owl:Class>
+          <owl:unionOf rdf:parseType="Collection">
+            <rdf:Description rdf:about="#AdministrationRoute"/>
+            <rdf:Description rdf:about="#AdministrationRoute"/>
+            <rdf:Description rdf:about="#AdministrationRoute"/>
+            <owl:Class>
+              <owl:oneOf rdf:parseType="Collection">
+                <rdf:Description rdf:about="#topical"/>
+                <rdf:Description rdf:about="#oral"/>
+                <rdf:Description rdf:about="#topical"/>
+                <rdf:Description rdf:about="#topical"/>
+              </owl:oneOf>
+            </owl:Class>
+          </owl:unionOf>
+        </owl:Class>
+      </owl:allValuesFrom>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#has_for_active_principle"/>
+      <owl:allValuesFrom>
+        <owl:Class>
+          <owl:unionOf rdf:parseType="Collection">
+            <rdf:Description rdf:about="#ActivePrinciple"/>
+            <rdf:Description rdf:about="#ActivePrinciple"/>
+            <rdf:Description rdf:about="#ActivePrinciple"/>
+            <owl:Class>
+              <owl:oneOf rdf:parseType="Collection">
+                <rdf:Description rdf:about="#amoxicillin"/>
+                <rdf:Description rdf:about="#acetaminophen"/>
+                <rdf:Description rdf:about="#amoxicillin"/>
+                <rdf:Description rdf:about="#clavulanic_acid"/>
+                <rdf:Description rdf:about="#acetaminophen"/>
+                <rdf:Description rdf:about="#acetaminophen"/>
+              </owl:oneOf>
+            </owl:Class>
+          </owl:unionOf>
+        </owl:Class>
+      </owl:allValuesFrom>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+</owl:Class>
+
+<owl:Class rdf:about="#ActivePrinciple">
+  <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+</owl:Class>
+
+<owl:Class rdf:about="#AdministrationRoute">
+  <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Placebo">
+  <rdfs:subClassOf rdf:resource="#Drug"/>
+  <owl:equivalentClass>
+    <owl:Class>
+      <owl:intersectionOf rdf:parseType="Collection">
+        <rdf:Description rdf:about="#Drug"/>
+        <owl:Class>
+          <owl:complementOf>
+            <owl:Restriction>
+              <owl:onProperty rdf:resource="#has_for_active_principle"/>
+              <owl:someValuesFrom rdf:resource="#ActivePrinciple"/>
+            </owl:Restriction>
+          </owl:complementOf>
+        </owl:Class>
+        <owl:Restriction>
+          <owl:onProperty rdf:resource="#has_administration_route"/>
+          <owl:someValuesFrom rdf:resource="#AdministrationRoute"/>
+        </owl:Restriction>
+      </owl:intersectionOf>
+    </owl:Class>
+  </owl:equivalentClass>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#has_administration_route"/>
+      <owl:allValuesFrom rdf:resource="#AdministrationRoute"/>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#has_for_active_principle"/>
+      <owl:allValuesFrom rdf:resource="http://www.w3.org/2002/07/owl#Nothing"/>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+</owl:Class>
+
+<owl:Class rdf:about="#SingleActivePrincipleDrug">
+  <rdfs:subClassOf rdf:resource="#Drug"/>
+  <owl:equivalentClass>
+    <owl:Class>
+      <owl:intersectionOf rdf:parseType="Collection">
+        <rdf:Description rdf:about="#Drug"/>
+        <owl:Restriction>
+          <owl:onProperty rdf:resource="#has_for_active_principle"/>
+          <owl:onClass rdf:resource="#ActivePrinciple"/>
+          <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
+        </owl:Restriction>
+        <owl:Restriction>
+          <owl:onProperty rdf:resource="#has_administration_route"/>
+          <owl:someValuesFrom rdf:resource="#AdministrationRoute"/>
+        </owl:Restriction>
+      </owl:intersectionOf>
+    </owl:Class>
+  </owl:equivalentClass>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#has_administration_route"/>
+      <owl:allValuesFrom rdf:resource="#AdministrationRoute"/>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#has_for_active_principle"/>
+      <owl:allValuesFrom rdf:resource="#ActivePrinciple"/>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+</owl:Class>
+
+<owl:Class rdf:about="#DrugAssociation">
+  <rdfs:subClassOf rdf:resource="#Drug"/>
+  <owl:equivalentClass>
+    <owl:Class>
+      <owl:intersectionOf rdf:parseType="Collection">
+        <rdf:Description rdf:about="#Drug"/>
+        <owl:Restriction>
+          <owl:onProperty rdf:resource="#has_for_active_principle"/>
+          <owl:onClass rdf:resource="#ActivePrinciple"/>
+          <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">2</owl:qualifiedCardinality>
+        </owl:Restriction>
+        <owl:Restriction>
+          <owl:onProperty rdf:resource="#has_administration_route"/>
+          <owl:someValuesFrom rdf:resource="#AdministrationRoute"/>
+        </owl:Restriction>
+      </owl:intersectionOf>
+    </owl:Class>
+  </owl:equivalentClass>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#has_administration_route"/>
+      <owl:allValuesFrom rdf:resource="#AdministrationRoute"/>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#has_for_active_principle"/>
+      <owl:allValuesFrom rdf:resource="#ActivePrinciple"/>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+</owl:Class>
+
+<owl:Class rdf:about="#TopicalDrug">
+  <rdfs:subClassOf rdf:resource="#Drug"/>
+  <owl:equivalentClass>
+    <owl:Class>
+      <owl:intersectionOf rdf:parseType="Collection">
+        <rdf:Description rdf:about="#Drug"/>
+        <owl:Restriction>
+          <owl:onProperty rdf:resource="#has_for_active_principle"/>
+          <owl:someValuesFrom rdf:resource="#ActivePrinciple"/>
+        </owl:Restriction>
+        <owl:Restriction>
+          <owl:onProperty rdf:resource="#has_administration_route"/>
+          <owl:hasValue rdf:resource="#topical"/>
+        </owl:Restriction>
+      </owl:intersectionOf>
+    </owl:Class>
+  </owl:equivalentClass>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#has_administration_route"/>
+      <owl:allValuesFrom>
+        <owl:Class>
+          <owl:oneOf rdf:parseType="Collection">
+            <rdf:Description rdf:about="#topical"/>
+          </owl:oneOf>
+        </owl:Class>
+      </owl:allValuesFrom>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#has_for_active_principle"/>
+      <owl:allValuesFrom rdf:resource="#ActivePrinciple"/>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+</owl:Class>
+
+<owl:NamedIndividual rdf:about="#oral">
+  <rdf:type rdf:resource="#AdministrationRoute"/>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#topical">
+  <rdf:type rdf:resource="#AdministrationRoute"/>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#acetaminophen">
+  <rdf:type rdf:resource="#ActivePrinciple"/>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#amoxicillin">
+  <rdf:type rdf:resource="#ActivePrinciple"/>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#clavulanic_acid">
+  <rdf:type rdf:resource="#ActivePrinciple"/>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#drug1">
+  <rdf:type rdf:resource="#Drug"/>
+  <has_for_active_principle rdf:resource="#acetaminophen"/>
+  <rdf:type>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#has_administration_route"/>
+      <owl:allValuesFrom rdf:resource="http://www.w3.org/2002/07/owl#Nothing"/>
+    </owl:Restriction>
+  </rdf:type>
+  <rdf:type>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#has_for_active_principle"/>
+      <owl:allValuesFrom>
+        <owl:Class>
+          <owl:oneOf rdf:parseType="Collection">
+            <rdf:Description rdf:about="#acetaminophen"/>
+          </owl:oneOf>
+        </owl:Class>
+      </owl:allValuesFrom>
+    </owl:Restriction>
+  </rdf:type>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#drug2">
+  <rdf:type rdf:resource="#Drug"/>
+  <has_for_active_principle rdf:resource="#amoxicillin"/>
+  <has_for_active_principle rdf:resource="#clavulanic_acid"/>
+  <rdf:type>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#has_administration_route"/>
+      <owl:allValuesFrom rdf:resource="http://www.w3.org/2002/07/owl#Nothing"/>
+    </owl:Restriction>
+  </rdf:type>
+  <rdf:type>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#has_for_active_principle"/>
+      <owl:allValuesFrom>
+        <owl:Class>
+          <owl:oneOf rdf:parseType="Collection">
+            <rdf:Description rdf:about="#amoxicillin"/>
+            <rdf:Description rdf:about="#clavulanic_acid"/>
+          </owl:oneOf>
+        </owl:Class>
+      </owl:allValuesFrom>
+    </owl:Restriction>
+  </rdf:type>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#drug3">
+  <rdf:type rdf:resource="#Drug"/>
+  <rdf:type>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#has_administration_route"/>
+      <owl:allValuesFrom rdf:resource="http://www.w3.org/2002/07/owl#Nothing"/>
+    </owl:Restriction>
+  </rdf:type>
+  <rdf:type>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#has_for_active_principle"/>
+      <owl:allValuesFrom rdf:resource="http://www.w3.org/2002/07/owl#Nothing"/>
+    </owl:Restriction>
+  </rdf:type>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#drug4">
+  <rdf:type rdf:resource="#Drug"/>
+  <has_for_active_principle rdf:resource="#acetaminophen"/>
+  <has_administration_route rdf:resource="#topical"/>
+  <rdf:type>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#has_administration_route"/>
+      <owl:allValuesFrom>
+        <owl:Class>
+          <owl:oneOf rdf:parseType="Collection">
+            <rdf:Description rdf:about="#topical"/>
+          </owl:oneOf>
+        </owl:Class>
+      </owl:allValuesFrom>
+    </owl:Restriction>
+  </rdf:type>
+  <rdf:type>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#has_for_active_principle"/>
+      <owl:allValuesFrom>
+        <owl:Class>
+          <owl:oneOf rdf:parseType="Collection">
+            <rdf:Description rdf:about="#acetaminophen"/>
+          </owl:oneOf>
+        </owl:Class>
+      </owl:allValuesFrom>
+    </owl:Restriction>
+  </rdf:type>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#drug5">
+  <rdf:type rdf:resource="#Drug"/>
+  <has_for_active_principle rdf:resource="#amoxicillin"/>
+  <has_administration_route rdf:resource="#oral"/>
+  <rdf:type>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#has_administration_route"/>
+      <owl:allValuesFrom>
+        <owl:Class>
+          <owl:oneOf rdf:parseType="Collection">
+            <rdf:Description rdf:about="#oral"/>
+          </owl:oneOf>
+        </owl:Class>
+      </owl:allValuesFrom>
+    </owl:Restriction>
+  </rdf:type>
+  <rdf:type>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#has_for_active_principle"/>
+      <owl:allValuesFrom>
+        <owl:Class>
+          <owl:oneOf rdf:parseType="Collection">
+            <rdf:Description rdf:about="#amoxicillin"/>
+          </owl:oneOf>
+        </owl:Class>
+      </owl:allValuesFrom>
+    </owl:Restriction>
+  </rdf:type>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#drug6">
+  <rdf:type rdf:resource="#Drug"/>
+  <has_for_active_principle rdf:resource="#acetaminophen"/>
+  <has_administration_route rdf:resource="#topical"/>
+  <rdf:type>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#has_administration_route"/>
+      <owl:allValuesFrom>
+        <owl:Class>
+          <owl:oneOf rdf:parseType="Collection">
+            <rdf:Description rdf:about="#topical"/>
+          </owl:oneOf>
+        </owl:Class>
+      </owl:allValuesFrom>
+    </owl:Restriction>
+  </rdf:type>
+  <rdf:type>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#has_for_active_principle"/>
+      <owl:allValuesFrom>
+        <owl:Class>
+          <owl:oneOf rdf:parseType="Collection">
+            <rdf:Description rdf:about="#acetaminophen"/>
+          </owl:oneOf>
+        </owl:Class>
+      </owl:allValuesFrom>
+    </owl:Restriction>
+  </rdf:type>
+</owl:NamedIndividual>
+
+<owl:AllDifferent>
+  <owl:distinctMembers rdf:parseType="Collection">
+    <rdf:Description rdf:about="#acetaminophen"/>
+    <rdf:Description rdf:about="#amoxicillin"/>
+    <rdf:Description rdf:about="#clavulanic_acid"/>
+  </owl:distinctMembers>
+</owl:AllDifferent>
+
+<owl:AllDisjointClasses>
+  <owl:members rdf:parseType="Collection">
+    <rdf:Description rdf:about="#Placebo"/>
+    <rdf:Description rdf:about="#SingleActivePrincipleDrug"/>
+    <rdf:Description rdf:about="#DrugAssociation"/>
+  </owl:members>
+</owl:AllDisjointClasses>
+
+
+</rdf:RDF>

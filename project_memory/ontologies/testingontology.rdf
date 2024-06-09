@@ -1,0 +1,444 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11/"
+     xml:base="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11/"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:untitled-ontology-11="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#">
+    <owl:Ontology rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#hasActivePrinciple -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#hasActivePrinciple">
+        <owl:inverseOf rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#isActivePrincipleOf"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#Drug"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#ActivePrinciple"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#hasAdministrationRoute -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#hasAdministrationRoute">
+        <owl:inverseOf rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#isAdministrationRouteOf"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#Drug"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#AdministrationRoute"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#hasDrug -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#hasDrug">
+        <owl:inverseOf rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#isDrugOf"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#hasOralDrug -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#hasOralDrug">
+        <rdfs:subPropertyOf rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#hasDrug"/>
+        <owl:inverseOf rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#isOralDrugOf"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#Patient"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#OralDrug"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#hasTopicalDrug -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#hasTopicalDrug">
+        <rdfs:subPropertyOf rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#hasDrug"/>
+        <owl:inverseOf rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#isTopicalDrugOf"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#Patient"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#TopicalDrug"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#isActivePrincipleOf -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#isActivePrincipleOf">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#isAdministrationRouteOf -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#isAdministrationRouteOf">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#isDrugOf -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#isDrugOf">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#Drug"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#Patient"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#isOralDrugOf -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#isOralDrugOf">
+        <rdfs:subPropertyOf rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#isDrugOf"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#OralDrug"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#isTopicalDrugOf -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#isTopicalDrugOf">
+        <rdfs:subPropertyOf rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#isDrugOf"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#ActivePrinciple -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#ActivePrinciple"/>
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#AdministrationRoute -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#AdministrationRoute"/>
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#AssociationDrug -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#AssociationDrug">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#Drug"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#hasActivePrinciple"/>
+                <owl:minQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">2</owl:minQualifiedCardinality>
+                <owl:onClass rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#ActivePrinciple"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#Drug -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#Drug">
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#hasAdministrationRoute"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#AdministrationRoute"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#OralDrug -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#OralDrug">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#Drug"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#hasAdministrationRoute"/>
+                <owl:hasValue rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#oral"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#Patient -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#Patient">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#Person"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#hasDrug"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#Drug"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <owl:disjointUnionOf rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#PlaceboPatient"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#RealPatient"/>
+        </owl:disjointUnionOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#Person -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#Person"/>
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#PlaceboDrug -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#PlaceboDrug">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#Drug"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#hasActivePrinciple"/>
+                <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">0</owl:qualifiedCardinality>
+                <owl:onClass rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#ActivePrinciple"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#PlaceboPatient -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#PlaceboPatient">
+        <owl:equivalentClass>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#hasDrug"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#PlaceboDrug"/>
+            </owl:Restriction>
+        </owl:equivalentClass>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#Patient"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#hasDrug"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#PlaceboDrug"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#RealPatient -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#RealPatient">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#hasDrug"/>
+                        <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#AssociationDrug"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#hasDrug"/>
+                        <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#SingleDrug"/>
+                    </owl:Restriction>
+                </owl:unionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#Patient"/>
+        <rdfs:subClassOf>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#hasDrug"/>
+                        <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#AssociationDrug"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#hasDrug"/>
+                        <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#SingleDrug"/>
+                    </owl:Restriction>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#SingleDrug -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#SingleDrug">
+        <owl:equivalentClass>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#hasActivePrinciple"/>
+                <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onClass rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#ActivePrinciple"/>
+            </owl:Restriction>
+        </owl:equivalentClass>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#Drug"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#TopicalDrug -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#TopicalDrug">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#Drug"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#hasAdministrationRoute"/>
+                <owl:hasValue rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#topical"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#John -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#John">
+        <rdf:type rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#PlaceboPatient"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#Mary -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#Mary">
+        <rdf:type rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#RealPatient"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#Philippe -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#Philippe">
+        <rdf:type rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#Patient"/>
+        <untitled-ontology-11:hasDrug rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#someDrug"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#acetaminophen -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#acetaminophen">
+        <rdf:type rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#ActivePrinciple"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#amoxicillin -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#amoxicillin">
+        <rdf:type rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#ActivePrinciple"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#clavulanic_acid -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#clavulanic_acid">
+        <rdf:type rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#ActivePrinciple"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#oral -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#oral">
+        <rdf:type rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#AdministrationRoute"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#someDrug -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#someDrug">
+        <rdf:type rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#Drug"/>
+        <untitled-ontology-11:hasActivePrinciple rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#acetaminophen"/>
+        <untitled-ontology-11:hasAdministrationRoute rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#topical"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#topical -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#topical">
+        <rdf:type rdf:resource="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#AdministrationRoute"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // General axioms
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDisjointClasses"/>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#ActivePrinciple"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#AdministrationRoute"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#Drug"/>
+        </owl:members>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDisjointClasses"/>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#AssociationDrug"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#PlaceboDrug"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#SingleDrug"/>
+        </owl:members>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDifferent"/>
+        <owl:distinctMembers rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#John"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#Mary"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/philippe/ontologies/2024/4/untitled-ontology-11#Philippe"/>
+        </owl:distinctMembers>
+    </rdf:Description>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.5.26.2023-07-17T20:34:13Z) https://github.com/owlcs/owlapi -->
+

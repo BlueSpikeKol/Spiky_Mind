@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+         xmlns:owl="http://www.w3.org/2002/07/owl#"
+         xml:base="http://example.org/greg.owl"
+         xmlns="http://example.org/greg.owl#">
+
+<owl:Ontology rdf:about="http://example.org/greg.owl"/>
+
+<owl:ObjectProperty rdf:about="#worksFor">
+  <rdfs:domain rdf:resource="#Person"/>
+  <rdfs:range rdf:resource="#Organization"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#participatesIn">
+  <rdfs:domain rdf:resource="#Person"/>
+  <rdfs:range rdf:resource="#Project"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#employsTechnology">
+  <rdfs:domain rdf:resource="#Project"/>
+  <rdfs:range rdf:resource="#Technology"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#usesEnergySource">
+  <rdfs:domain rdf:resource="#Project"/>
+  <rdfs:range rdf:resource="#EnergySource"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#monitoredBy">
+  <rdfs:domain rdf:resource="#Project"/>
+  <rdfs:range rdf:resource="#Sensor"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#protectedBy">
+  <rdfs:domain rdf:resource="#Project"/>
+  <rdfs:range rdf:resource="#SecurityProtocol"/>
+</owl:ObjectProperty>
+
+<owl:Class rdf:about="#Person">
+  <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Organization">
+  <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Project">
+  <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Technology">
+  <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+</owl:Class>
+
+<owl:Class rdf:about="#EnergySource">
+  <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Sensor">
+  <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+</owl:Class>
+
+<owl:Class rdf:about="#SecurityProtocol">
+  <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+</owl:Class>
+
+<owl:NamedIndividual rdf:about="#Global_Renewable_Energy_Grid">
+  <rdf:type rdf:resource="#Project"/>
+  <employsTechnology rdf:resource="#Smart_Grid_Technology"/>
+  <employsTechnology rdf:resource="#AI_Algorithm"/>
+  <monitoredBy rdf:resource="#IoT_Sensor"/>
+  <protectedBy rdf:resource="#Advanced_Firewall"/>
+  <usesEnergySource rdf:resource="#Solar_Energy"/>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Smart_Grid_Technology">
+  <rdf:type rdf:resource="#Technology"/>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#AI_Algorithm">
+  <rdf:type rdf:resource="#Technology"/>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#IoT_Sensor">
+  <rdf:type rdf:resource="#Sensor"/>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Advanced_Firewall">
+  <rdf:type rdf:resource="#SecurityProtocol"/>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Solar_Energy">
+  <rdf:type rdf:resource="#EnergySource"/>
+</owl:NamedIndividual>
+
+
+</rdf:RDF>
