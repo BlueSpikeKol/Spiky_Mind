@@ -1,0 +1,2424 @@
+{
+  "label": "spice or herb",
+  "subclasses": [
+    {
+      "label": "spice food product",
+      "subclasses": [
+        {
+          "label": "mustard seed food product",
+          "subclasses": [
+            {
+              "label": "mustard seed",
+              "subclasses": [
+                {
+                  "label": "indian mustard seed",
+                  "subclasses": [],
+                  "annotations": {
+                    "IAO_0000115": [
+                      "A seed of an indian mustard plant (Brassica juncea subsp. integrifolia)."
+                    ]
+                  }
+                },
+                {
+                  "label": "mustard seed (raw)",
+                  "subclasses": [],
+                  "annotations": {}
+                }
+              ],
+              "annotations": {
+                "IAO_0000115": [
+                  "A seed of black mustard or indian mustard or white/yellow mustard plant."
+                ]
+              }
+            },
+            {
+              "label": "brassica carinata meal",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A meal that is a co-product produced after the extraction of oil from the seed of the Ethiopian mustard plant (Brassica carinata)."
+                ]
+              }
+            },
+            {
+              "label": "mustard oil",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "mustard seed (ground)",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "mustard powder",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "mustard bran",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "mustard (reconstituted from powder)",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "mustard oil press cake",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "mustard spice",
+              "subclasses": [],
+              "annotations": {}
+            }
+          ],
+          "annotations": {
+            "IAO_0000115": [
+              "A product made from the seeds of a mustard plant (white or yellow mustard, Sinapis hirta; brown or Indian mustard, Brassica juncea; or black mustard, Brassica nigra)."
+            ]
+          }
+        },
+        {
+          "label": "peppercorn food product",
+          "subclasses": [
+            {
+              "label": "black or white pepper product",
+              "subclasses": [
+                {
+                  "label": "pepper (ground)",
+                  "subclasses": [],
+                  "annotations": {}
+                },
+                {
+                  "label": "peppercorn",
+                  "subclasses": [],
+                  "annotations": {}
+                }
+              ],
+              "annotations": {}
+            },
+            {
+              "label": "black pepper food product",
+              "subclasses": [
+                {
+                  "label": "black pepper (whole or pieces)",
+                  "subclasses": [],
+                  "annotations": {
+                    "IAO_0000115": [
+                      "A whole black pepper or some substance made from processed black pepper."
+                    ]
+                  }
+                },
+                {
+                  "label": "black pepper (ground)",
+                  "subclasses": [],
+                  "annotations": {}
+                },
+                {
+                  "label": "black peppercorn",
+                  "subclasses": [],
+                  "annotations": {}
+                },
+                {
+                  "label": "black pepper powder",
+                  "subclasses": [],
+                  "annotations": {}
+                }
+              ],
+              "annotations": {}
+            },
+            {
+              "label": "white pepper food product",
+              "subclasses": [
+                {
+                  "label": "white peppercorn",
+                  "subclasses": [
+                    {
+                      "label": "white peppercorn (raw)",
+                      "subclasses": [],
+                      "annotations": {}
+                    },
+                    {
+                      "label": "white peppercorn (dried)",
+                      "subclasses": [],
+                      "annotations": {}
+                    }
+                  ],
+                  "annotations": {
+                    "IAO_0000115": [
+                      "A riped berry fruit of a white pepper plant."
+                    ]
+                  }
+                },
+                {
+                  "label": "white pepper (ground)",
+                  "subclasses": [],
+                  "annotations": {}
+                }
+              ],
+              "annotations": {}
+            },
+            {
+              "label": "pink peppercorn",
+              "subclasses": [
+                {
+                  "label": "pink peppercorn (dried)",
+                  "subclasses": [],
+                  "annotations": {}
+                }
+              ],
+              "annotations": {
+                "IAO_0000115": [
+                  "A berry fruit from a pink peppercorn tree (Schinus molle)."
+                ]
+              }
+            },
+            {
+              "label": "white peppercorn (whole or pieces)",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A whole white peppercorn or some substance made from a processed white peppercorn."
+                ]
+              }
+            }
+          ],
+          "annotations": {
+            "IAO_0000115": [
+              "A food product made from black, white, pink or similar peppercorns."
+            ]
+          }
+        },
+        {
+          "label": "caper food product",
+          "subclasses": [
+            {
+              "label": "caper",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "An edible flower bud of a caper plant (Capparis spinosa)."
+                ]
+              }
+            },
+            {
+              "label": "caper in vinegar",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "caper (canned)",
+              "subclasses": [],
+              "annotations": {}
+            }
+          ],
+          "annotations": {
+            "IAO_0000115": [
+              "A caper food product is a food product derived from the flower buds or fruit of the caper plant."
+            ]
+          }
+        },
+        {
+          "label": "cardamom food product",
+          "subclasses": [
+            {
+              "label": "green cardamom pod",
+              "subclasses": [
+                {
+                  "label": "cardamom seed (candy-coated)",
+                  "subclasses": [],
+                  "annotations": {}
+                }
+              ],
+              "annotations": {
+                "IAO_0000115": [
+                  "A pod harvested from a green cardamom plant variety."
+                ]
+              }
+            },
+            {
+              "label": "black cardamom pod",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A pod harvested from a black cardamom plant variety."
+                ]
+              }
+            },
+            {
+              "label": "cardamom seed",
+              "subclasses": [
+                {
+                  "label": "cardamom seed (dried)",
+                  "subclasses": [],
+                  "annotations": {}
+                }
+              ],
+              "annotations": {
+                "IAO_0000115": [
+                  "A seed of a cardamom plant (Elettaria cardamomum)."
+                ]
+              }
+            },
+            {
+              "label": "green cardamom seed (dried)",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A whole dried green cardamom seed."
+                ]
+              }
+            },
+            {
+              "label": "cardamom seed (ground)",
+              "subclasses": [
+                {
+                  "label": "green cardamom seed (ground)",
+                  "subclasses": [],
+                  "annotations": {
+                    "IAO_0000115": [
+                      "A green cardamom that has been ground."
+                    ]
+                  }
+                }
+              ],
+              "annotations": {}
+            },
+            {
+              "label": "cardamom seed (whole or pieces)",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A whole cardamom or some substance made from a processed cardamom."
+                ]
+              }
+            }
+          ],
+          "annotations": {
+            "IAO_0000115": [
+              "A cardamom food product is a food product derived from a black or green cardamom plant."
+            ]
+          }
+        },
+        {
+          "label": "cinnamon food product",
+          "subclasses": [
+            {
+              "label": "cinnamon",
+              "subclasses": [
+                {
+                  "label": "cinnamon stick",
+                  "subclasses": [],
+                  "annotations": {}
+                },
+                {
+                  "label": "cinnamon (ground)",
+                  "subclasses": [
+                    {
+                      "label": "cinnamon (washed, ground)",
+                      "subclasses": [],
+                      "annotations": {}
+                    }
+                  ],
+                  "annotations": {}
+                }
+              ],
+              "annotations": {}
+            }
+          ],
+          "annotations": {}
+        },
+        {
+          "label": "clove food product",
+          "subclasses": [
+            {
+              "label": "clove (spice)",
+              "subclasses": [
+                {
+                  "label": "clove (dried)",
+                  "subclasses": [],
+                  "annotations": {}
+                }
+              ],
+              "annotations": {
+                "IAO_0000115": [
+                  "A flower bud of a clove plant (Syzygium aromaticum)."
+                ]
+              }
+            },
+            {
+              "label": "clove ground",
+              "subclasses": [],
+              "annotations": {}
+            }
+          ],
+          "annotations": {}
+        },
+        {
+          "label": "coriander food product",
+          "subclasses": [
+            {
+              "label": "coriander bunch",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A bunch of raw coriander leaves."
+                ]
+              }
+            },
+            {
+              "label": "coriander (whole or pieces)",
+              "subclasses": [
+                {
+                  "label": "coriander leaf (whole or pieces)",
+                  "subclasses": [],
+                  "annotations": {
+                    "IAO_0000115": [
+                      "A whole coriander leaf or some substance made from a processed coriander leaf."
+                    ]
+                  }
+                },
+                {
+                  "label": "coriander seed (whole or pieces)",
+                  "subclasses": [],
+                  "annotations": {
+                    "IAO_0000115": [
+                      "A whole coriander seed or some substance made from a processed coriander seed."
+                    ]
+                  }
+                }
+              ],
+              "annotations": {
+                "IAO_0000115": [
+                  "Whole coriander or some substance made from processed coriander."
+                ]
+              }
+            },
+            {
+              "label": "pickling spice",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "coriander",
+              "subclasses": [],
+              "annotations": {}
+            }
+          ],
+          "annotations": {}
+        },
+        {
+          "label": "ginger food product",
+          "subclasses": [
+            {
+              "label": "ginger root",
+              "subclasses": [
+                {
+                  "label": "ginger root (raw)",
+                  "subclasses": [],
+                  "annotations": {}
+                },
+                {
+                  "label": "ginger root (dried)",
+                  "subclasses": [],
+                  "annotations": {}
+                }
+              ],
+              "annotations": {
+                "IAO_0000115": [
+                  "A root of a ginger plant (Zingiber officinale)"
+                ]
+              }
+            },
+            {
+              "label": "krachai",
+              "subclasses": [
+                {
+                  "label": "krachai powder",
+                  "subclasses": [],
+                  "annotations": {
+                    "IAO_0000115": [
+                      "A herbal powder made from krachai plant (Boesenbergia rotunda)"
+                    ]
+                  }
+                }
+              ],
+              "annotations": {
+                "IAO_0000115": [
+                  "A finger like herb in the ginger family (Boesenbergia rotunda)."
+                ]
+              }
+            },
+            {
+              "label": "ginger leaf",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A leaf of a ginger plant (Zingiber officinale)."
+                ]
+              }
+            },
+            {
+              "label": "ginger leaf (whole or pieces)",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A whole ginger leaf or some substance made from a processed ginger leaf."
+                ]
+              }
+            },
+            {
+              "label": "ginger root (whole or pieces)",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A whole ginger root or some substance made from a processed ginger root."
+                ]
+              }
+            },
+            {
+              "label": "ginger (green)",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "ginger nectar",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "ginger wine",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "baby ginger (thermally processed)",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "ginger (ground)",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "ginger (dried)",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "ginger in syrup",
+              "subclasses": [],
+              "annotations": {}
+            }
+          ],
+          "annotations": {}
+        },
+        {
+          "label": "spice (capsicum-based)",
+          "subclasses": [
+            {
+              "label": "hot pepper spice food product",
+              "subclasses": [
+                {
+                  "label": "cayenne pepper",
+                  "subclasses": [
+                    {
+                      "label": "cayenne pepper (dried)",
+                      "subclasses": [],
+                      "annotations": {}
+                    }
+                  ],
+                  "annotations": {
+                    "IAO_0000115": [
+                      "A berry fruit of a cayenne pepper plant cultivar."
+                    ]
+                  }
+                },
+                {
+                  "label": "chili powder",
+                  "subclasses": [
+                    {
+                      "label": "deggi pepper",
+                      "subclasses": [],
+                      "annotations": {
+                        "IAO_0000115": [
+                          "An Indian red chili powder, whose flavour range from mild to spicy hot."
+                        ]
+                      }
+                    },
+                    {
+                      "label": "de arbol powder",
+                      "subclasses": [],
+                      "annotations": {
+                        "IAO_0000115": [
+                          "A red colored powder made from Chile de \u00e1rbol, a small Mexican chili pepper used in Mexican cooking."
+                        ]
+                      }
+                    },
+                    {
+                      "label": "habanero powder",
+                      "subclasses": [],
+                      "annotations": {
+                        "IAO_0000115": [
+                          "A powder made from habanero, which is a hot variety of a chili pepper."
+                        ]
+                      }
+                    },
+                    {
+                      "label": "new mexico chili powder",
+                      "subclasses": [],
+                      "annotations": {
+                        "IAO_0000115": [
+                          "A chili powder made by grinding dried new mexico chili."
+                        ]
+                      }
+                    }
+                  ],
+                  "annotations": {}
+                },
+                {
+                  "label": "chili seed oil",
+                  "subclasses": [],
+                  "annotations": {}
+                },
+                {
+                  "label": "cayenne pepper (ground)",
+                  "subclasses": [],
+                  "annotations": {}
+                },
+                {
+                  "label": "chili pepper (ground)",
+                  "subclasses": [],
+                  "annotations": {}
+                },
+                {
+                  "label": "jalapeno pepper (pickled)",
+                  "subclasses": [],
+                  "annotations": {}
+                },
+                {
+                  "label": "piri piri",
+                  "subclasses": [],
+                  "annotations": {}
+                },
+                {
+                  "label": "red pepper (finely threaded)",
+                  "subclasses": [],
+                  "annotations": {}
+                },
+                {
+                  "label": "cayenne pepper pieces (dried)",
+                  "subclasses": [],
+                  "annotations": {}
+                }
+              ],
+              "annotations": {}
+            }
+          ],
+          "annotations": {}
+        },
+        {
+          "label": "hungarian wax pepper food product",
+          "subclasses": [
+            {
+              "label": "hungarian wax pepper",
+              "subclasses": [
+                {
+                  "label": "hungarian wax pepper (raw)",
+                  "subclasses": [],
+                  "annotations": {
+                    "IAO_0000115": [
+                      "A whole raw hungarian wax pepper."
+                    ]
+                  }
+                }
+              ],
+              "annotations": {
+                "IAO_0000115": [
+                  "A berry fruit of a hungarian wax pepper plant."
+                ]
+              }
+            },
+            {
+              "label": "paprika (ground)",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A ground, bright red and non-pungent spice powder that is derived from the dried fruit of several varieties of Capsicum annuum L."
+                ]
+              }
+            },
+            {
+              "label": "paprika puree",
+              "subclasses": [],
+              "annotations": {}
+            }
+          ],
+          "annotations": {}
+        },
+        {
+          "label": "nutmeg food product",
+          "subclasses": [
+            {
+              "label": "mace food product",
+              "subclasses": [
+                {
+                  "label": "mace (dried)",
+                  "subclasses": [],
+                  "annotations": {}
+                },
+                {
+                  "label": "mace (ground)",
+                  "subclasses": [],
+                  "annotations": {}
+                }
+              ],
+              "annotations": {
+                "IAO_0000115": [
+                  "Mace is the spice made from the reddish seed covering (aril) of the nutmeg seed. Its flavour is similar to nutmeg but more delicate; it is used to flavour baked goods, meat, fish, vegetables and in preserving and pickling."
+                ]
+              }
+            },
+            {
+              "label": "nutmeg butter",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A butter obtained from the nutmeg nut by expression. It is semisolid, reddish-brown in colour, and has the taste and smell of nutmeg itself."
+                ]
+              }
+            },
+            {
+              "label": "nutmeg seed",
+              "subclasses": [
+                {
+                  "label": "nutmeg seed (dried)",
+                  "subclasses": [],
+                  "annotations": {}
+                },
+                {
+                  "label": "nutmeg seed (ground)",
+                  "subclasses": [],
+                  "annotations": {}
+                }
+              ],
+              "annotations": {}
+            }
+          ],
+          "annotations": {
+            "IAO_0000115": [
+              "Nutmeg food product is a product made from the nutmeg seed or seed skin."
+            ]
+          }
+        },
+        {
+          "label": "onion flavouring food product",
+          "subclasses": [
+            {
+              "label": "onion powder",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "onion dip (dry mix)",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "onion flake (dried)",
+              "subclasses": [],
+              "annotations": {}
+            }
+          ],
+          "annotations": {}
+        },
+        {
+          "label": "turmeric food product",
+          "subclasses": [
+            {
+              "label": "turmeric extract",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "turmeric root",
+              "subclasses": [
+                {
+                  "label": "turmeric root (raw)",
+                  "subclasses": [],
+                  "annotations": {}
+                },
+                {
+                  "label": "turmeric root (dried)",
+                  "subclasses": [],
+                  "annotations": {}
+                }
+              ],
+              "annotations": {
+                "IAO_0000115": [
+                  "A root of a turmeric plant (Curcuma longa)"
+                ]
+              }
+            },
+            {
+              "label": "turmeric (ground)",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A spice that is made by grounding the dried root of the ginger plant (Curcuma longa)."
+                ]
+              }
+            }
+          ],
+          "annotations": {}
+        },
+        {
+          "label": "vanilla bean food product",
+          "subclasses": [
+            {
+              "label": "vanilla bean extract",
+              "subclasses": [
+                {
+                  "label": "vanilla extract (concentrated)",
+                  "subclasses": [],
+                  "annotations": {
+                    "IAO_0000115": [
+                      "Vanilla bean extract is a concentrated form of vanilla bean extract."
+                    ]
+                  }
+                }
+              ],
+              "annotations": {
+                "IAO_0000115": [
+                  "Vanilla extract is a solution containing the flavor compound vanillin as the primary ingredient.  It is made by macerating and percolating vanilla pods in a solution of ethanol and water."
+                ]
+              }
+            },
+            {
+              "label": "vanilla bean",
+              "subclasses": [
+                {
+                  "label": "vanilla bean (raw)",
+                  "subclasses": [],
+                  "annotations": {
+                    "IAO_0000115": [
+                      "A raw vanilla bean is the fruit, a pod, of a vanilla plant.  As a consumer product it is usually partially dried."
+                    ]
+                  }
+                }
+              ],
+              "annotations": {
+                "IAO_0000115": [
+                  "A seed of a vanilla bean plant."
+                ]
+              }
+            },
+            {
+              "label": "vanilla bean (spent)",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A spent vanilla bean is the shell and seeds of a vanilla bean after a solvent extraction process has been applied to it."
+                ]
+              }
+            },
+            {
+              "label": "vanilla sugar",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "vanilla powder",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "Vanilla bean powder is vanilla beans, dried to zero percent humidity and ground into a fine powder."
+                ]
+              }
+            }
+          ],
+          "annotations": {
+            "IAO_0000115": [
+              "A vanilla bean food product is derived from the fruit, a seed capsule, of a vanilla plant."
+            ]
+          }
+        },
+        {
+          "label": "sarsaparilla food product",
+          "subclasses": [
+            {
+              "label": "sarsaparilla root (Smilax aristolochiifolia)",
+              "subclasses": [
+                {
+                  "label": "sarsaparilla root (Smilax aristolochiifolia, raw)",
+                  "subclasses": [],
+                  "annotations": {}
+                }
+              ],
+              "annotations": {
+                "IAO_0000115": [
+                  "A root of a sarsaparilla plant."
+                ]
+              }
+            }
+          ],
+          "annotations": {}
+        },
+        {
+          "label": "licorice plant food product",
+          "subclasses": [
+            {
+              "label": "licorice root tea (dry)",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "licorice root",
+              "subclasses": [],
+              "annotations": {}
+            }
+          ],
+          "annotations": {}
+        },
+        {
+          "label": "spice rub",
+          "subclasses": [],
+          "annotations": {
+            "IAO_0000115": [
+              "Spice rub is any mixture of ground spices that is made for the purpose of being rubbed on raw food before the food is cooked. The spice rub forms a coating on the food. The food can be marinated in the spice rub for some time for the flavors to incorporate into the food or it can be cooked immediately after it is coated in the rub. The spice rub can be left on or partially removed before cooking."
+            ]
+          }
+        },
+        {
+          "label": "allspice",
+          "subclasses": [
+            {
+              "label": "allspice (ground)",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "Ground allspice is a powder consisting of dried and ground allspice berry."
+                ]
+              }
+            }
+          ],
+          "annotations": {
+            "IAO_0000115": [
+              "Allspice is the dried unripe fruit (berries, used as a spice) of Pimenta dioica, a midcanopy tree native to the Greater Antilles, southern Mexico, and Central America, now cultivated in many warm parts of the world."
+            ]
+          }
+        },
+        {
+          "label": "pumpkin pie spice",
+          "subclasses": [],
+          "annotations": {
+            "IAO_0000115": [
+              "Pumpkin pie spice, also known as pumpkin spice, is an American spice mix commonly used as an ingredient in pumpkin pie. Pumpkin pie spice is similar to the British and Commonwealth mixed spice. It is generally a blend of ground cinnamon, nutmeg, ginger, cloves, and sometimes allspice."
+            ]
+          }
+        },
+        {
+          "label": "asafoetida",
+          "subclasses": [],
+          "annotations": {
+            "IAO_0000115": [
+              "Asafoetida is the dried latex (gum oleoresin) (Perumkayam) exuded from the rhizome or tap root of several species of Ferula (F. foetida and F. assa-foetida), perennial herbs growing 1 to 1.5 m (3.3 to 4.9 ft) tall. They are part of the celery family, Umbelliferae. The species are native to the deserts of Iran and mountains of Afghanistan, but are mainly cultivated in nearby Pakistan and India. Asafoetida has a pungent smell, lending it the trivial name of stinking gum, but in cooked dishes it delivers a smooth flavour reminiscent of leeks or other onion relatives."
+            ]
+          }
+        },
+        {
+          "label": "caraway food product",
+          "subclasses": [
+            {
+              "label": "caraway seed (dried)",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "caraway seed (ground)",
+              "subclasses": [],
+              "annotations": {}
+            }
+          ],
+          "annotations": {}
+        },
+        {
+          "label": "saffron food product",
+          "subclasses": [
+            {
+              "label": "saffron thread",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "An anther of a saffron plant (Crocus sativus)."
+                ]
+              }
+            },
+            {
+              "label": "saffron (ground)",
+              "subclasses": [],
+              "annotations": {}
+            }
+          ],
+          "annotations": {}
+        },
+        {
+          "label": "star anise food product",
+          "subclasses": [
+            {
+              "label": "star anise",
+              "subclasses": [
+                {
+                  "label": "star anise fruit (dried)",
+                  "subclasses": [],
+                  "annotations": {}
+                }
+              ],
+              "annotations": {
+                "IAO_0000115": [
+                  "A pericarp from the Star Anise (Illicium verum) tree."
+                ]
+              }
+            },
+            {
+              "label": "star anise seed (dried)",
+              "subclasses": [],
+              "annotations": {}
+            }
+          ],
+          "annotations": {}
+        },
+        {
+          "label": "cumin food product",
+          "subclasses": [
+            {
+              "label": "cumin seed",
+              "subclasses": [
+                {
+                  "label": "cumin seed (dried)",
+                  "subclasses": [],
+                  "annotations": {}
+                }
+              ],
+              "annotations": {
+                "IAO_0000115": [
+                  "A seed of a cumin plant (Cuminum cyminum)."
+                ]
+              }
+            },
+            {
+              "label": "cumin (powdered)",
+              "subclasses": [],
+              "annotations": {}
+            }
+          ],
+          "annotations": {
+            "IAO_0000115": [
+              "A cumin food product is derived from the seed of a cumin plant."
+            ]
+          }
+        },
+        {
+          "label": "sichuan pepper",
+          "subclasses": [
+            {
+              "label": "red sichuan peppercorn",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A red variety of sichuan peppercorn harvestaed from Zanthoxylum bungeanum."
+                ]
+              }
+            },
+            {
+              "label": "green sichuan peppercorn",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A green variety of sichuan peppercorn harvested from Zanthoxylum armatum."
+                ]
+              }
+            }
+          ],
+          "annotations": {
+            "IAO_0000115": [
+              "A signature spice of the Sichuan cuisine of China's southwestern Sichuan Province, commonly available in a red or green peppercorn variety."
+            ]
+          }
+        },
+        {
+          "label": "anise seed",
+          "subclasses": [
+            {
+              "label": "anise seed (dried)",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A dried whole anise seed."
+                ]
+              }
+            }
+          ],
+          "annotations": {
+            "IAO_0000115": [
+              "A seed of an anise plant (Pimpinella anisum)."
+            ]
+          }
+        },
+        {
+          "label": "chinese five spice powder",
+          "subclasses": [],
+          "annotations": {
+            "IAO_0000115": [
+              "A powder made from the blend of of five or more ground spices used  in Chinese cuisine. The five flavors of the spices (sweet, bitter, sour, salty, and umami (savoriness)) refers to the five traditional Chinese elements."
+            ]
+          }
+        },
+        {
+          "label": "fenugreek seed",
+          "subclasses": [
+            {
+              "label": "fenugreek seed (dried)",
+              "subclasses": [],
+              "annotations": {}
+            }
+          ],
+          "annotations": {
+            "IAO_0000115": [
+              "A seed of a fenugreek plant (Trigonella foenum-graecum)"
+            ]
+          }
+        },
+        {
+          "label": "black cumin food product",
+          "subclasses": [
+            {
+              "label": "black cumin seed",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A seed of a black cumin plant (Nigella sativa)."
+                ]
+              }
+            },
+            {
+              "label": "black cumin seed (whole or pieces)",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "Whole black cumin seed or some substance made from a processed black cumin seed."
+                ]
+              }
+            }
+          ],
+          "annotations": {
+            "IAO_0000115": [
+              "A food product derived from a black cumin plant."
+            ]
+          }
+        },
+        {
+          "label": "curry leaf food product",
+          "subclasses": [
+            {
+              "label": "curry leaf",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A leaf from a curry tree."
+                ]
+              }
+            },
+            {
+              "label": "curry leaf (whole or pieces)",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A whole curry leaf or some substance made from a processed curry leaf."
+                ]
+              }
+            }
+          ],
+          "annotations": {
+            "IAO_0000115": [
+              "A food product derives from the leaf of a curry plant."
+            ]
+          }
+        },
+        {
+          "label": "spice seed",
+          "subclasses": [],
+          "annotations": {}
+        },
+        {
+          "label": "spice (leafy)",
+          "subclasses": [],
+          "annotations": {}
+        },
+        {
+          "label": "spice (ground)",
+          "subclasses": [],
+          "annotations": {}
+        },
+        {
+          "label": "spice (dried)",
+          "subclasses": [],
+          "annotations": {}
+        },
+        {
+          "label": "spice mixture (whole or pieces)",
+          "subclasses": [
+            {
+              "label": "curry powder",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A spice mixture that is made from finely ground spices and is used for making curry."
+                ]
+              }
+            },
+            {
+              "label": "curry (instant)",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "khmeli suneli",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A spice mixture which consists of ground coriander seed, celery seed, basil, dill, parsley, blue fenugreek, summer savory, bay, leaf, mint and marigold."
+                ]
+              }
+            },
+            {
+              "label": "panch phoron (non-ground)",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A spice mixture in which the spices are still intact and contains cumin, fennel, nigella, fenugreek and mustard seeds."
+                ]
+              }
+            },
+            {
+              "label": "dhana jiru",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A spice mixture which consists primarily of ground, roasted cumin and coriander seeds."
+                ]
+              }
+            }
+          ],
+          "annotations": {
+            "IAO_0000115": [
+              "A spice product which is a mixture of more than one spice."
+            ]
+          }
+        },
+        {
+          "label": "celery seed (dried)",
+          "subclasses": [],
+          "annotations": {}
+        },
+        {
+          "label": "spice extract",
+          "subclasses": [
+            {
+              "label": "spice oil",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "spice oleoresins",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "spice extraction in soluble carrier",
+              "subclasses": [],
+              "annotations": {}
+            }
+          ],
+          "annotations": {}
+        },
+        {
+          "label": "grains of paradise",
+          "subclasses": [],
+          "annotations": {
+            "IAO_0000115": [
+              "Grains of paradise are seeds from the grain of paradise plant, Aframomum melegueta, a species in the ginger family, Zingiberaceae, and closely related to cardamom. The seeds are used as a spice (ground or whole)."
+            ]
+          }
+        },
+        {
+          "label": "spice",
+          "subclasses": [],
+          "annotations": {
+            "IAO_0000115": [
+              "A seed, fruit, root, bark, or other plant substance that is primarily used for flavouring or colouring food."
+            ]
+          }
+        },
+        {
+          "label": "cassia spice",
+          "subclasses": [],
+          "annotations": {}
+        },
+        {
+          "label": "koshou",
+          "subclasses": [],
+          "annotations": {}
+        },
+        {
+          "label": "pepperoni spice mix",
+          "subclasses": [],
+          "annotations": {}
+        },
+        {
+          "label": "za'atar",
+          "subclasses": [],
+          "annotations": {
+            "IAO_0000115": [
+              "A spice mixture typically used as a condiment, containing the herb along with toasted sesame seeds, dried sumac, and often salt, as well as other spices."
+            ]
+          }
+        }
+      ],
+      "annotations": {
+        "IAO_0000115": [
+          "A food product derived from a spice."
+        ]
+      }
+    },
+    {
+      "label": "herb food product",
+      "subclasses": [
+        {
+          "label": "chive food product",
+          "subclasses": [
+            {
+              "label": "chive leaf",
+              "subclasses": [
+                {
+                  "label": "chive leaf (raw)",
+                  "subclasses": [],
+                  "annotations": {
+                    "IAO_0000115": [
+                      "A raw chive leaf"
+                    ]
+                  }
+                }
+              ],
+              "annotations": {
+                "IAO_0000115": [
+                  "A leaf of a chive plant (Allium schoenoprasum)"
+                ]
+              }
+            },
+            {
+              "label": "Chinese chive leaf",
+              "subclasses": [
+                {
+                  "label": "Chinese chive leaf (raw)",
+                  "subclasses": [],
+                  "annotations": {}
+                }
+              ],
+              "annotations": {
+                "IAO_0000115": [
+                  "A leaf from a Chinese chive plant (Allium tuberosum)."
+                ]
+              }
+            },
+            {
+              "label": "Chinese chive bunch",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A bunch of chinese chive leaves."
+                ]
+              }
+            },
+            {
+              "label": "chive leaf (whole or pieces)",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A whole chive leaf or some substance made from a processed chive leaf."
+                ]
+              }
+            },
+            {
+              "label": "chive (freeze-dried)",
+              "subclasses": [],
+              "annotations": {}
+            }
+          ],
+          "annotations": {
+            "IAO_0000115": [
+              "A food product deriving from the chive plant."
+            ]
+          }
+        },
+        {
+          "label": "dill food product",
+          "subclasses": [
+            {
+              "label": "dill seed",
+              "subclasses": [
+                {
+                  "label": "dill seed (dried)",
+                  "subclasses": [],
+                  "annotations": {}
+                }
+              ],
+              "annotations": {
+                "IAO_0000115": [
+                  "A seed of a dill plant (Anethum graveolens)."
+                ]
+              }
+            },
+            {
+              "label": "dill leaf (dried)",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "dill spice",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A leaf or seed of a dill plant (Anethum graveolens), that is used as a spice for flavouring food."
+                ]
+              }
+            },
+            {
+              "label": "dill leaf (raw)",
+              "subclasses": [],
+              "annotations": {}
+            }
+          ],
+          "annotations": {}
+        },
+        {
+          "label": "ginseng food product",
+          "subclasses": [
+            {
+              "label": "ginseng tea",
+              "subclasses": [
+                {
+                  "label": "ginseng tea (instant)",
+                  "subclasses": [],
+                  "annotations": {}
+                },
+                {
+                  "label": "ginseng tea (dry)",
+                  "subclasses": [],
+                  "annotations": {}
+                },
+                {
+                  "label": "ginseng and jasmine tea (instant)",
+                  "subclasses": [],
+                  "annotations": {}
+                },
+                {
+                  "label": "ginseng tea with ginseng root (steeped)",
+                  "subclasses": [],
+                  "annotations": {}
+                },
+                {
+                  "label": "ginseng tea capsule",
+                  "subclasses": [],
+                  "annotations": {}
+                }
+              ],
+              "annotations": {}
+            },
+            {
+              "label": "ginseng extract with added ginseng root",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "ginseng (liquid extract)",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "ginseng product",
+              "subclasses": [],
+              "annotations": {}
+            }
+          ],
+          "annotations": {}
+        },
+        {
+          "label": "marjoram food product",
+          "subclasses": [
+            {
+              "label": "marjoram (dried)",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "marjoram (crushed)",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "marjoram (ground)",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "marjoram leaf",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A leaf of a marjoram plant (Origanum majorana)."
+                ]
+              }
+            }
+          ],
+          "annotations": {}
+        },
+        {
+          "label": "oregano food product",
+          "subclasses": [
+            {
+              "label": "oregano (whole or pieces)",
+              "subclasses": [
+                {
+                  "label": "oregano leaf",
+                  "subclasses": [
+                    {
+                      "label": "oregano leaf (dried)",
+                      "subclasses": [],
+                      "annotations": {
+                        "IAO_0000115": [
+                          "A whole dried oregano leaf."
+                        ]
+                      }
+                    }
+                  ],
+                  "annotations": {
+                    "IAO_0000115": [
+                      "A whole leaf of an oregano plant (Origanum vulgare)."
+                    ]
+                  }
+                }
+              ],
+              "annotations": {
+                "IAO_0000115": [
+                  "A whole oregano leaf or some substance made from a processed oregano leaf."
+                ]
+              }
+            },
+            {
+              "label": "oregano (crushed)",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "oregano (ground)",
+              "subclasses": [],
+              "annotations": {}
+            }
+          ],
+          "annotations": {
+            "IAO_0000115": [
+              "A spice or herb which derives from one or more oregano leaves."
+            ]
+          }
+        },
+        {
+          "label": "parsley food product",
+          "subclasses": [
+            {
+              "label": "parsley leaf",
+              "subclasses": [
+                {
+                  "label": "parsley leaf (dried)",
+                  "subclasses": [],
+                  "annotations": {
+                    "IAO_0000115": [
+                      "A whole dried parsley leaf."
+                    ]
+                  }
+                },
+                {
+                  "label": "Parsley leaf (freeze-dried)",
+                  "subclasses": [],
+                  "annotations": {
+                    "IAO_0000115": [
+                      "A whole freeze-dried parsley leaf."
+                    ]
+                  }
+                },
+                {
+                  "label": "parsley leaf (raw)",
+                  "subclasses": [],
+                  "annotations": {}
+                }
+              ],
+              "annotations": {
+                "IAO_0000115": [
+                  "A leaf of a parsley plant (Petroselinum crispum)"
+                ]
+              }
+            },
+            {
+              "label": "parsley bunch",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A bunch of raw parsley leaves."
+                ]
+              }
+            },
+            {
+              "label": "parsley (whole or pieces)",
+              "subclasses": [
+                {
+                  "label": "parsley leaf (whole or pieces)",
+                  "subclasses": [],
+                  "annotations": {
+                    "IAO_0000115": [
+                      "A whole parsley leaf or some substance made from a processed parsley leaf."
+                    ]
+                  }
+                }
+              ],
+              "annotations": {
+                "IAO_0000115": [
+                  "A whole or processed parsley."
+                ]
+              }
+            },
+            {
+              "label": "parsley flake",
+              "subclasses": [],
+              "annotations": {}
+            }
+          ],
+          "annotations": {}
+        },
+        {
+          "label": "peppermint food product",
+          "subclasses": [
+            {
+              "label": "peppermint",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "peppermint leaf",
+              "subclasses": [],
+              "annotations": {}
+            }
+          ],
+          "annotations": {}
+        },
+        {
+          "label": "rosemary food product",
+          "subclasses": [
+            {
+              "label": "rosemary leaf",
+              "subclasses": [
+                {
+                  "label": "rosemary leaf (dried)",
+                  "subclasses": [],
+                  "annotations": {}
+                }
+              ],
+              "annotations": {
+                "IAO_0000115": [
+                  "A leaf of a rosemary plant (Salvia rosmarinus)."
+                ]
+              }
+            },
+            {
+              "label": "rosemary (ground, dried)",
+              "subclasses": [],
+              "annotations": {}
+            }
+          ],
+          "annotations": {}
+        },
+        {
+          "label": "sage food product",
+          "subclasses": [
+            {
+              "label": "pineapple sage leaf",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A whole leaf from a pineapple sage plant."
+                ]
+              }
+            },
+            {
+              "label": "sage (dried)",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "sage (ground)",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "sage leaf",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A leaf of a sage plant (Salvia officinalis)."
+                ]
+              }
+            },
+            {
+              "label": "sage rubbed",
+              "subclasses": [],
+              "annotations": {}
+            }
+          ],
+          "annotations": {}
+        },
+        {
+          "label": "tarragon food product",
+          "subclasses": [
+            {
+              "label": "tarragon leaf",
+              "subclasses": [
+                {
+                  "label": "tarragon leaf (fresh)",
+                  "subclasses": [],
+                  "annotations": {
+                    "IAO_0000115": [
+                      "Tarragon leaf is a leaf from a tarragon plant"
+                    ]
+                  }
+                }
+              ],
+              "annotations": {
+                "IAO_0000115": [
+                  "A leaf of a tarragon plant (Artemisia dracunculus)."
+                ]
+              }
+            },
+            {
+              "label": "tarragon (dried)",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "tarragon in vinegar",
+              "subclasses": [],
+              "annotations": {}
+            }
+          ],
+          "annotations": {}
+        },
+        {
+          "label": "thyme food product",
+          "subclasses": [
+            {
+              "label": "thyme leaf",
+              "subclasses": [
+                {
+                  "label": "thyme leaf (whole,raw)",
+                  "subclasses": [],
+                  "annotations": {
+                    "IAO_0000115": [
+                      "A whole dried thyme leaf."
+                    ]
+                  }
+                }
+              ],
+              "annotations": {
+                "IAO_0000115": [
+                  "A leaf of a thyme plant (genus Thymus)."
+                ]
+              }
+            },
+            {
+              "label": "thyme (dried)",
+              "subclasses": [],
+              "annotations": {}
+            },
+            {
+              "label": "thyme (ground)",
+              "subclasses": [],
+              "annotations": {}
+            }
+          ],
+          "annotations": {}
+        },
+        {
+          "label": "basil food product",
+          "subclasses": [
+            {
+              "label": "basil leaf",
+              "subclasses": [
+                {
+                  "label": "holy basil leaf",
+                  "subclasses": [
+                    {
+                      "label": "holy basil leaf (raw)",
+                      "subclasses": [],
+                      "annotations": {
+                        "IAO_0000115": [
+                          "A whole raw holy basil leaf."
+                        ]
+                      }
+                    },
+                    {
+                      "label": "holy basil leaf (dried)",
+                      "subclasses": [],
+                      "annotations": {
+                        "IAO_0000115": [
+                          "A whole dried holy basil leaf."
+                        ]
+                      }
+                    }
+                  ],
+                  "annotations": {}
+                },
+                {
+                  "label": "basil leaf (raw)",
+                  "subclasses": [
+                    {
+                      "label": "holy basil leaf (raw)",
+                      "subclasses": [],
+                      "annotations": {
+                        "IAO_0000115": [
+                          "A whole raw holy basil leaf."
+                        ]
+                      }
+                    }
+                  ],
+                  "annotations": {
+                    "IAO_0000115": [
+                      "A whole raw basil leaf."
+                    ]
+                  }
+                },
+                {
+                  "label": "basil leaf (dried)",
+                  "subclasses": [],
+                  "annotations": {
+                    "IAO_0000115": [
+                      "A whole dried basil leaf."
+                    ]
+                  }
+                }
+              ],
+              "annotations": {
+                "IAO_0000115": [
+                  "A rosette leaf of a basil plant (Ocimum basilicum)"
+                ]
+              }
+            },
+            {
+              "label": "basil (whole or pieces)",
+              "subclasses": [
+                {
+                  "label": "basil leaf (whole or pieces)",
+                  "subclasses": [],
+                  "annotations": {
+                    "IAO_0000115": [
+                      "A whole basil leaf or some substance made from a processed basil leaf."
+                    ]
+                  }
+                }
+              ],
+              "annotations": {
+                "IAO_0000115": [
+                  "Whole basil or some substance made from processed basil."
+                ]
+              }
+            },
+            {
+              "label": "pesto sauce",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A sauce originating in Genoa, Italy, it traditionally consists of crushed garlic, European pine nuts, coarse salt, basil leaves, hard cheese such as Parmigiano-Reggiano or Pecorino Sardo, all blended with olive oil."
+                ]
+              }
+            }
+          ],
+          "annotations": {
+            "IAO_0000115": [
+              "A food product that has some defining ingredient some basil part."
+            ]
+          }
+        },
+        {
+          "label": "hyssop food product",
+          "subclasses": [],
+          "annotations": {
+            "IAO_0000115": [
+              "A hyssop food product is a product made with the leaves, flowers, or oil extract of the hyssop plant."
+            ]
+          }
+        },
+        {
+          "label": "lemongrass food product",
+          "subclasses": [
+            {
+              "label": "lemongrass stalk",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A stalk harvested from a lemon grass plant."
+                ]
+              }
+            },
+            {
+              "label": "lemongrass powder",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A powder from a lemongrass plant (Cymbopogon citratus), which is used in food for a fresh lemon flavor."
+                ]
+              }
+            }
+          ],
+          "annotations": {}
+        },
+        {
+          "label": "fenugreek leaf",
+          "subclasses": [],
+          "annotations": {
+            "IAO_0000115": [
+              "A leaf of a fenugreek plant (Trigonella foenum-graecum)."
+            ]
+          }
+        },
+        {
+          "label": "field cress leaf",
+          "subclasses": [
+            {
+              "label": "field cress leaf (raw)",
+              "subclasses": [],
+              "annotations": {}
+            }
+          ],
+          "annotations": {
+            "IAO_0000115": [
+              "A rosette leaf of a field cress plant (Lepidium campestre)."
+            ]
+          }
+        },
+        {
+          "label": "bay leaf",
+          "subclasses": [
+            {
+              "label": "california bay leaf",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A leaf of a california bay leaf plant (Umbellularia californica)."
+                ]
+              }
+            },
+            {
+              "label": "bay laurel",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A leaf of a bay laurel  plant (Laurus nobilis)."
+                ]
+              }
+            },
+            {
+              "label": "indian bay leaf",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A leaf of an indian bay leaf plant (Laurus nobilis)."
+                ]
+              }
+            },
+            {
+              "label": "indonesian bay leaf",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A leaf of an indonesian bay leaf plant (Syzygium polyanthum)."
+                ]
+              }
+            },
+            {
+              "label": "west Indian bay leaf",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A leaf of a west Indian bay leaf plant (Pimenta racemosa)."
+                ]
+              }
+            },
+            {
+              "label": "mexican bay leaf",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A leaf of a mexican bay leaf  plant (Litsea glaucescens)."
+                ]
+              }
+            },
+            {
+              "label": "bay leaf (dried)",
+              "subclasses": [],
+              "annotations": {}
+            }
+          ],
+          "annotations": {
+            "IAO_0000115": [
+              "A leaf of a bay leaf plant."
+            ]
+          }
+        },
+        {
+          "label": "spanish thyme leaf",
+          "subclasses": [
+            {
+              "label": "spanish thyme leaf (dried)",
+              "subclasses": [],
+              "annotations": {}
+            }
+          ],
+          "annotations": {
+            "IAO_0000115": [
+              "A leaf of a spanish thyme plant (Coleus amboinicus)."
+            ]
+          }
+        },
+        {
+          "label": "herb leaf",
+          "subclasses": [
+            {
+              "label": "herb (fresh)",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A whole fresh herb leaf."
+                ]
+              }
+            },
+            {
+              "label": "herb leaf (dried)",
+              "subclasses": [
+                {
+                  "label": "herb (ground)",
+                  "subclasses": [],
+                  "annotations": {
+                    "IAO_0000115": [
+                      "A dried herb that has been ground."
+                    ]
+                  }
+                }
+              ],
+              "annotations": {
+                "IAO_0000115": [
+                  "A whole dried herb leaf."
+                ]
+              }
+            }
+          ],
+          "annotations": {
+            "IAO_0000115": [
+              "A leaf of a herb plant."
+            ]
+          }
+        },
+        {
+          "label": "herb (powdered)",
+          "subclasses": [
+            {
+              "label": "aloe vera powder",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A herbal powder made from an Aloe vera plant (Aloe vera)."
+                ]
+              }
+            },
+            {
+              "label": "neem leaf powder",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A herbal green powder made from a leaf of Neem tree (Azadirachta indica)."
+                ]
+              }
+            },
+            {
+              "label": "lemongrass powder",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A powder from a lemongrass plant (Cymbopogon citratus), which is used in food for a fresh lemon flavor."
+                ]
+              }
+            },
+            {
+              "label": "krachai powder",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A herbal powder made from krachai plant (Boesenbergia rotunda)"
+                ]
+              }
+            },
+            {
+              "label": "kapikachu powder",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A herbal powder made by processing the seeds of velvet beans (Mucuna Pruriens)."
+                ]
+              }
+            },
+            {
+              "label": "kratom leaf powder",
+              "subclasses": [
+                {
+                  "label": "indo kratom leaf powder",
+                  "subclasses": [],
+                  "annotations": {
+                    "IAO_0000115": [
+                      "A powder made from a leaf of kratom plant (Mitragyna speciosa) which originates from Indonesia."
+                    ]
+                  }
+                }
+              ],
+              "annotations": {
+                "IAO_0000115": [
+                  "A powder made from the leaves of kratom plant (Mitragyna speciosa)."
+                ]
+              }
+            }
+          ],
+          "annotations": {}
+        },
+        {
+          "label": "piece(s) of herb",
+          "subclasses": [
+            {
+              "label": "herb (ground)",
+              "subclasses": [],
+              "annotations": {
+                "IAO_0000115": [
+                  "A dried herb that has been ground."
+                ]
+              }
+            }
+          ],
+          "annotations": {
+            "IAO_0000115": [
+              "One or more pieces of herb leaf."
+            ]
+          }
+        },
+        {
+          "label": "fireweed food product",
+          "subclasses": [
+            {
+              "label": "fireweed leaf",
+              "subclasses": [
+                {
+                  "label": "fireweed leaf (raw)",
+                  "subclasses": [],
+                  "annotations": {
+                    "IAO_0000115": [
+                      "A whole raw fireweed leaf."
+                    ]
+                  }
+                }
+              ],
+              "annotations": {
+                "IAO_0000115": [
+                  "A young leaf of a fireweed plant (Chamaenerion angustifolium)"
+                ]
+              }
+            }
+          ],
+          "annotations": {
+            "IAO_0000115": [
+              "A food product derived from the fireweed plant."
+            ]
+          }
+        },
+        {
+          "label": "spearmint",
+          "subclasses": [],
+          "annotations": {}
+        },
+        {
+          "label": "herb blend seasoning",
+          "subclasses": [],
+          "annotations": {}
+        },
+        {
+          "label": "herb mixture",
+          "subclasses": [],
+          "annotations": {}
+        },
+        {
+          "label": "shiso",
+          "subclasses": [],
+          "annotations": {
+            "IAO_0000115": [
+              "Shiso is a variety of species Perilla frutescens of the genus Perilla, belonging to the mint family, Lamiaceae."
+            ]
+          }
+        },
+        {
+          "label": "poultry seasoning (dry)",
+          "subclasses": [],
+          "annotations": {}
+        }
+      ],
+      "annotations": {
+        "IAO_0000115": [
+          "A leaf of a plant that is used for flavoring.",
+          "The leaves, flowers, or stems of plants, typically excluding vegetables, used for flavoring or as a garnish."
+        ]
+      }
+    },
+    {
+      "label": "fenugreek food product",
+      "subclasses": [
+        {
+          "label": "fenugreek leaf",
+          "subclasses": [],
+          "annotations": {
+            "IAO_0000115": [
+              "A leaf of a fenugreek plant (Trigonella foenum-graecum)."
+            ]
+          }
+        },
+        {
+          "label": "fenugreek leaf bunch",
+          "subclasses": [],
+          "annotations": {
+            "IAO_0000115": [
+              "A bunch of raw fenugreek leaves."
+            ]
+          }
+        },
+        {
+          "label": "fenugreek seed",
+          "subclasses": [
+            {
+              "label": "fenugreek seed (dried)",
+              "subclasses": [],
+              "annotations": {}
+            }
+          ],
+          "annotations": {
+            "IAO_0000115": [
+              "A seed of a fenugreek plant (Trigonella foenum-graecum)"
+            ]
+          }
+        },
+        {
+          "label": "fenugreek tea (dry)",
+          "subclasses": [],
+          "annotations": {}
+        },
+        {
+          "label": "fenugreek leaf (raw)",
+          "subclasses": [],
+          "annotations": {}
+        },
+        {
+          "label": "fenugreek leaf (dried)",
+          "subclasses": [],
+          "annotations": {}
+        }
+      ],
+      "annotations": {}
+    },
+    {
+      "label": "garlic food product",
+      "subclasses": [
+        {
+          "label": "softneck garlic",
+          "subclasses": [],
+          "annotations": {
+            "IAO_0000115": [
+              "Softneck garlic is garlic from the (Allium sativum ssp. sativum) plant, and is widely available in grocery stores."
+            ]
+          }
+        },
+        {
+          "label": "hardneck garlic",
+          "subclasses": [],
+          "annotations": {
+            "IAO_0000115": [
+              "Hardneck garlic is garlic from the Allium sativum ssp. ophioscorodon garlic plant, and is closer to wild garlic, with complex flavors."
+            ]
+          }
+        },
+        {
+          "label": "garlic bulb",
+          "subclasses": [
+            {
+              "label": "garlic bulb (raw)",
+              "subclasses": [],
+              "annotations": {}
+            }
+          ],
+          "annotations": {
+            "IAO_0000115": [
+              "A bulb of a garlic plant (Allium sativum)"
+            ]
+          }
+        },
+        {
+          "label": "garlic clove",
+          "subclasses": [],
+          "annotations": {
+            "IAO_0000115": [
+              "A clove of a garlic bulb, including the husk."
+            ]
+          }
+        },
+        {
+          "label": "garlic scape",
+          "subclasses": [],
+          "annotations": {
+            "IAO_0000115": [
+              "An immature flower stalk of a garlic plant."
+            ]
+          }
+        },
+        {
+          "label": "garlic powder",
+          "subclasses": [
+            {
+              "label": "green garlic powder",
+              "subclasses": [],
+              "annotations": {}
+            }
+          ],
+          "annotations": {
+            "IAO_0000115": [
+              "A seasoning made from dried garlic flake that has been ground into a powder."
+            ]
+          }
+        },
+        {
+          "label": "venetian garlic",
+          "subclasses": [],
+          "annotations": {}
+        },
+        {
+          "label": "garlic juice",
+          "subclasses": [],
+          "annotations": {}
+        },
+        {
+          "label": "garlic (dehydrated)",
+          "subclasses": [],
+          "annotations": {}
+        },
+        {
+          "label": "garlic (chopped, bottled)",
+          "subclasses": [],
+          "annotations": {}
+        },
+        {
+          "label": "garlic in oil mixture",
+          "subclasses": [],
+          "annotations": {}
+        },
+        {
+          "label": "chili-garlic in oil",
+          "subclasses": [],
+          "annotations": {}
+        },
+        {
+          "label": "garlic in water",
+          "subclasses": [],
+          "annotations": {}
+        },
+        {
+          "label": "garlic in oil",
+          "subclasses": [],
+          "annotations": {}
+        },
+        {
+          "label": "garlic in butter",
+          "subclasses": [],
+          "annotations": {}
+        },
+        {
+          "label": "garlic in margarine",
+          "subclasses": [],
+          "annotations": {}
+        },
+        {
+          "label": "garlic pulp",
+          "subclasses": [],
+          "annotations": {}
+        },
+        {
+          "label": "garlic (chopped)",
+          "subclasses": [],
+          "annotations": {}
+        },
+        {
+          "label": "garlic (grated)",
+          "subclasses": [],
+          "annotations": {}
+        },
+        {
+          "label": "garlic granules",
+          "subclasses": [],
+          "annotations": {}
+        }
+      ],
+      "annotations": {}
+    },
+    {
+      "label": "safflower flower",
+      "subclasses": [],
+      "annotations": {
+        "IAO_0000115": [
+          "Safflower flowers come from the plant Carthamus tinctorius, and are occasionally used in cooking as a cheaper substitute for saffron, sometimes referred to as \"bastard saffron\". The dried safflower petals are also used as a herbal tea variety."
+        ]
+      }
+    },
+    {
+      "label": "vegetable seasoning (dehydrated)",
+      "subclasses": [],
+      "annotations": {}
+    },
+    {
+      "label": "celery flakes",
+      "subclasses": [],
+      "annotations": {}
+    },
+    {
+      "label": "herbs and seasonings",
+      "subclasses": [],
+      "annotations": {}
+    }
+  ],
+  "annotations": {
+    "IAO_0000115": [
+      "A food product that has some spice or herb as a defining ingredient.",
+      "A vegetable product such as leaves, flowers, seeds and roots that is rich in essential oils and aromatic principles. Used mainly a a condiment."
+    ]
+  }
+}

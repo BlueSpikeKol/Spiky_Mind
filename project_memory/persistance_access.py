@@ -1,6 +1,7 @@
 import uuid
 import numpy as np
-import pinecone
+from pinecone import Pinecone, PodSpec
+from pinecone import ServerlessSpec
 import mysql.connector
 from typing import Tuple, List
 import re
@@ -107,6 +108,7 @@ class Neo4jDatabaseManager:
 class MemoryStreamAccess:  # TODO find a way to reduce the times this class is initialized, there could be too many connections and time lost
     def __init__(self):
         self.mysql_config = config_manager.mysql.as_dict()
+        self.pinecone_controller = Pinecone(api_key=config_manager.pinecone.api_key)
         self.pinecone_index = config_manager.pinecone.index_name
         self.gpt_manager = GPTManager()
         self.virtuoso_auth = HTTPDigestAuth(config_manager.virtuoso.user, config_manager.virtuoso.password)
@@ -119,12 +121,12 @@ class MemoryStreamAccess:  # TODO find a way to reduce the times this class is i
             self.mydb = None
             self.mycursor = None
 
-        pinecone.init(api_key=config_manager.pinecone.api_key, environment=config_manager.pinecone.environment)
-        print(pinecone.list_indexes())
+        print(self.pinecone_controller.list_indexes())
         try:
-            if self.pinecone_index not in pinecone.list_indexes():
-                pinecone.create_index(name=self.pinecone_index, dimension=1536, metric="cosine")
-            self.index = pinecone.Index(index_name=self.pinecone_index)
+            if self.pinecone_index not in self.pinecone_controller.list_indexes().names():
+                self.pinecone_controller.create_index(name=self.pinecone_index, dimension=1536, metric="cosine",
+                                                      spec=PodSpec(environment='us-east-1'))
+            self.index = self.pinecone_controller.Index(index_name=self.pinecone_index)
         except Exception as e:
             print(f"Error with Pinecone: {e}")
             self.index = None
@@ -136,7 +138,6 @@ class MemoryStreamAccess:  # TODO find a way to reduce the times this class is i
         # Setup for digest authentication
         if auth is None:
             auth = HTTPDigestAuth('dba', 'hhggRSe6DFZPcqze')
-
 
         # Ensure the endpoint returns JSON
         headers = {"Accept": "application/sparql-results+json"}  # This line is crucial
