@@ -1,0 +1,28 @@
+{
+  "Task1": {
+    "children": {
+      "Task2": {
+        "children": {},
+        "metadata": "task2"
+      },
+      "Task3": {
+        "children": {
+          "Task4": {
+            "children": {},
+            "metadata": "task4"
+          },
+          "Task5": {
+            "children": {},
+            "metadata": "Task5"
+          }
+        },
+        "metadata": "task3"
+      },
+      "Task6": {
+        "children": {},
+        "metadata": "Task6"
+      }
+    },
+    "metadata": "small test to see if the recursion of the creation of the task works correctly"
+  }
+}

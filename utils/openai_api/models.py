@@ -15,6 +15,7 @@ class ModelType:
     CHAT_GPT4_old = "gpt-4"
     FUNCTION_CALLING_GPT4 = "gpt-4-0613"
     GPT_4_TURBO = "gpt-4-1106-preview"
+    GPT_4_OMNI = "gpt-4o"
 
     # Text Models
     TEXT_DAVINCI_COMMON_3 = "text-davinci-003"
@@ -22,7 +23,7 @@ class ModelType:
 
     # Categories
     EMBEDDING_MODELS = [TEXT_EMBEDDING_ADA]
-    CHAT_MODELS = [GPT_3_5_TURBO, CHAT_GPT4_old, FUNCTION_CALLING_GPT4, FUNCTION_CALLING_GPT_3_5, GPT_4_TURBO]
+    CHAT_MODELS = [GPT_3_5_TURBO, CHAT_GPT4_old, FUNCTION_CALLING_GPT4, FUNCTION_CALLING_GPT_3_5, GPT_4_TURBO, GPT_4_OMNI]
     TEXT_MODELS = [TEXT_DAVINCI_COMMON_3]
 
     # Prices per token for each model
@@ -33,6 +34,7 @@ class ModelType:
         CHAT_GPT4_old: {'input': 0.03, 'output': 0.06},
         GPT_4_TURBO: {'input': 0.01, 'output': 0.3},
         FUNCTION_CALLING_GPT4: {'input': 0.03, 'output': 0.06},
+        GPT_4_OMNI: {"input": 0.005, "output": 0.015},
         TEXT_EMBEDDING_ADA: {'input': 0.0001, 'output': 0.0001}
     }
     @classmethod
@@ -65,6 +67,7 @@ class ModelsTokenLimits:
         "gpt-4": 8192,
         "gpt-4-0613": 8192,
         "gpt-4-1106-preview": 128000,
+        "gpt-4o": 128000,
         "text-embedding-ada-002": 8192
     }
 
@@ -84,7 +87,10 @@ class ModelManager:
             raise ValueError(f"Token limit for model '{model}' is not defined.")
 
         # Note the use of 'ModelManager.num_tokens_from_string' to call the static method
-        prompt_token_count = ModelManager.num_tokens_from_string(prompt, model_str)
+        if model == ModelType.GPT_4_OMNI:
+            prompt_token_count = -1
+        else:
+            prompt_token_count = ModelManager.num_tokens_from_string(prompt, model_str)
 
         total_tokens = prompt_token_count + (max_tokens if max_tokens else 0)
         if total_tokens > model_token_limit:

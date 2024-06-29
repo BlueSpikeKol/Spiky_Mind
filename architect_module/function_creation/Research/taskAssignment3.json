@@ -1,0 +1,44 @@
+{
+  "Question 9":{
+    "children":{
+      "Question 8": {
+        "children": {},
+        "metadata" : "This function takes a one dimensional list of letters and a list of boolean as input arguments. Both lists should have the same size.\nThis function will return a string grouping all the letters where their corresponding value in the list of boolean is False."
+      },
+      "Question 7": {
+        "children": {
+          "Question 6":{
+            "children": {},
+            "metadata": "This function takes a list of boolean, the size of a word, the index of the first letter of the word in the list and the direction (either 1 or -1 depending in which sense the word was written) in which the word is find in the list.\nIt will set to true all the value of the list of boolean where a letter of the word is. "
+          }
+        },
+        "metadata": "This function takes a one dimensional list of letters, the size of a word and a nested list of positions and directions (either 1 or -1 depending in which sense the word was written) of a word in the list.\nFor each pair of position and direction, the function will set to true all the value of the list of boolean where a letter of the word is."
+      },
+      "Question 5": {
+        "children" : {
+          "Question 4": {
+            "children": {
+              "Question 3": {
+                "children": {
+                  "Question 2": {
+                    "children": {
+                      "Question 1": {
+                        "children": {},
+                        "metadata": "Write a function that take a one dimensional list of letter and an index as input.\nThe function indicates whether the index is out of bounds with regards to the length of the list. \nIt will return True if the index is out of the list or if it is negative."
+                      }
+                    },
+                    "metadata": "The function will look for all the positive indices in a given list of character where the given character is found. If the character is not found in the list, then the function returns an empty list"
+                  }
+                },
+                "metadata": "This function takes a one dimensional list of letters, a word, an index and a direction as input arguments.\nIt will return if the word is in the list of letter at the specified index and direction."
+              }
+            },
+            "metadata": "This function takes a one dimensional list of letters, a word and an index as input arguments.\nIt will return the list of direction in which the word has been found. If the word is not found, then the function return a empty list."
+          }
+        },
+        "metadata": "This function takes a one dimensional list of letters and a word as input arguments.\nIt will return a nested list of the indices and positions of the word in the list of letters."
+      }
+    },
+    "metadata": "This function takes a one dimensional list of letters and a list of words as input arguments.\nIt will create a list of boolean of the same size as the list of letters. All the value of the list of boolean will be False.\nIt will update every value of the boolean list to true if the corresponding letter composed a word of the list of word in the specified list of letters.\nFinally the function will return the word that is made by grouping all the letters wheree their corresponding value in the list of boolean is False."
+  }
+}

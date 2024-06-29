@@ -3,39 +3,8 @@ import spacy
 nlp = spacy.load('en_core_web_lg')
 
 text = "Given the recent changes in tax legislation, reviewing our budget allocations is crucial, especially for our R&D department. This department will see the new law, effective from next quarter, imposing stricter regulations on capital expenditure. It will significantly impact the team, which consists of more than 25 people. How do you think this affects our planned investment in new technology and personnel over the next fiscal year?"
-
-
-def print_tokens_with_head(text):
-    doc = nlp(text)
-    important_list = []
-    for token in doc:
-        print(f"{token.text} ({token.pos_})--({token.dep_})", end="")
-        print(f" -----> Head: {token.head.text} ({token.head.pos_})", end="")
-        if token.pos_ == "NOUN" or token.pos_ == "VERB" or token.pos_ == "ADJ" or token.pos_ == "DET":
-            important_list.append(token.text)
-            important_list.append(token.pos_)
-            print()
-        else:
-            print()
-    print("Important words: ")
-    print(important_list)
-
-
-#
 test_text = "Despite the heavy rain that was falling intermittently, she has, after much deliberation, decided to embark on the journey, knowing well that it could, without warning, turn more perilous."
-print("Test 1:")
-print_tokens_with_head(test_text)
-# print()
-
 test_2 = "The flowers smell fragrant in the garden. The orchids were responsible for this pleasant fragrance."
-print("Test 2:")
-# print_tokens_with_head(test_2)
-print()
-#
-# test_3="He found the book on the top shelf interesting."
-# print("Test 3:")
-# print_tokens_with_head(test_3)
-# print()
 
 complete_text = """Given the recent changes in tax legislation, reviewing our budget allocations is crucial,
 especially for our R&D department. This department will see the new law, effective from next quarter,
@@ -51,17 +20,28 @@ collaboration tools, less affected by these constraints. To support our team of 
 partnerships to sustain our technology and personnel investments. Our department's agility will be key in leveraging 
 these changes to continue leading in innovation.
 """
-print("Test 4:")
-print_tokens_with_head(complete_text)
-#print_tokens_with_head(response_to_legislation_changes)
-print()
 
+
+def print_tokens_with_head(text):
+    doc = nlp(text)
+    important_dict = {}
+    for token in doc:
+        print(f"{token.text} ({token.pos_})--({token.dep_})", end="")
+        print(f" -----> Head: {token.head.text} ({token.head.pos_})", end="")
+
+        if token.pos_ == "NOUN" or token.pos_ == "VERB" or token.pos_ == "ADJ" or token.pos_ == "DET":
+            important_dict[token.text] = token.pos_
+            # important_list.append(token.text)
+            # important_list.append(token.pos_)
+            print()
+        else:
+            print()
+    print("Important words: ")
+    print(important_dict.keys())
+
+
+#
 # Text to process
-
-
-# Process the text with spaCy
-doc = nlp(complete_text+response_to_legislation_changes)
-
 
 def create_object_clusters(doc):
     object_clusters = {}
@@ -85,7 +65,6 @@ def create_object_clusters(doc):
                         break
 
     return object_clusters
-
 
 
 def create_action_modifier_clusters(doc):
@@ -124,6 +103,8 @@ def create_action_modifier_clusters(doc):
             action_modifier_clusters[i] = [token]
 
     return action_modifier_clusters
+
+
 def add_acomp_to_clusters(doc, object_clusters, action_modifier_clusters):
     for token in doc:
         if token.dep_ == 'acomp':
@@ -144,8 +125,6 @@ def add_acomp_to_clusters(doc, object_clusters, action_modifier_clusters):
 
     # Return the updated clusters
     return object_clusters, action_modifier_clusters
-
-
 
 
 def create_linking_clusters(doc, object_clusters, action_modifier_clusters):
@@ -192,26 +171,50 @@ def create_linking_clusters(doc, object_clusters, action_modifier_clusters):
     return linking_cluster
 
 
-# Assuming 'doc' is already processed by spaCy
+if __name__ == "__main__":
+    print("Test 1:")
+    print_tokens_with_head(test_text)
+    # print()
 
-object_clusters = create_object_clusters(doc)
-action_modifier_clusters = create_action_modifier_clusters(doc)
-object_clusters, action_modifier_clusters = add_acomp_to_clusters(doc, object_clusters, action_modifier_clusters)
-linking_clusters = create_linking_clusters(doc, object_clusters, action_modifier_clusters)
+    # print("Test 2:")
+    # print_tokens_with_head(test_2)
+    # print()
+    #
+    # test_3="He found the book on the top shelf interesting."
+    # print("Test 3:")
+    # print_tokens_with_head(test_3)
+    # print()
 
-# Now you have all three types of clusters ready for further analysis or processing.
-for link in linking_clusters:
-    print(link)
-# Print the clusters
-print("Object Clusters:")
-for cluster in object_clusters.values():
-    print(cluster)
+    # print("Test 4:")
+    # print_tokens_with_head(complete_text)
+    # print_tokens_with_head(response_to_legislation_changes)
+    # print()
 
-print("\nAction Modifier Clusters:")
-for cluster in action_modifier_clusters.values():
-    print(cluster)
+    # Process the text with spaCy
+    """
+    doc = nlp(complete_text + response_to_legislation_changes)
+    # Assuming 'doc' is already processed by spaCy
 
-print()
+    object_clusters = create_object_clusters(doc)
+    action_modifier_clusters = create_action_modifier_clusters(doc)
+    object_clusters, action_modifier_clusters = add_acomp_to_clusters(doc, object_clusters, action_modifier_clusters)
+    linking_clusters = create_linking_clusters(doc, object_clusters, action_modifier_clusters)
+
+    # Now you have all three types of clusters ready for further analysis or processing.
+    for link in linking_clusters:
+        print(link)
+    # Print the clusters
+    print("Object Clusters:")
+    for cluster in object_clusters.values():
+        print(cluster)
+
+    print("\nAction Modifier Clusters:")
+    for cluster in action_modifier_clusters.values():
+        print(cluster)
+
+    print()
+    """
+
 # from utils.openai_api.agent_sessions.trajectory_listener import TrajectoryListenerOntologyTermDetector
 # from project_memory import persistance_access, ontology_manager
 # from utils.openai_api.agent_sessions.trajectory import UserAIRound, UserMessage, AIMessage

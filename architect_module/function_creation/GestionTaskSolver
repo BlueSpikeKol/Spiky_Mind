@@ -1,0 +1,16 @@
+Différents types de taches:
+    - Administrative/en lien avec des textes de loi ou des régulations
+    - Programmation
+    - Manuel
+    - Autre
+
+Taches administrative:
+Doivent donner à l'utilisateur des liens vers les textes de loi/régulation qui sont intéressantes.
+Ne pas se fier à gpt qui peut ne pas connaitre les loi actuelles car son entrainement est plus ancien.
+
+Taches de programmation
+Il faut faire la distinction entre une tache atomique (qui ne requiert aucune fonction préalable excepté celles dans les
+bibliothèques courantes) et les taches non atomique qui doivent avoir accès au travail fait pour leur tache enfant.
+
+Taches manuel
+Parfois la tache se suffit à elle même sinon proposer une démarche étape par étape afin d'aider à compléter la tache.
