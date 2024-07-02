@@ -24,6 +24,48 @@ class OntologyManager:
 
     def get_ontology_owlready2(self):
         return self.ontology_owlready2
+    def get_class_by_name(self, class_name: str):
+        """
+        Retrieves a class by its name from the loaded ontology.
+
+        Parameters:
+        - class_name: The name of the class to retrieve.
+
+        Returns:
+        - The class object if found, None otherwise.
+        """
+        if self.ontology_owlready2 is not None:
+            # Search in the ontology for the class by name
+            class_name = self.restore_original_class_name(class_name)
+            results = self.ontology_owlready2.search(iri="*" + class_name)
+            if results:
+                return results[0]  # Return the first match
+            else:
+                print(f"No class found with the name '{class_name}'.")
+        else:
+            print("No ontology is loaded.")
+        return None
+
+    def restore_original_class_name(self, modified_name):
+        """
+        Restores the original class name by removing any added suffixes or formatting.
+
+        Parameters:
+        - modified_name (str): The modified class name to restore.
+
+        Returns:
+        - str: The original class name.
+        """
+        # Define a list of known suffixes that might be appended to class names
+        known_suffixes = ['_simple', '_vector']
+
+        # Iterate over the list of known suffixes and remove them if found
+        for suffix in known_suffixes:
+            if modified_name.endswith(suffix):
+                # Strip the suffix and return the result
+                return modified_name[:-len(suffix)]
+        # If no known suffix is found, return the name as is
+        return modified_name
 
     def process_conversation_analysis(self, round_analysis):
         """

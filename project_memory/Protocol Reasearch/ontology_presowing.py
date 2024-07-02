@@ -23,10 +23,18 @@ annotation_properties = [
     "has_exact_synonym"
 ]
 
+# Configuration flags
+wipe_database_before_insertion = True  # Set to True to wipe the database before insertion
+include_object_properties = False  # Set to True to include object properties in the insertion
+
 # Lists to track data for bulk insertion
 class_data = []
 property_data = []
 processed_properties = set()
+
+# Wipe the database if the flag is set
+if wipe_database_before_insertion:
+    memory_stream.delete_from_pinecone(delete_all=True)
 
 def get_applicable_object_properties(owl_class):
     applicable_properties = set()
@@ -50,14 +58,15 @@ def process_class_for_pinecone(owl_class):
     vector_name = f"{class_name}_simple"
     class_data.append((vector_name, combined_text))
 
-    object_properties = get_applicable_object_properties(owl_class)
-    for obj_prop in object_properties:
-        if obj_prop not in processed_properties:
-            prop_name = obj_prop.name
-            vector_name = f"{prop_name}_vector"
-            prop_description = f"Object property {prop_name} relates {obj_prop.domain[0]} to {obj_prop.range[0]}"
-            property_data.append((vector_name, prop_description))
-            processed_properties.add(obj_prop)
+    if include_object_properties:
+        object_properties = get_applicable_object_properties(owl_class)
+        for obj_prop in object_properties:
+            if obj_prop not in processed_properties:
+                prop_name = obj_prop.name
+                vector_name = f"{prop_name}_vector"
+                prop_description = f"Object property {prop_name} relates {obj_prop.domain[0]} to {obj_prop.range[0]}"
+                property_data.append((vector_name, prop_description))
+                processed_properties.add(obj_prop)
 
 def upsert_to_memory_stream(data_list):
     for vector_name, description in data_list:
@@ -83,6 +92,7 @@ processed_classes = process_ontology(root_class, total_classes, 0)
 print("Ontology processing completed. Now updating the database...")
 
 upsert_to_memory_stream(class_data)
-upsert_to_memory_stream(property_data)
+if include_object_properties:
+    upsert_to_memory_stream(property_data)
 
 print("Vector creation and upserting completed.")

@@ -434,16 +434,12 @@ class MemoryStreamAccess:  # TODO find a way to reduce the times this class is i
         Returns:
             str: The identifier with the UUID stripped if it was present.
         """
-        # Regex to identify a UUID appended at the end of the identifier
-        # UUIDs typically look like: 123e4567-e89b-12d3-a456-426614174000
-        # The pattern assumes the UUID is at the end and possibly preceded by an underscore or other separator
-        pattern = r'(.*)_[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
+        # Adjusted pattern to handle UUID preceded by various separators
+        pattern = r'(.*)[-_][0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
         match = re.match(pattern, identifier)
         if match:
-            # Return the part before the UUID
             return match.group(1)
         else:
-            # Return the original identifier if no UUID is found
             return identifier
 
     def get_vectors_whitelist(self, whitelist):

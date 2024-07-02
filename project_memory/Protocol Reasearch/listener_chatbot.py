@@ -28,6 +28,8 @@ class ListenerChatbot:
             self.ontology_manager = OntologyManager(self.memory_stream, self.gpt_manager)
         else:
             self.ontology_manager = ontology_manager
+        if self.ontology_manager.get_ontology_owlready2() is None:
+            self.ontology_manager.load_ontology(MAIN_ONTOLOGY_TESTING_PATH)
         self.NLQ = ""
         self.NLQ_clusters = []
         self.NLQ_clusters_vectorized = []
@@ -214,7 +216,7 @@ class ListenerChatbot:
                 return True
         return False
 
-    def handle_triples(self, triple_parts, problem_type, original_question):
+    def handle_triples(self, triple_parts, original_question):
         if isinstance(triple_parts, tuple):
             triple = ' '.join(triple_parts)  # Converts tuple to a space-separated string
         else:
@@ -250,36 +252,33 @@ class ListenerChatbot:
                 part_vector = vectorizer_agent.get_vector()
 
                 most_similar_vector_list = self.memory_stream.query_similar_vectors(vector=part_vector, k=3,
-                                                                                    scope="classes")
-                class_corrections[component] = most_similar_vector_list
+                                                                                    strip_UUID=True)
+                class_corrections[component] = [self.ontology_manager.get_class_by_name(cls_name) for cls_name, _ in
+                                                most_similar_vector_list]  # Assuming these are class names
 
             # Resolve property based on updated classes
             if all(k in class_corrections for k in [subject, object]):
-                updated_subject = class_corrections[subject][0][0]  # Assuming the first result is the best match
-                updated_object = class_corrections[object][0][0]
-                onto = None
-                if self.ontology_manager.get_ontology_owlready2():
-                    onto= self.ontology_manager.get_ontology_owlready2()
-                else:
-                    self.ontology_manager.load_ontology(MAIN_ONTOLOGY_TESTING_PATH)
-                    onto = self.ontology_manager.get_ontology_owlready2()
+                updated_subject = class_corrections[subject][0]  # Assuming the first result is the best match
+                updated_object = class_corrections[object][0]
+                onto = self.ontology_manager.get_ontology_owlready2() or self.ontology_manager.load_ontology(
+                    MAIN_ONTOLOGY_TESTING_PATH)
+
                 applicable_properties = [
                     prop for prop in onto.object_properties()
                     if self.is_applicable_property(updated_subject, prop.domain) and self.is_applicable_property(
-                        updated_object,
-                        prop.range)
+                        updated_object, prop.range)
                 ]
 
                 corrections_for_triple.append({
                     'original': predicate,
                     'suggested_corrections': [prop.name for prop in applicable_properties],
-                    'reason': f"Object properties fitting the domain of {updated_subject} and range of {updated_object}."
+                    'reason': f"Object properties fitting the domain of {updated_subject.name} and range of {updated_object.name}."
                 })
 
             corrections_for_triple.extend([
-                {'original': subject, 'suggested_correction': class_corrections[subject][0],
+                {'original': subject, 'suggested_correction': class_corrections[subject][0].name,
                  'reason': 'Class correction based on semantic similarity.'},
-                {'original': object, 'suggested_correction': class_corrections[object][0],
+                {'original': object, 'suggested_correction': class_corrections[object][0].name,
                  'reason': 'Class correction based on semantic similarity.'}
             ])
 
@@ -292,7 +291,7 @@ class ListenerChatbot:
             found_parts = details['found']
             for part in found_parts:
                 if problem_type == 'triples':
-                    triple_corrections = self.handle_triples(part, problem_type, isolated_parts['nlq'])
+                    triple_corrections = self.handle_triples(part, isolated_parts['nlq'])
                     corrections.append({
                         'original': part,
                         'corrections': triple_corrections
