@@ -10,15 +10,21 @@ from utils.openai_api.gpt_calling import GPTManager
 
 class OntologyManager:
     def __init__(self, memory_stream: MemoryStreamAccess, gpt_manager: GPTManager):
-        self.ontology = None
+        self.ontology_path = None
+        self.ontology_owlready2 = None
         self.gpt_manager = gpt_manager
         self.memory_stream = memory_stream
 
     def load_ontology(self, ontology_path):
         self.ontology = ontology_path
+        self.ontology_owlready2 = get_ontology(ontology_path).load()
 
-    def get_ontology(self):
-        return self.ontology
+    def get_ontology_path(self):
+        return self.ontology_path
+
+    def get_ontology_owlready2(self):
+        return self.ontology_owlready2
+
     def process_conversation_analysis(self, round_analysis):
         """
         Process the analysis of a conversation round that was done through en_core_web_lg and
@@ -46,6 +52,7 @@ class OntologyManager:
             obj = list(object_matches.keys())[idx]
             suggested_rule_type = object_matches[obj]['rule_name']
             self.add_new_rule_to_ontology(suggested_rule_type=suggested_rule_type)
+
     def chunk_potential_objects(self, round_analysis):
         """
         Chunk potential project objects from the conversation analysis.
@@ -56,8 +63,6 @@ class OntologyManager:
         # each entity is a potential object and its surrounding context should be included.
         # to detect surrounding context, use the tokens before and after the entity and the tokens that are related to
         # the entity using Parser and Tagger labels on the analysis. ex: ('the', 'det', 'DT') ('department', 'dobj', 'NN')
-
-
 
         return ["Project A", "Project B", "Project C"]
 

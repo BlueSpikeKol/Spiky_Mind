@@ -41,12 +41,14 @@ def main(ontology_subject: str):
     explorer = ExplorerChatbot(ontology_subject=ontology_subject)
 
     while True:
-        if explorer.ask_question() == "exit":
+        explorer.ask_question()
+        if explorer.question == "exit":
             break
-        if explorer.ask_question() == "reset":
+        if explorer.question == "reset":
             explorer.reset()
             continue
-        explorer.ask_question()
         answer = listener.answer_question(explorer.question)
         explorer.update_explorer_memory(answer)
         build_ontology(explorer)
+
+main("test")

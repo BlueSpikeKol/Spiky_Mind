@@ -126,7 +126,7 @@ class MemoryStreamAccess:  # TODO find a way to reduce the times this class is i
             if self.pinecone_index not in self.pinecone_controller.list_indexes().names():
                 self.pinecone_controller.create_index(name=self.pinecone_index, dimension=1536, metric="cosine",
                                                       spec=PodSpec(environment='us-east-1'))
-            self.index = self.pinecone_controller.Index(index_name=self.pinecone_index)
+            self.index = self.pinecone_controller.Index(self.pinecone_index)
         except Exception as e:
             print(f"Error with Pinecone: {e}")
             self.index = None
@@ -391,13 +391,15 @@ class MemoryStreamAccess:  # TODO find a way to reduce the times this class is i
 
         return combined_results
 
-    def query_similar_vectors(self, vector: List[float], k: int = 5) -> List[Tuple[str, float]]:
+    def query_similar_vectors(self, vector: List[float], k: int = 5, strip_UUID: bool = False) -> List[
+        Tuple[str, float]]:
         """
         Queries the Pinecone database for the top k most similar vectors to the given vector.
 
         Parameters:
             vector (List[float]): The query vector.
             k (int): The number of similar vectors to retrieve.
+            strip_UUID (bool): Whether to strip UUIDs from the returned vector IDs.
 
         Returns:
             List[Tuple[str, float]]: A list of tuples, where each tuple contains the ID of a similar vector and its similarity score.
@@ -408,16 +410,41 @@ class MemoryStreamAccess:  # TODO find a way to reduce the times this class is i
 
         try:
             # Query Pinecone for the top k most similar vectors
-            query_result = self.index.query(queries=[vector], top_k=k)
-            matches = query_result['matches'][0]  # Assuming single query
+            query_result = self.index.query(vector=vector, top_k=k)
+            matches = query_result['matches']
 
-            # Extract and return the IDs and scores of the top k matches
-            similar_vectors = [(match['id'], match['score']) for match in matches]
+            # Extract and process the IDs and scores of the top k matches
+            if strip_UUID:
+                similar_vectors = [(self.strip_uuid(match['id']), match['score']) for match in matches]
+            else:
+                similar_vectors = [(match['id'], match['score']) for match in matches]
             return similar_vectors
 
         except Exception as e:
             print(f"Error querying Pinecone for similar vectors: {e}")
             return []
+
+    def strip_uuid(self, identifier: str) -> str:
+        """
+        Strips the UUID from the identifier using a regex pattern, if present.
+
+        Parameters:
+            identifier (str): The identifier potentially containing a UUID.
+
+        Returns:
+            str: The identifier with the UUID stripped if it was present.
+        """
+        # Regex to identify a UUID appended at the end of the identifier
+        # UUIDs typically look like: 123e4567-e89b-12d3-a456-426614174000
+        # The pattern assumes the UUID is at the end and possibly preceded by an underscore or other separator
+        pattern = r'(.*)_[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
+        match = re.match(pattern, identifier)
+        if match:
+            # Return the part before the UUID
+            return match.group(1)
+        else:
+            # Return the original identifier if no UUID is found
+            return identifier
 
     def get_vectors_whitelist(self, whitelist):
         """

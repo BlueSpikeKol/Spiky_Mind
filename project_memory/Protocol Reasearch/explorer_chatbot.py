@@ -27,6 +27,7 @@ from utils.openai_api.gpt_calling import GPTManager, GPTAgent
 from utils.openai_api.models import ModelType
 import re
 
+
 class ExplorerChatbot:
     def __init__(self, ontology_subject: str):
         exploration_system_prompt = f"You are a very curious chatbot whose goal is to understand everything about" \
@@ -46,18 +47,22 @@ class ExplorerChatbot:
         self.logit_bias = {}
 
     def ask_question(self):
-        self.explorer_agent.run_agent()
-        self.question = self.explorer_agent.get_text()
-        self.explorer_direct_memory.append(self.question)
-        #print all the answers that are part of the explorer as well as the last exchange
-        print(f"Explorer list of answers:\n{self.list_of_anwers}\n")
-        print(f"Explorer last question:\n{self.question}\n")
-        user_input = input("Type exit to exit or reset to reset the explorer\n")
+        test = True
+        user_input = "test"
+        if test:
+            self.question = "Is garlic a spice or an herb? What are all ways you know to use garlic in dishes?"
+        else:
+            self.explorer_agent.run_agent()
+            self.question = self.explorer_agent.get_text()
+            self.explorer_direct_memory.append(self.question)
+            # print all the answers that are part of the explorer as well as the last exchange
+            print(f"Explorer list of answers:\n{self.list_of_anwers}\n")
+            print(f"Explorer last question:\n{self.question}\n")
+            user_input = input("Type exit to exit or reset to reset the explorer\n")
         if user_input == "exit":
             return "exit"
         if user_input == "reset":
             return "reset"
-        return self.question
 
     def reset(self):
         self.list_of_anwers = []
@@ -73,20 +78,21 @@ class ExplorerChatbot:
                         "No more than 5 words per topic. there may be multiple topics. Put each cluster in between[]." \
                         "ex:[chicken nuggets][oxygen removal][copper wires][electromagnetism][soda]"
         message = f"Here is the text to summarize:{self.explorer_direct_memory}"
-        memory_agent = self.gpt_manager.create_agent(model=ModelType.GPT_3_5_TURBO, temperature=0.3, system_prompt=system_prompt,
-                                      messages=message, max_tokens=150)
+        memory_agent = self.gpt_manager.create_agent(model=ModelType.GPT_3_5_TURBO, temperature=0.3,
+                                                     system_prompt=system_prompt,
+                                                     messages=message, max_tokens=150)
         memory_agent.run_agent()
         memory_update = memory_agent.get_text()
         self.explorer_direct_memory = []
         # use a regex pattern to extract the clusters from the memory_update
         pattern = re.compile(r'\[(.*?)\]')
         clustered_memory_update = pattern.findall(memory_update)
-        #logit bias only accepts a dictionary of the words and a value between -100 and 100
+        # logit bias only accepts a dictionary of the words and a value between -100 and 100
         for cluster in clustered_memory_update:
             self.logit_bias[cluster] = -50
         self.explorer_agent.update_agent(logit_bias=self.logit_bias)
+
     def reset_explorer(self):
         self.logit_bias = {}
         self.explorer_direct_memory = []
         self.list_of_anwers = []
-
