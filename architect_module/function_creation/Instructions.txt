@@ -1,0 +1,27 @@
+# Arbre
+création de taches (class) nécessaire à la complétion du projet
+
+# Class tache
+Il faut déterminer les informations nécessaires à la réalisation de chaque tache.
+Il faut aussi déterminer la méthode pour stocker l'information.
+Chaque tache doit savoir si les taches enfants sont effectué ou non.
+Si les taches enfants sont nécessaires les effectuer avant de faire la tache parent.
+Il faut un système de lien entre les objets taches
+
+# Possibilité de complétion d'une tache de manière différente 
+
+# Tache de programmation
+Création d'un fichier de programmation pour chaque tache qui le demande
+création d'un squelette.
+Il faut comprendre les dépendances.
+Le code doit être fonctionnel (d'une manière générale).
+Possibilité d'utiliser du pseudo code (il doit être claire pour permettre à l'utilisateur de comprendre).
+
+# Objectif
+Il faut que le résultat même s'il est partiel doit être correct.
+Il ne faut pas que le résultat ne soit pas complètement faux.
+
+# Tester les taches non programmation
+Créer des scénarios à la main afin de tester le programme pour voir s'il donne des bonnes solutions.
+
+

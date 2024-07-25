@@ -11,6 +11,9 @@ from utils import config_retrieval
 from utils.openai_api.agent_sessions.message_types import SystemMessage, UserMessage, AIMessage
 from utils.openai_api.agent_sessions.trajectory import UserAITrajectory
 
+
+from architect_module.PluginsGPT.AllFunctions import *
+
 EXAMPLE_CHAT_COMPLETION = """
 {
   "id": "chatcmpl-123",
