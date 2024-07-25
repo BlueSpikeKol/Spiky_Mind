@@ -16,7 +16,7 @@ class OntologyManager:
         self.memory_stream = memory_stream
 
     def load_ontology(self, ontology_path):
-        self.ontology = ontology_path
+        self.ontology_path = ontology_path
         self.ontology_owlready2 = get_ontology(ontology_path).load()
 
     def get_ontology_path(self):
@@ -24,24 +24,17 @@ class OntologyManager:
 
     def get_ontology_owlready2(self):
         return self.ontology_owlready2
-    def get_class_by_name(self, class_name: str):
+
+    def get_class_by_iri(self, class_iri: str):
         """
-        Retrieves a class by its name from the loaded ontology.
-
-        Parameters:
-        - class_name: The name of the class to retrieve.
-
-        Returns:
-        - The class object if found, None otherwise.
+        Retrieves a class by its IRI from the loaded ontology.
         """
         if self.ontology_owlready2 is not None:
-            # Search in the ontology for the class by name
-            class_name = self.restore_original_class_name(class_name)
-            results = self.ontology_owlready2.search(iri="*" + class_name)
+            results = self.ontology_owlready2.search(iri=class_iri)
             if results:
-                return results[0]  # Return the first match
+                return results[0]  # Ensure this is the class object
             else:
-                print(f"No class found with the name '{class_name}'.")
+                print(f"No class found with the IRI '{class_iri}'.")
         else:
             print("No ontology is loaded.")
         return None

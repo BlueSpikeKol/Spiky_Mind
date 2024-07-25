@@ -46,6 +46,7 @@ def get_applicable_object_properties(owl_class):
 
 def process_class_for_pinecone(owl_class):
     class_name = owl_class.label.first() if owl_class.label else str(owl_class)
+    class_iri = owl_class.iri  # Fetch the full IRI of the class
     synonyms = getattr(owl_class, "has_exact_synonym", [])
     name_with_synonyms = f"[{class_name}]{'|'.join(synonyms)}"
 
@@ -54,23 +55,36 @@ def process_class_for_pinecone(owl_class):
         if hasattr(owl_class, prop):
             annotations.extend([str(value) for value in getattr(owl_class, prop)])
 
+    # Include the IRI in the metadata
+    metadata = {
+        "iri": class_iri,
+        "annotations": annotations
+    }
+
     combined_text = f"{name_with_synonyms}|{'|'.join(annotations)}"
     vector_name = f"{class_name}_simple"
-    class_data.append((vector_name, combined_text))
+    class_data.append((vector_name, combined_text, metadata))  # Add metadata to the tuple
 
-    if include_object_properties:
-        object_properties = get_applicable_object_properties(owl_class)
-        for obj_prop in object_properties:
-            if obj_prop not in processed_properties:
-                prop_name = obj_prop.name
-                vector_name = f"{prop_name}_vector"
-                prop_description = f"Object property {prop_name} relates {obj_prop.domain[0]} to {obj_prop.range[0]}"
-                property_data.append((vector_name, prop_description))
-                processed_properties.add(obj_prop)
+if include_object_properties:
+    object_properties = get_applicable_object_properties(owl_class)
+    for obj_prop in object_properties:
+        if obj_prop not in processed_properties:
+            prop_name = obj_prop.name
+            prop_iri = obj_prop.iri  # Fetch the full IRI of the object property
+            vector_name = f"{prop_name}_vector"
+            prop_description = f"Object property {prop_name} relates {obj_prop.domain[0]} to {obj_prop.range[0]}"
+            prop_metadata = {
+                "iri": prop_iri,
+                "domain": str(obj_prop.domain[0].iri),
+                "range": str(obj_prop.range[0].iri)
+            }
+            property_data.append((vector_name, prop_description, prop_metadata))
+            processed_properties.add(obj_prop)
 
 def upsert_to_memory_stream(data_list):
-    for vector_name, description in data_list:
-        memory_stream.add_to_pinecone(vector_name, description)
+    for vector_name, description, metadata in data_list:
+        memory_stream.add_to_pinecone(vector_name, description, metadata=metadata)
+
 
 def process_ontology(owl_class, total_classes, processed_classes):
     process_class_for_pinecone(owl_class)

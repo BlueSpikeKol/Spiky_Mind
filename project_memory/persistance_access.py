@@ -3,7 +3,7 @@ import numpy as np
 from pinecone import Pinecone, PodSpec
 from pinecone import ServerlessSpec
 import mysql.connector
-from typing import Tuple, List
+from typing import Tuple, List, Union, Dict, Any
 import re
 import tempfile
 import os
@@ -299,33 +299,54 @@ class MemoryStreamAccess:  # TODO find a way to reduce the times this class is i
 
         print(f"Reasoning completed. Reasoned ontology saved to {reasoned_save_path}.")
 
-    def similarity_comparison(self, comparison_list_id: List[str], single_id: str, top_k: int = 5) -> List[
-        Tuple[str, float]]:
+    def similarity_comparison(self, comparison_list_id: List[str], single_vector_or_id: Union[List[float], str],
+                              top_k: int = 5, return_metadata: bool = False) -> List:
         """
-        Compares a list of parent IDs against a single ID to find the top k most similar parents.
+        Compares a list of parent IDs against a single vector or the vector of a single ID to find the top k most similar parents,
+        optionally returning metadata.
 
-        :param parent_ids: List of parent IDs to compare.
-        :param single_id: The single ID to compare against the list.
+        :param comparison_list_id: List of parent IDs to compare.
+        :param single_vector_or_id: The single vector as a list of floats or the ID of the vector to compare against the list.
         :param top_k: The number of top similar items to return.
-        :return: A list of tuples containing the parent ID and its similarity score, sorted by similarity.
+        :param return_metadata: Whether to return metadata along with vector IDs and scores.
+        :return: A list of tuples containing the parent ID, its similarity score, and optionally its metadata.
         """
-        # Retrieve vectors for all IDs using the whitelist function
-        all_ids = comparison_list_id + [single_id]
-        vectors, missing_ids = self.get_vectors_whitelist(all_ids)
+        # Retrieve vectors for all parent IDs using the whitelist function
+        all_ids = comparison_list_id
+        vectors, missing_ids = self.get_vectors_whitelist(all_ids, include_metadata=return_metadata)
 
         if missing_ids:
             print(f"Missing vectors for IDs: {missing_ids}")
 
-        # Extract the vector for the single ID
-        single_vector = np.array(vectors[single_id])
+        # Determine if the single_vector_or_id is a list (vector) or an ID
+        if isinstance(single_vector_or_id, str):
+            # If ID, fetch the vector from the database
+            additional_vector, missing_vector = self.get_vectors_whitelist([single_vector_or_id],
+                                                                           include_metadata=return_metadata)
+            if missing_vector:
+                print(f"No vector found for ID: {single_vector_or_id}")
+                return []
+            single_vector = np.array(additional_vector[single_vector_or_id]['vector'])
+        else:
+            # If already a vector, convert the list to a numpy array for calculation
+            single_vector = np.array(single_vector_or_id)
 
         # Calculate similarity scores
         similarities = []
         for parent_id in comparison_list_id:
-            parent_vector = np.array(vectors[parent_id])
-            similarity_score = np.dot(single_vector, parent_vector) / (
-                    np.linalg.norm(single_vector) * np.linalg.norm(parent_vector))  # Cosine similarity
-            similarities.append((parent_id, similarity_score))
+            if parent_id in vectors:
+                parent_vector = np.array(vectors[parent_id]['vector'])
+                if np.linalg.norm(parent_vector) == 0 or np.linalg.norm(single_vector) == 0:
+                    similarity_score = 0  # Handle zero vectors if any
+                else:
+                    similarity_score = np.dot(single_vector, parent_vector) / (
+                            np.linalg.norm(single_vector) * np.linalg.norm(parent_vector))  # Cosine similarity
+                if return_metadata:
+                    similarities.append((parent_id, similarity_score, vectors[parent_id].get('metadata', {})))
+                else:
+                    similarities.append((parent_id, similarity_score))
+            else:
+                print(f"Missing vector data for parent ID: {parent_id}")
 
         # Sort by similarity score in descending order and return top k results
         top_similarities = sorted(similarities, key=lambda x: x[1], reverse=True)[:top_k]
@@ -391,8 +412,8 @@ class MemoryStreamAccess:  # TODO find a way to reduce the times this class is i
 
         return combined_results
 
-    def query_similar_vectors(self, vector: List[float], k: int = 5, strip_UUID: bool = False) -> List[
-        Tuple[str, float]]:
+    def query_similar_vectors(self, vector: List[float], k: int = 5, strip_UUID: bool = False,
+                              return_metadata: bool = False) -> List:
         """
         Queries the Pinecone database for the top k most similar vectors to the given vector.
 
@@ -400,9 +421,11 @@ class MemoryStreamAccess:  # TODO find a way to reduce the times this class is i
             vector (List[float]): The query vector.
             k (int): The number of similar vectors to retrieve.
             strip_UUID (bool): Whether to strip UUIDs from the returned vector IDs.
+            return_metadata (bool): Whether to return metadata along with vector IDs and scores.
 
         Returns:
-            List[Tuple[str, float]]: A list of tuples, where each tuple contains the ID of a similar vector and its similarity score.
+            List[Tuple[str, float]] or List[Tuple[str, float, dict]]: A list of tuples, where each tuple contains
+            the ID of a similar vector, its similarity score, and optionally its metadata.
         """
         if not self.index:
             print("Pinecone index is not initialized.")
@@ -410,14 +433,23 @@ class MemoryStreamAccess:  # TODO find a way to reduce the times this class is i
 
         try:
             # Query Pinecone for the top k most similar vectors
-            query_result = self.index.query(vector=vector, top_k=k)
+            query_result = self.index.query(vector=vector, top_k=k, include_metadata=return_metadata)
             matches = query_result['matches']
 
-            # Extract and process the IDs and scores of the top k matches
-            if strip_UUID:
-                similar_vectors = [(self.strip_uuid(match['id']), match['score']) for match in matches]
+            if return_metadata:
+                # Extract IDs, scores, and metadata of the top k matches
+                if strip_UUID:
+                    similar_vectors = [(self.strip_uuid(match['id']), match['score'], match['metadata']) for match in
+                                       matches]
+                else:
+                    similar_vectors = [(match['id'], match['score'], match['metadata']) for match in matches]
             else:
-                similar_vectors = [(match['id'], match['score']) for match in matches]
+                # Extract only IDs and scores of the top k matches
+                if strip_UUID:
+                    similar_vectors = [(self.strip_uuid(match['id']), match['score']) for match in matches]
+                else:
+                    similar_vectors = [(match['id'], match['score']) for match in matches]
+
             return similar_vectors
 
         except Exception as e:
@@ -442,15 +474,17 @@ class MemoryStreamAccess:  # TODO find a way to reduce the times this class is i
         else:
             return identifier
 
-    def get_vectors_whitelist(self, whitelist):
+    def get_vectors_whitelist(self, whitelist: List[str], include_metadata: bool = False) -> Tuple[
+        Dict[str, Any], List[str]]:
         """
-        Retrieve vectors from the Pinecone database based on a whitelist of IDs.
+        Retrieve vectors and optionally metadata from the Pinecone database based on a whitelist of IDs.
 
         Parameters:
             whitelist (list): List of vector IDs to include in retrieval.
+            include_metadata (bool): Flag to include metadata in the retrieval.
 
         Returns:
-            A tuple containing a dictionary with vector names as keys and vectors as values,
+            A tuple containing a dictionary with vector IDs as keys and vectors (and optionally metadata) as values,
             and a list of IDs that did not return any data.
         """
         if not self.index:
@@ -470,17 +504,24 @@ class MemoryStreamAccess:  # TODO find a way to reduce the times this class is i
                 print(f"Duplicate IDs in batch {i // batch_size + 1}: {duplicates}")
 
             try:
-                response = self.index.fetch(ids=batch)
+                # Fetch vectors with optional metadata
+                response = self.index.fetch(ids=batch, include_metadata=include_metadata)
                 returned_vectors = response.get('vectors', {})
 
                 for id in batch:
                     if id not in returned_vectors:
                         missing_ids.append(id)
+                    else:
+                        vector_data = returned_vectors[id]
+                        vector_values = vector_data.get('values', [])
+                        if include_metadata:
+                            metadata = vector_data.get('metadata', {})
+                            all_vectors[id] = {'vector': vector_values, 'metadata': metadata}
+                        else:
+                            all_vectors[id] = {'vector': vector_values}
 
-                for vector_id, vector_data in returned_vectors.items():
-                    vector_values = vector_data.get('values', [])
-                    all_vectors[vector_id] = vector_values
-                    print(f"Retrieved vector ID: {vector_id}")
+                for vector_id in all_vectors:
+                    print(f"Retrieved vector ID: {vector_id}, Metadata included: {include_metadata}")
 
             except Exception as e:
                 print(f"Error retrieving batch from Pinecone: {e}")
@@ -519,13 +560,14 @@ class MemoryStreamAccess:  # TODO find a way to reduce the times this class is i
 
         return grouped_vectors
 
-    def add_to_pinecone(self, vector_name, vector_text, return_id=False):
+    def add_to_pinecone(self, vector_name, vector_text, metadata=None, return_id=False):
         """
-        Adds or updates a single entry in the Pinecone database and MySQL.
+        Adds or updates a single entry in the Pinecone database and MySQL, including metadata.
 
         Parameters:
             vector_name (str): The name of the vector.
             vector_text (str): The description of the vector.
+            metadata (dict, optional): Additional metadata to store with the vector.
             return_id (bool): If True, returns the ID of the vector added to Pinecone.
 
         Returns:
@@ -541,7 +583,7 @@ class MemoryStreamAccess:  # TODO find a way to reduce the times this class is i
         # Generate a UUID for the vector and combine it with the vector_name
         vector_id = vector_name + "-" + str(uuid.uuid4())
 
-        # Replace spaces with underscores in combined_text
+        # Replace spaces with underscores in combined_text and prepare for embedding
         combined_text = (vector_name + "." + vector_text).replace(" ", "_")
 
         # Generate the vector using the embedding agent
@@ -549,15 +591,28 @@ class MemoryStreamAccess:  # TODO find a way to reduce the times this class is i
         embedding_agent.run_agent()
         vector = embedding_agent.get_vector()
 
-        # Insert into MySQL
+        # Insert into MySQL (Consider storing metadata as a JSON string if necessary)
         try:
-            self.add_to_mysql("vector_storage", {'id': vector_id, 'name': vector_name, 'content': vector_text})
+            mysql_entry = {
+                'id': vector_id,
+                'name': vector_name,
+                'content': vector_text,
+                'metadata': json.dumps(metadata) if metadata else "{}"  # Storing metadata as JSON string
+            }
+            self.add_to_mysql("vector_storage", mysql_entry)
             print(f"Vector with ID '{vector_id}' added to MySQL. content:{combined_text}")
 
             # Proceed with Pinecone insertion only if MySQL insertion is successful
             try:
-                self.index.upsert(vectors=[(vector_id, vector)])
-                print(f"Vector with ID '{vector_id}' added or updated in Pinecone.")
+                self.index.upsert(vectors=[
+                    {
+                        "id": vector_id,
+                        "values": vector,
+                        "metadata": metadata
+                    }
+                ])
+
+                print(f"Vector with ID '{vector_id}' added or updated in Pinecone with metadata.")
                 if return_id:
                     return vector_id
             except Exception as e:

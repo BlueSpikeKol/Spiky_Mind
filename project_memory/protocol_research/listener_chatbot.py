@@ -9,8 +9,11 @@ information matched to transform them into ASQs.
 """
 import re
 
+import owlready2
+
 from project_memory.persistance_access import MemoryStreamAccess
 from project_memory.ontology_manager import OntologyManager
+from project_memory.protocol_research.query_solver import QuerySolver
 from utils.openai_api.gpt_calling import GPTManager
 from utils.openai_api.models import ModelType
 
@@ -126,6 +129,7 @@ class ListenerChatbot:
         refined_query = self.recombine_query_parts(refined_parts)
         return refined_query
 
+    # not useful for now since we use owlready2 instead of queries
     def isolate_problematic_query_parts(self, query_dict: dict) -> dict:
         """The goal of this function is to identify where the SPARQL part of the query could be misaligned with the ontology
         and reason of the misalignment, which will then be used to correct the misalignment."""
@@ -208,81 +212,222 @@ class ListenerChatbot:
 
     @staticmethod
     def is_applicable_property(owl_class, property_class_list):
-        """ Check if owl_class is the same as or a subclass of any class in property_class_list """
-        if owl_class in property_class_list:
-            return True
-        for superclass in owl_class.ancestors():
-            if superclass in property_class_list:
-                return True
-        return False
+        """ Check if owl_class is the same as or a subclass of any class in property_class_list. """
+        if not property_class_list:  # Handle None or empty scenarios
+            return False
 
-    def handle_triples(self, triple_parts, original_question):
-        if isinstance(triple_parts, tuple):
-            triple = ' '.join(triple_parts)  # Converts tuple to a space-separated string
+        # Ensure property_class_list is a list, even if it's a single class or set
+        if not isinstance(property_class_list, list):
+            property_class_list = [property_class_list]
+
+        # Create a set for efficient membership checks
+        class_set = set(property_class_list)
+
+        # Check if the class itself or any of its ancestors is in the class set
+        return owl_class in class_set or any(
+            superclass in class_set for superclass in owl_class.ancestors(include_self=True))
+
+    def handle_triples(self, triple_parts, original_question, use_dummy_data=False):
+        if use_dummy_data:
+            return self.get_dummy_corrections()
         else:
-            triple = triple_parts  # It's already a string, proceed as normal
+            triple = ' '.join(triple_parts) if isinstance(triple_parts, tuple) else triple_parts
+            corrections_for_triple = []
+            subject, predicate, object = self.extract_triple_parts(triple)
 
+            class_corrections = self.resolve_classes([subject, object], triple, original_question)
+            if class_corrections:
+                corrections_for_triple.extend(self.resolve_properties(subject, object, class_corrections, predicate))
+                corrections_for_triple.extend(self.format_class_corrections(class_corrections))
+
+            return corrections_for_triple
+
+    def extract_triple_parts(self, triple):
         triple_pattern = re.compile(r"(\?\w+|:\w+)\s+(\w+:\w+|a)\s+(\?\w+|:\w+|\w+)")
-        corrections_for_triple = []
         match = triple_pattern.match(triple)
-
         if match:
-            subject, predicate, object = match.groups()
-            components = [subject, object]  # Handle class components first
+            return match.groups()
+        return None, None, None
 
-            # Resolve classes
-            class_corrections = {}
-            for component in components:
-                # Generate and process descriptions for classes
-                description_generator = self.gpt_manager.create_agent(
-                    model=ModelType.GPT_3_5_TURBO,
-                    system_prompt="Describe the class in the context of the ontology.",
-                    messages=f"Ontologic class: {component}. Context: {triple} + {original_question}.",
-                    temperature=0.3,
-                    max_tokens=100
-                )
-                description_generator.run_agent()
-                semantic_description = description_generator.get_text()
+    def resolve_classes(self, components, triple, original_question):
+        class_corrections = {}
+        for component in components:
+            semantic_description = self.generate_class_description(component, triple, original_question)
+            part_vector = self.generate_vector(semantic_description)
+            class_corrections[component] = self.get_similar_classes(part_vector)
+        return class_corrections
 
-                vectorizer_agent = self.gpt_manager.create_agent(
-                    model=ModelType.TEXT_EMBEDDING_ADA,
-                    messages=semantic_description
-                )
-                vectorizer_agent.run_agent()
-                part_vector = vectorizer_agent.get_vector()
+    def generate_class_description(self, component, triple, original_question):
+        description_generator = self.gpt_manager.create_agent(
+            model=ModelType.GPT_3_5_TURBO,
+            system_prompt="Describe the class in the context of the ontology.",
+            messages=f"Ontologic class: {component}. Context: {triple} + {original_question}.",
+            temperature=0.3,
+            max_tokens=100
+        )
+        description_generator.run_agent()
+        return description_generator.get_text()
 
-                most_similar_vector_list = self.memory_stream.query_similar_vectors(vector=part_vector, k=3,
-                                                                                    strip_UUID=True)
-                class_corrections[component] = [self.ontology_manager.get_class_by_name(cls_name) for cls_name, _ in
-                                                most_similar_vector_list]  # Assuming these are class names
+    def generate_vector(self, semantic_description):
+        vectorizer_agent = self.gpt_manager.create_agent(
+            model=ModelType.TEXT_EMBEDDING_ADA,
+            messages=semantic_description
+        )
+        vectorizer_agent.run_agent()
+        return vectorizer_agent.get_vector()
 
-            # Resolve property based on updated classes
-            if all(k in class_corrections for k in [subject, object]):
-                updated_subject = class_corrections[subject][0]  # Assuming the first result is the best match
-                updated_object = class_corrections[object][0]
-                onto = self.ontology_manager.get_ontology_owlready2() or self.ontology_manager.load_ontology(
-                    MAIN_ONTOLOGY_TESTING_PATH)
+    def get_similar_classes(self, part_vector):
+        most_similar_vector_list = self.memory_stream.query_similar_vectors(vector=part_vector, k=3,
+                                                                            strip_UUID=True, return_metadata=True)
+        return [self.ontology_manager.get_class_by_iri(metadata['iri']) for _, _, metadata in most_similar_vector_list]
 
-                applicable_properties = [
-                    prop for prop in onto.object_properties()
-                    if self.is_applicable_property(updated_subject, prop.domain) and self.is_applicable_property(
-                        updated_object, prop.range)
-                ]
+    def resolve_properties(self, subject, object, class_corrections, predicate):
+        corrections = []
+        if subject in class_corrections and object in class_corrections:
+            updated_subject = class_corrections[subject][0]
+            updated_object = class_corrections[object][0]
+            onto = self.ontology_manager.get_ontology_owlready2()
+            applicable_properties = self.find_applicable_properties(updated_subject, updated_object, onto)
+            corrections.append({
+                'original': predicate,
+                'suggested_corrections': applicable_properties,
+                'reason': f"Object properties fitting the domain of {updated_subject.label.first()} and range of {updated_object.label.first()}."
+            })
+        return corrections
 
-                corrections_for_triple.append({
-                    'original': predicate,
-                    'suggested_corrections': [prop.name for prop in applicable_properties],
-                    'reason': f"Object properties fitting the domain of {updated_subject.name} and range of {updated_object.name}."
+    def find_applicable_properties(self, updated_subject, updated_object, onto):
+        applicable_properties = []
+        for prop in onto.object_properties():
+            if self.is_applicable_property(updated_subject, prop.domain) and \
+                    self.is_applicable_property(updated_object, prop.range):
+                domain_info, range_info = self.get_property_details(prop)
+                applicable_properties.append({
+                    'iri': prop.iri,
+                    'label': prop.label[0] if prop.label else prop.name,
+                    'domain': domain_info,
+                    'range': range_info
                 })
+        return applicable_properties
 
-            corrections_for_triple.extend([
-                {'original': subject, 'suggested_correction': class_corrections[subject][0].name,
-                 'reason': 'Class correction based on semantic similarity.'},
-                {'original': object, 'suggested_correction': class_corrections[object][0].name,
-                 'reason': 'Class correction based on semantic similarity.'}
-            ])
+    def get_property_details(self, prop):
+        domain_info = {'iri': prop.domain[0].iri, 'label': prop.domain[0].label.first() if prop.domain else "No Label"}
+        range_info = {'iri': prop.range[0].iri, 'label': prop.range[0].label.first() if prop.range else "No Label"}
+        return domain_info, range_info
 
-        return corrections_for_triple
+    def format_class_corrections(self, class_corrections):
+        formatted_corrections = []
+        for key, corrections in class_corrections.items():
+            formatted_corrections.append({
+                'original': key,
+                'suggested_correction': {
+                    'iri': corrections[0].iri,
+                    'label': corrections[0].label.first() if corrections[0].label else "No Label"
+                },
+                'reason': 'Class correction based on semantic similarity.'
+            })
+        return formatted_corrections
+
+    def get_dummy_corrections(self):
+        return {
+            'predicate_corrections': [
+                {
+                    'original': ':hasType',
+                    'suggested_corrections': [
+                        {
+                            'iri': 'http://purl.obolibrary.org/obo/FOODON_00002420',
+                            'label': 'has ingredient',
+                            'domain': {
+                                'iri': 'http://purl.obolibrary.org/obo/FOODON_00002403',
+                                'label': 'food material'
+                            },
+                            'range': {
+                                'iri': 'http://purl.obolibrary.org/obo/FOODON_00001002',
+                                'label': 'food product'
+                            }
+                        },
+                        {
+                            'iri': 'http://purl.obolibrary.org/obo/RO_0002434',
+                            'label': 'interacts with',
+                            'domain': {
+                                'iri': 'http://purl.obolibrary.org/obo/BFO_0000040',
+                                'label': 'material entity'
+                            },
+                            'range': {
+                                'iri': 'http://purl.obolibrary.org/obo/BFO_0000040',
+                                'label': 'material entity'
+                            }
+                        },
+                        {
+                            'iri': 'http://purl.obolibrary.org/obo/RO_0002448',
+                            'label': 'directly regulates activity of',
+                            'domain': {
+                                'iri': 'http://purl.obolibrary.org/obo/BFO_0000040',
+                                'label': 'material entity'
+                            },
+                            'range': {
+                                'iri': 'http://purl.obolibrary.org/obo/BFO_0000040',
+                                'label': 'material entity'
+                            }
+                        },
+                        {
+                            'iri': 'http://purl.obolibrary.org/obo/RO_0011002',
+                            'label': 'regulates activity of',
+                            'domain': {
+                                'iri': 'http://purl.obolibrary.org/obo/BFO_0000040',
+                                'label': 'material entity'
+                            },
+                            'range': {
+                                'iri': 'http://purl.obolibrary.org/obo/BFO_0000040',
+                                'label': 'material entity'
+                            }
+                        },
+                        {
+                            'iri': 'http://purl.obolibrary.org/obo/RO_0002449',
+                            'label': 'directly negatively regulates activity of',
+                            'domain': {
+                                'iri': 'http://purl.obolibrary.org/obo/BFO_0000040',
+                                'label': 'material entity'
+                            },
+                            'range': {
+                                'iri': 'http://purl.obolibrary.org/obo/BFO_0000040',
+                                'label': 'material entity'
+                            }
+                        },
+                        {
+                            'iri': 'http://purl.obolibrary.org/obo/RO_0002450',
+                            'label': 'directly positively regulates activity of',
+                            'domain': {
+                                'iri': 'http://purl.obolibrary.org/obo/BFO_0000040',
+                                'label': 'material entity'
+                            },
+                            'range': {
+                                'iri': 'http://purl.obolibrary.org/obo/BFO_0000040',
+                                'label': 'material entity'
+                            }
+                        }
+                    ],
+                    'reason': "Object properties fitting the domain of spice or herb and range of spice food product."
+                }
+            ],
+            'class_corrections': [
+                {
+                    'original': ':Garlic',
+                    'suggested_correction': {
+                        'iri': 'http://purl.obolibrary.org/obo/FOODON_00001242',
+                        'label': 'spice or herb'
+                    },
+                    'reason': 'Class correction based on semantic similarity.'
+                },
+                {
+                    'original': '?garlicType',
+                    'suggested_correction': {
+                        'iri': 'http://purl.obolibrary.org/obo/FOODON_03303380',
+                        'label': 'spice food product'
+                    },
+                    'reason': 'Class correction based on semantic similarity.'
+                }
+            ]
+        }
 
     def correlate_to_ontology(self, isolated_parts: dict) -> list:
         corrections = []
@@ -291,7 +436,7 @@ class ListenerChatbot:
             found_parts = details['found']
             for part in found_parts:
                 if problem_type == 'triples':
-                    triple_corrections = self.handle_triples(part, isolated_parts['nlq'])
+                    triple_corrections = self.handle_triples(part, isolated_parts['nlq'], use_dummy_data=True)
                     corrections.append({
                         'original': part,
                         'corrections': triple_corrections
