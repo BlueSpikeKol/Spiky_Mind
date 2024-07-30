@@ -1,10 +1,23 @@
 import spacy
 
-nlp = spacy.load('en_core_web_lg')
+temporary_text = "She sat on the chair.He walked into the room.They arrived after midnight.She looked at the painting.He is from Germany.He bought apples and oranges.She likes tea but prefers coffee.They neither drink nor smoke.She worked hard, so she succeeded.I am tired, yet I will continue working."
 
-text = "Given the recent changes in tax legislation, reviewing our budget allocations is crucial, especially for our R&D department. This department will see the new law, effective from next quarter, imposing stricter regulations on capital expenditure. It will significantly impact the team, which consists of more than 25 people. How do you think this affects our planned investment in new technology and personnel over the next fiscal year?"
-test_text = "Despite the heavy rain that was falling intermittently, she has, after much deliberation, decided to embark on the journey, knowing well that it could, without warning, turn more perilous."
-test_2 = "The flowers smell fragrant in the garden. The orchids were responsible for this pleasant fragrance."
+test_text1 = "What biological methods have been successful in eradicating invasive fish and mushroom species?"
+test_text2 = "How would the global climate be affected if deforestation rates were reduced by 50% over the next 10 years?"
+test_text3 = "What are the primary survival strategies of desert flora during prolonged drought conditions?"
+
+test_text4 = test_text1 + " " + test_text2 + " " + test_text3
+
+modified_test_text1 = "Invasive species like fish and mushrooms can disrupt local ecosystems. " \
+                      "What methods have been successful in eradicating them? Have any biological approaches proven effective?"
+
+modified_test_text2 = "Deforestation is a major environmental concern. " \
+                      "How would the global climate change if the rates of deforestation were reduced by 50% over the next 10 years?" \
+                      " Would this reduction have a significant impact?"
+
+modified_test_text3 = "Desert flora face extreme conditions during droughts. " \
+                      "What are their primary survival strategies during such prolonged periods?" \
+                      " How do these plants manage to sustain themselves?"
 
 complete_text = """Given the recent changes in tax legislation, reviewing our budget allocations is crucial,
 especially for our R&D department. This department will see the new law, effective from next quarter,
@@ -22,8 +35,7 @@ these changes to continue leading in innovation.
 """
 
 
-def print_tokens_with_head(text):
-    doc = nlp(text)
+def print_tokens_with_head(doc):
     important_dict = {}
     for token in doc:
         print(f"{token.text} ({token.pos_})--({token.dep_})", end="")
@@ -128,10 +140,35 @@ def add_acomp_to_clusters(doc, object_clusters, action_modifier_clusters):
 
 
 def create_linking_clusters(doc, object_clusters, action_modifier_clusters):
+    """
+    Analyze a spaCy document to identify linking relationships based on adpositions ('ADP') with
+    prepositional dependencies ('prep'), and separate logic for coordinating conjunctions ('CCONJ')
+    with dependency 'cc'. This function aims to link clusters of objects or action modifiers through
+    connections indicated by prepositions and coordinating conjunctions, establishing semantic relationships.
+
+    Parameters:
+    - doc (spacy.tokens.Doc): The spaCy document to analyze, which should already be processed
+      by a spaCy pipeline with annotated tokens for parts-of-speech and dependencies.
+    - object_clusters (dict): A dictionary with identifiers for clusters of noun objects,
+      and values as lists (or sets) of tokens representing these objects.
+    - action_modifier_clusters (dict): A dictionary with identifiers for clusters of verbs
+      or adjectives (action modifiers), and values as lists (or sets) of tokens that modify actions.
+
+    Returns:
+    - list: A list of dictionaries, where each dictionary represents a linking relationship identified
+      in the document. Each dictionary includes:
+        - 'link_token' (spacy.tokens.Token): The token that establishes the link (a preposition or conjunction).
+        - 'sender_cluster' (list or set): The cluster from which the link originates.
+        - 'target_cluster' (list or set): The cluster to which the link points.
+
+    The function processes tokens with 'ADP'/'prep' for typical adpositional linking and 'CCONJ'/'cc' for
+    conjunction-based linking, identifying associations within specified clusters.
+    """
     linking_cluster = []
 
+    # Process adpositions (ADP with prep)
     for token in doc:
-        if token.pos_ == 'ADP' or token.dep_ == 'prep':
+        if token.pos_ == 'ADP' and token.dep_ == 'prep':
             sender_cluster = None
             target_cluster = None
 
@@ -149,7 +186,7 @@ def create_linking_clusters(doc, object_clusters, action_modifier_clusters):
 
             # Find the target_cluster by comparing token objects directly
             for other_token in doc:
-                if other_token != token and other_token.head == token:
+                if other_token.head == token:
                     for cluster_id, cluster in object_clusters.items():
                         if other_token in cluster:
                             target_cluster = cluster
@@ -168,32 +205,42 @@ def create_linking_clusters(doc, object_clusters, action_modifier_clusters):
                     'target_cluster': target_cluster
                 })
 
+    # Process coordinating conjunctions (CCONJ with cc)
+    for token in doc:
+        if token.pos_ == 'CCONJ' and token.dep_ == 'cc':
+            sender_cluster = None
+            target_cluster = None
+
+            # Handling coordinating conjunctions
+            conjuncts = [t for t in doc if t.dep_ == 'conj' and t.head == token.head]
+            if conjuncts:
+                sender_cluster = [token.head] + [t for t in conjuncts if t.i < token.i]
+                target_cluster = [t for t in conjuncts if t.i > token.i]
+
+                if sender_cluster and target_cluster:
+                    linking_cluster.append({
+                        'link_token': token,
+                        'sender_cluster': sender_cluster,
+                        'target_cluster': target_cluster
+                    })
+
     return linking_cluster
 
 
 if __name__ == "__main__":
-    print("Test 1:")
-    print_tokens_with_head(test_text)
-    # print()
+    nlp = spacy.load("en_core_web_trf")
+    nlp_coref = spacy.load("en_coreference_web_trf", vocab=nlp.vocab)
 
-    # print("Test 2:")
-    # print_tokens_with_head(test_2)
-    # print()
-    #
-    # test_3="He found the book on the top shelf interesting."
-    # print("Test 3:")
-    # print_tokens_with_head(test_3)
-    # print()
+    doc = nlp(test_text4)
+    doc = nlp_coref(doc)
+    print_tokens_with_head(doc)
+    for key in doc.spans:
+        if key.startswith('coref_clusters'):
+            print(f"Cluster ({key}):")
+            for mention in doc.spans[key]:
+                print(f" - Mention: {mention.text}, [Start: {mention.start}, End: {mention.end}]")
 
-    # print("Test 4:")
-    # print_tokens_with_head(complete_text)
-    # print_tokens_with_head(response_to_legislation_changes)
-    # print()
-
-    # Process the text with spaCy
-    """
-    doc = nlp(complete_text + response_to_legislation_changes)
-    # Assuming 'doc' is already processed by spaCy
+    print([(t.i, t.text, t.pos_, t.dep_) for t in doc])
 
     object_clusters = create_object_clusters(doc)
     action_modifier_clusters = create_action_modifier_clusters(doc)
@@ -213,7 +260,6 @@ if __name__ == "__main__":
         print(cluster)
 
     print()
-    """
 
 # from utils.openai_api.agent_sessions.trajectory_listener import TrajectoryListenerOntologyTermDetector
 # from project_memory import persistance_access, ontology_manager

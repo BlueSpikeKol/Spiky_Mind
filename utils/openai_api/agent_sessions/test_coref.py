@@ -21,8 +21,37 @@ partnerships to sustain our technology and personnel investments. Our department
 these changes to continue leading in innovation.
 """
 
+test_text1 = "What biological methods have been successful in eradicating invasive fish and mushroom species?"
+test_text2 = "How would the global climate be affected if deforestation rates were reduced by 50% over the next 10 years?"
+test_text3 = "What are the primary survival strategies of desert flora during prolonged drought conditions?"
+
+modified_test_text1 = "Invasive species like fish and mushrooms can disrupt local ecosystems. " \
+                      "What methods have been successful in eradicating them? Have any biological approaches proven effective?"
+
+modified_test_text2 = "Deforestation is a major environmental concern. " \
+                      "How would the global climate change if the rates of deforestation were reduced by 50% over the next 10 years?" \
+                      " Would this reduction have a significant impact?"
+
+modified_test_text3 = "Desert flora face extreme conditions during droughts. " \
+                      "What are their primary survival strategies during such prolonged periods?" \
+                      " How do these plants manage to sustain themselves?"
+
 
 def test1(t):
+    """
+    Loads separate spaCy models for core language processing and coreference resolution,
+    combines their pipelines while explicitly excluding certain pipes from the coreference model,
+    and processes text to check coreference resolution output.
+
+    This test illustrates an attempt to merge core linguistic features with coreference capabilities,
+    but may face issues with incompatible or missing annotations due to excluded pipes.
+
+    Parameters:
+    - t (str): Text to be processed.
+
+    Outputs:
+    - Prints spans detected by the coreference resolution, highlighting potential clustering issues.
+    """
     # NLP = spacy.load("en_core_web_trf")
     COREF = spacy.load("en_coreference_web_trf")
     COREF.disable_pipes("span_resolver", "span_cleaner")
@@ -43,6 +72,20 @@ def test1(t):
 
 
 def test2(t):
+    """
+    Loads coreference and core language processing models separately and merges them by adding coreference pipes first,
+    then core language pipes. This order ensures coreference annotations are preserved and then supplemented by core linguistic annotations.
+
+    However, this may lead to incomplete linguistic annotations as the core language model's pipes are added
+    after coreference pipes, which might not fully integrate.
+
+    Parameters:
+    - t (str): Text to be processed.
+
+    Outputs:
+    - Prints spans showing successful coreference clustering.
+    - Prints token indices, texts, parts of speech, and dependency labels, indicating potentially incorrect or missing linguistic annotations.
+    """
     COREF = spacy.load("en_coreference_web_trf")
     COREF.disable_pipes("span_resolver", "span_cleaner")
     CORE = spacy.load("en_core_web_trf")
@@ -64,6 +107,20 @@ def test2(t):
 
 
 def test3(t):
+    """
+    Demonstrates an advanced integration technique by loading a coreference model, replacing its transformer listener
+    with core language model components, and then removing the original transformer to optimize performance.
+
+    This approach is intended to fully integrate core linguistic processing with coreference resolution without
+    maintaining redundant transformers, potentially improving processing efficiency and annotation coherence.
+
+    Parameters:
+    - t (str): Text to be processed.
+
+    Outputs:
+    - Prints detected coreference spans.
+    - Prints detailed linguistic annotations for each token, showing effective integration of language processing.
+    """
     # move the 'transformer' from the coref pipeline to each component, then remove it
     nlp = spacy.load("en_coreference_web_trf")
     nlp.replace_listeners("transformer", "coref", ["model.tok2vec"])
@@ -82,7 +139,18 @@ def test3(t):
 
 def test4(t):
     """
-    Same results as test3 with 'complete_text' as input argument. But it is significantly faster.
+    Optimizes processing by loading both the core language and coreference models with a shared vocabulary,
+    and by processing the text first through the core model then passing the Doc object to the coreference model.
+
+    This method reduces overhead from duplicate tokenization and vocabulary management, leading to faster processing
+    while maintaining the integrity of both coreference and linguistic annotations.
+
+    Parameters:
+    - t (str): Text to be processed.
+
+    Outputs:
+    - Prints coreference spans.
+    - Prints detailed linguistic annotations, reflecting efficient and coherent processing of text.
     """
     nlp = spacy.load("en_core_web_trf")
     nlp_coref = spacy.load("en_coreference_web_trf", vocab=nlp.vocab)
@@ -93,6 +161,12 @@ def test4(t):
     doc = nlp_coref(doc)
 
     print(doc.spans)
+    for key in doc.spans:
+        if key.startswith('coref_clusters'):
+            print(f"Cluster ({key}):")
+            for mention in doc.spans[key]:
+                print(f" - Mention: {mention.text}, [Start: {mention.start}, End: {mention.end}]")
+
     print([(t.i, t.text, t.pos_, t.dep_) for t in doc])
 
 
@@ -100,5 +174,5 @@ if __name__ == "__main__":
     print(complete_text)
 
     t = time.time()
-    test3(complete_text)
+    test4(complete_text)
     print(time.time() - t)
